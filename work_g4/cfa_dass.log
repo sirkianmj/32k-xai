@@ -1,0 +1,36 @@
+Input: 39775 subjects x 42 items
+
+=== A: 3 correlated (Dep/Anx/Str) (0.4s) ===
+  DoF          816.0000
+  chi2         112410.9171
+  CFI          0.8978
+  TLI          0.8921
+  RMSEA        0.0586
+  GFI          0.8971
+  AGFI         0.8914
+
+=== B: unidimensional (0.3s) ===
+  DoF          819.0000
+  chi2         246909.8486
+  CFI          0.7746
+  TLI          0.7630
+  RMSEA        0.0869
+  GFI          0.7740
+  AGFI         0.7624
+
+=== C: bifactor (G + 3 specifics) (0.4s) ===
+  DoF          777.0000
+  chi2         75616.0244
+  CFI          0.9314
+  TLI          0.9240
+  RMSEA        0.0492
+  GFI          0.9308
+  AGFI         0.9233
+
+=== Comparison ===
+         model        chi2    df    CFI    TLI  RMSEA
+A:3-correlated 112410.9171 816.0 0.8978 0.8921 0.0586
+      B:unidim 246909.8486 819.0 0.7746 0.7630 0.0869
+    C:bifactor  75616.0244 777.0 0.9314 0.9240 0.0492
+
+Bifactor loadings saved: (136, 8)
