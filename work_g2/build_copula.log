@@ -1,0 +1,30 @@
+=== Loading source marginals ===
+  Atomic dim = 28, composites = ['D', 'general_distress']
+
+  RUN: A_equal_cov
+
+  RUN: B_uniform_corr
+
+  RUN: C_variance_prop
+
+
+########################################################################
+# SENSITIVITY — composite couplings with per-coupling literature SE
+########################################################################
+var_1            var_2  target  se_lit       A       B       C  spread  tol_combined  mean_err  robust  compatible
+    A general_distress  -0.038    0.04 -0.0265 -0.0266 -0.0263  0.0002        0.0808    0.0115    True        True
+    C general_distress  -0.320    0.03 -0.3129 -0.3134 -0.3140  0.0010        0.0610    0.0066    True        True
+    E general_distress  -0.250    0.03 -0.2446 -0.2452 -0.2457  0.0011        0.0610    0.0048    True        True
+    N general_distress   0.416    0.03  0.4125  0.4131  0.4136  0.0011        0.0610    0.0029    True        True
+    O general_distress  -0.084    0.03 -0.0777 -0.0780 -0.0782  0.0005        0.0610    0.0060    True        True
+
+========================================================================
+  FINAL G2 VERDICT (per-coupling literature SE)
+========================================================================
+  G2.1 atomic marginals:              PASS
+  G2.2 structural consistency:        PASS
+  G2.3a robustness across rules:      PASS
+  G2.3b literature compatibility:     PASS
+  OVERALL: PASS
+
+Saved canonical Rule A outputs to /home/kian/projects/xai_project/work_g2

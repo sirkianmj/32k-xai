@@ -1,0 +1,51 @@
+variable_1,variable_2,rho,effect_type,se_lit,N_source,citation,year,population,instruments,confidence,status
+O,C,0.055,spearman,,603322,work_ipip empirical,2026,open psychometrics,IPIP-50,high,empirical_direct
+O,E,0.175,spearman,,603322,work_ipip empirical,2026,open psychometrics,IPIP-50,high,empirical_direct
+O,A,0.102,spearman,,603322,work_ipip empirical,2026,open psychometrics,IPIP-50,high,empirical_direct
+O,N,-0.079,spearman,,603322,work_ipip empirical,2026,open psychometrics,IPIP-50,high,empirical_direct
+C,E,0.068,spearman,,603322,work_ipip empirical,2026,open psychometrics,IPIP-50,high,empirical_direct
+C,A,0.137,spearman,,603322,work_ipip empirical,2026,open psychometrics,IPIP-50,high,empirical_direct
+C,N,-0.235,spearman,,603322,work_ipip empirical,2026,open psychometrics,IPIP-50,high,empirical_direct
+E,A,0.306,spearman,,603322,work_ipip empirical,2026,open psychometrics,IPIP-50,high,empirical_direct
+E,N,-0.225,spearman,,603322,work_ipip empirical,2026,open psychometrics,IPIP-50,high,empirical_direct
+A,N,-0.040,spearman,,603322,work_ipip empirical,2026,open psychometrics,IPIP-50,high,empirical_direct
+S_M,S_P,0.530,spearman,,NA,Petrov et al.,2026,mixed,mixed,high,literature_meta_analysis
+S_M,S_N,0.420,spearman,,NA,Petrov et al.,2026,mixed,mixed,high,literature_meta_analysis
+S_P,S_N,0.390,spearman,,NA,Petrov et al.,2026,mixed,mixed,high,literature_meta_analysis
+DASS_Dep,DASS_Anx,0.670,spearman,,39775,work_dass empirical,2026,open psychometrics,DASS-42,high,empirical_direct
+DASS_Dep,DASS_Str,0.740,spearman,,39775,work_dass empirical,2026,open psychometrics,DASS-42,high,empirical_direct
+DASS_Anx,DASS_Str,0.802,spearman,,39775,work_dass empirical,2026,open psychometrics,DASS-42,high,empirical_direct
+general_distress,DASS_Dep,0.870,spearman,,NA,derived composite,2026,NA,DASS-42,medium,derived
+general_distress,DASS_Anx,0.850,spearman,,NA,derived composite,2026,NA,DASS-42,medium,derived
+general_distress,DASS_Str,0.890,spearman,,NA,derived composite,2026,NA,DASS-42,medium,derived
+N,general_distress,0.416,r,0.030,175,Kotov et al.,2010,clinical+community,NEO+IDAS,high,literature_meta_analysis
+E,general_distress,-0.250,r,0.030,175,Kotov et al.,2010,clinical+community,NEO+IDAS,high,literature_meta_analysis
+C,general_distress,-0.320,r,0.030,175,Kotov et al.,2010,clinical+community,NEO+IDAS,high,literature_meta_analysis
+A,general_distress,-0.038,r,0.040,175,Kotov et al.,2010,clinical+community,NEO+IDAS,high,literature_meta_analysis
+O,general_distress,-0.084,r,0.030,175,Kotov et al.,2010,clinical+community,NEO+IDAS,high,literature_meta_analysis
+A,S_M,-0.390,rho,,215,OBoyle et al.,2015,mixed,FFM+SD3,high,literature_meta_analysis
+A,S_P,-0.420,rho,,215,OBoyle et al.,2015,mixed,FFM+SD3,high,literature_meta_analysis
+A,S_N,-0.290,rho,,215,OBoyle et al.,2015,mixed,FFM+SD3,high,literature_meta_analysis
+C,S_M,-0.210,rho,,215,OBoyle et al.,2015,mixed,FFM+SD3,high,literature_meta_analysis
+C,S_P,-0.310,rho,,215,OBoyle et al.,2015,mixed,FFM+SD3,high,literature_meta_analysis
+C,S_N,0.090,rho,,215,OBoyle et al.,2015,mixed,FFM+SD3,high,literature_meta_analysis
+E,S_M,-0.010,rho,,215,OBoyle et al.,2015,mixed,FFM+SD3,high,literature_meta_analysis
+E,S_P,0.040,rho,,215,OBoyle et al.,2015,mixed,FFM+SD3,high,literature_meta_analysis
+E,S_N,0.400,rho,,215,OBoyle et al.,2015,mixed,FFM+SD3,high,literature_meta_analysis
+N,S_M,0.090,rho,,215,OBoyle et al.,2015,mixed,FFM+SD3,high,literature_meta_analysis
+N,S_P,0.050,rho,,215,OBoyle et al.,2015,mixed,FFM+SD3,high,literature_meta_analysis
+N,S_N,-0.160,rho,,215,OBoyle et al.,2015,mixed,FFM+SD3,high,literature_meta_analysis
+O,S_M,-0.040,rho,,215,OBoyle et al.,2015,mixed,FFM+SD3,high,literature_meta_analysis
+O,S_P,0.040,rho,,215,OBoyle et al.,2015,mixed,FFM+SD3,high,literature_meta_analysis
+O,S_N,0.200,rho,,215,OBoyle et al.,2015,mixed,FFM+SD3,high,literature_meta_analysis
+a_inhib,S_P,0.143,r,0.055,1394,Gillespie et al.,2022,mixed,go/no-go+stop-signal,high,literature_meta_analysis
+k_DD,C,NA,pearson,,1206,Yeh et al.,2021,HCP,MCQ+NEO-FFI,medium,empirical_null
+k_DD,N,NA,pearson,,1206,Yeh et al.,2021,HCP,MCQ+NEO-FFI,medium,empirical_null
+w_MB,S_P,NA,NA,,36,Hula et al.,2013,community,Bayesian RL+PPI,low,indirect_evidence
+k_DD,S_P,NA,NA,,NA,West et al.,2023,mixed,MCQ+PCL-R,low,direction_supported
+lambda_ineq,A,NA,NA,,NA,Hilbig et al.,2013,community,UG+HEXACO,low,direction_supported
+w_MB,C,NA,NA,,NA,none,NA,NA,NA,NA,unverified
+w_MB,N,NA,NA,,NA,none,NA,NA,NA,NA,unverified
+a_inhib,C,NA,NA,,NA,none,NA,NA,NA,NA,unverified
+a_inhib,N,NA,NA,,NA,none,NA,NA,NA,NA,unverified
+lambda_ineq,N,NA,NA,,NA,none,NA,NA,NA,NA,unverified

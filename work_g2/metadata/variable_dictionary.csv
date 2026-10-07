@@ -1,0 +1,31 @@
+spec_parameter,spec_range,work_dir,source_column,raw_dataset,transform,tier,notes
+O,[0 1],work_ipip,O,IPIP-FFM-data-8Nov2018,(sum-10)/40,empirical,big five openness
+C,[0 1],work_ipip,C,IPIP-FFM-data-8Nov2018,(sum-10)/40,empirical,big five conscientiousness
+E,[0 1],work_ipip,E,IPIP-FFM-data-8Nov2018,(sum-10)/40,empirical,big five extraversion
+A,[0 1],work_ipip,A,IPIP-FFM-data-8Nov2018,(sum-10)/40,empirical,big five agreeableness
+N,[0 1],work_ipip,N,IPIP-FFM-data-8Nov2018,(sum-10)/40,empirical,big five neuroticism
+D,[0 1],work_sd3,_composite_,SD3,mean(Mach_n,Psyc_n,Narc_n),derived,general dark core
+S_M,[0 1],work_sd3,Mach_n,SD3,(sum-9)/36,empirical,machiavellianism
+S_P,[0 1],work_sd3,Psyc_n,SD3,(sum-9)/36,empirical,psychopathy
+S_N,[0 1],work_sd3,Narc_n,SD3,(sum-9)/36,empirical,narcissism
+theta_T,[0 3],_,_,_,lognormal prior,synthetic,literature prior
+u_U,[0 3],_,_,_,lognormal prior,synthetic,literature prior
+alpha_R,[0 1],work_n500,alpha,XAI_Markov_TwoStep_Data,MLE,empirical,COLLAPSED-LR
+beta_choice,[0 10],work_n500,beta,XAI_Markov_TwoStep_Data,MLE,empirical,COLLAPSED-BETA
+phi_per,[0 3],work_n500,persev,XAI_Markov_TwoStep_Data,MLE,empirical,perseveration
+w_MB,[0 1],work_n500,w,XAI_Markov_TwoStep_Data,MLE,empirical,model-based arbitration
+k_DD,(0 inf),work_dd,log_k,XAI_Delay_Discounting_Data,log(k),empirical,log transformed
+eta_vol,[0 1],_,_,_,lognormal prior,synthetic,literature prior
+omega_social,[0 3],_,_,_,lognormal prior,synthetic,literature prior
+lambda_ineq,[0 3],work_fs,alpha,XAI_Social_Games_Data,MLE,empirical,SIMPLIFIED MODEL envy only
+lambda_norm,[0 3],_,_,_,lognormal prior,synthetic,literature prior
+s_spite,[0 3],_,_,_,lognormal prior,synthetic,literature prior
+tau_sens,[0 3],_,_,_,lognormal prior,synthetic,literature prior
+gamma_sal,[0 3],_,_,_,lognormal prior,synthetic,literature prior
+kappa_ctx,[0 1],_,_,_,beta prior,synthetic,literature prior
+m_t,[-3 3],_,_,_,normal prior,synthetic,AR(1) state model
+a_inhib,(0 inf),work_ssrt,ssrt,XAI_Risk_Impulsivity_Data,integration method,empirical,SSRT index seconds
+general_distress,[0 1],work_g4,_composite_,XAI_Mental_Health_DASS,mean(DASS_Dep,DASS_Anx,DASS_Str),derived,modulator of w_MB
+DASS_Dep,[0 1],work_dass,D42_Dep_n,XAI_Mental_Health_DASS,raw/42,secondary,secondary modulator
+DASS_Anx,[0 1],work_dass,D42_Anx_n,XAI_Mental_Health_DASS,raw/42,secondary,secondary modulator
+DASS_Str,[0 1],work_dass,D42_Str_n,XAI_Mental_Health_DASS,raw/42,secondary,secondary modulator

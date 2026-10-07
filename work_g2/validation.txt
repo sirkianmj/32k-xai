@@ -1,0 +1,9 @@
+N_AGENTS=32000
+atomic_d=28
+g21_pass=True
+g22_pass=True
+g23_robust=True
+g23_compatible=True
+overall=PASS
+se_synth=0.00559
+per_coupling_lit_se=yes

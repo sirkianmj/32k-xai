@@ -1,0 +1,31 @@
+parameter,n,family,ks_stat,ks_p,aic
+A,603322,empirical (dense),,,
+C,603322,empirical (dense),,,
+D,17740,empirical (dense),,,
+DASS_Anx,39775,empirical (dense),,,
+DASS_Dep,39775,empirical (dense),,,
+DASS_Str,39775,empirical (dense),,,
+E,603322,empirical (dense),,,
+N,603322,empirical (dense),,,
+O,603322,empirical (dense),,,
+S_M,17740,empirical (dense),,,
+S_N,17740,empirical (dense),,,
+S_P,17740,empirical (dense),,,
+a_inhib,264,lognorm,0.04996589545647723,0.5089749316143051,-699.4695607451515
+alpha_R,149,beta,0.1619032159132866,0.0007022006832050838,-79.41525570564616
+beta_choice,149,lognorm,0.0661796339720544,0.5102388968880902,672.853952466256
+eta_vol,20000,empirical (dense),,,
+gamma_sal,20000,empirical (dense),,,
+general_distress,39775,empirical (dense),,,
+k_DD,476,norm,0.09503736207669977,0.0003414723799515957,1973.3334147014714
+kappa_ctx,20000,empirical (dense),,,
+lambda_ineq,111,lognorm,0.5233607540822266,7.773273724827398e-29,-18381.7211029347
+lambda_norm,20000,empirical (dense),,,
+m_t,20000,empirical (dense),,,
+omega_social,20000,empirical (dense),,,
+phi_per,149,norm,0.10628283460132193,0.06408158448093293,61.09702519369668
+s_spite,20000,empirical (dense),,,
+tau_sens,20000,empirical (dense),,,
+theta_T,20000,empirical (dense),,,
+u_U,20000,empirical (dense),,,
+w_MB,149,beta,0.08264002868936282,0.24682899723608842,-100.65018622810086
