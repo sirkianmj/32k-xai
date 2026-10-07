@@ -1,0 +1,51 @@
+Input: 17740 subjects x 27 items
+
+=== A: three correlated factors (0.3s) ===
+  DoF             321.0000
+  chi2            26228.8043
+  chi2 p-value    0.0000
+  CFI             0.8479
+  TLI             0.8337
+  RMSEA           0.0675
+  GFI             0.8463
+  AGFI            0.8319
+  NFI             0.8463
+  AIC             111.0430
+  BIC             554.7069
+  LogLik          1.4785
+
+=== B: unidimensional (0.3s) ===
+  DoF             324.0000
+  chi2            38914.0337
+  chi2 p-value    0.0000
+  CFI             0.7734
+  TLI             0.7545
+  RMSEA           0.0819
+  GFI             0.7720
+  AGFI            0.7530
+  NFI             0.7720
+  AIC             103.6128
+  BIC             523.9260
+  LogLik          2.1936
+
+=== C: bifactor (0.3s) ===
+  DoF             297.0000
+  chi2            17175.0903
+  chi2 p-value    0.0000
+  CFI             0.9009
+  TLI             0.8829
+  RMSEA           0.0566
+  GFI             0.8994
+  AGFI            0.8811
+  NFI             0.8994
+  AIC             160.0637
+  BIC             790.5334
+  LogLik          0.9682
+
+=== Comparison ===
+           model       chi2    CFI    TLI  RMSEA      AIC      BIC
+  A:3-correlated 26228.8043 0.8479 0.8337 0.0675 111.0430 554.7069
+B:unidimensional 38914.0337 0.7734 0.7545 0.0819 103.6128 523.9260
+      C:bifactor 17175.0903 0.9009 0.8829 0.0566 160.0637 790.5334
+
+Bifactor loadings save failed: module 'semopy' has no attribute 'inspect'
