@@ -1,0 +1,40 @@
+Device: cuda:0  Backend: gpu
+copula: 30 columns
+
+===== N = 32,000 =====
+  graph in 0.18s  deg[3,10] mean=6.000
+  wall = 1.969s  VRAM = 13.8 MB
+
+===== N = 100,000 =====
+  graph in 0.55s  deg[3,10] mean=6.000
+  wall = 2.994s  VRAM = 42.7 MB
+
+===== N = 500,000 =====
+  graph in 2.77s  deg[3,11] mean=6.000
+  wall = 5.760s  VRAM = 206.1 MB
+
+===== N = 1,000,000 =====
+  graph in 5.53s  deg[3,11] mean=6.000
+  wall = 9.613s  VRAM = 408.3 MB
+
+===== N = 2,000,000 =====
+  graph in 10.86s  deg[3,12] mean=6.000
+  wall = 18.105s  VRAM = 864.5 MB
+
+
+=== SCALE LADDER (engine_v5, deep agent) ===
+         N    wall_s    vram_MB     coop     gini     dist       a2   reward
+    32,000     1.969       13.8   0.9611   0.5627   0.4638   2.1110   0.5014
+   100,000     2.994       42.7   0.9737   0.5631   0.4632   2.1119   0.4895
+   500,000     5.760      206.1   0.9623   0.5629   0.4629   2.1116   0.4947
+ 1,000,000     9.613      408.3   0.9596   0.5624   0.4629   2.1100   0.4823
+ 2,000,000    18.105      864.5   0.9610   0.5624   0.4628   2.1096   0.4845
+
+=== SCALE-INVARIANCE vs N=32000 ===
+         N    RMSE_coop    RMSE_gini      RMSE_a2
+   100,000      0.01407      0.00113      0.00473
+   500,000      0.01283      0.00121      0.00488
+ 1,000,000      0.01289      0.00140      0.00478
+ 2,000,000      0.01276      0.00149      0.00491
+
+Saved: /home/kian/projects/xai_project/work_env/scale_v5_results.json
