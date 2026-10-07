@@ -1,0 +1,90 @@
+Device: cuda:0  Backend: gpu
+Screen N=10000  Full N=32000  Ticks=500
+
+=== SCREEN (N=10000) ===
+[sweep] TAU_BASE        ×0.5  = 1.000    coop=0.9675 gini=0.4026 a2=2.0981 wall=2.51s
+[sweep] TAU_BASE        ×1.0  = 2.000    coop=0.9882 gini=0.5635 a2=2.1065 wall=2.61s
+[sweep] TAU_BASE        ×2.0  = 4.000    coop=1.0000 gini=0.7159 a2=2.1126 wall=2.50s
+
+[sweep] KAPPA_DECAY     ×0.5  = 0.400    coop=0.9875 gini=0.5546 a2=2.1034 wall=2.46s
+[sweep] KAPPA_DECAY     ×1.0  = 0.800    coop=0.9882 gini=0.5635 a2=2.1065 wall=2.65s
+[sweep] KAPPA_DECAY     ×2.0  = 1.600    coop=0.9884 gini=0.5712 a2=2.1131 wall=2.50s
+
+[sweep] C_BOOST         ×0.5  = 0.150    coop=0.9880 gini=0.5659 a2=2.1082 wall=2.48s
+[sweep] C_BOOST         ×1.0  = 0.300    coop=0.9882 gini=0.5635 a2=2.1065 wall=2.66s
+[sweep] C_BOOST         ×2.0  = 0.600    coop=0.9873 gini=0.5581 a2=2.1046 wall=2.47s
+
+[sweep] E_ENGAGE        ×0.5  = 0.250    coop=1.0000 gini=0.5903 a2=2.1082 wall=2.65s
+[sweep] E_ENGAGE        ×1.0  = 0.500    coop=0.9882 gini=0.5635 a2=2.1065 wall=2.50s
+[sweep] E_ENGAGE        ×2.0  = 1.000    coop=0.9693 gini=0.4891 a2=2.1002 wall=2.66s
+
+[sweep] A_INHIB         ×0.5  = 0.100    coop=0.9888 gini=0.5550 a2=2.1080 wall=2.65s
+[sweep] A_INHIB         ×1.0  = 0.200    coop=0.9882 gini=0.5635 a2=2.1065 wall=2.67s
+[sweep] A_INHIB         ×2.0  = 0.400    coop=0.9851 gini=0.5760 a2=2.1057 wall=2.49s
+
+[sweep] T_THREAT        ×0.5  = 0.250    coop=0.9701 gini=0.4470 a2=2.1011 wall=2.47s
+[sweep] T_THREAT        ×1.0  = 0.500    coop=0.9882 gini=0.5635 a2=2.1065 wall=2.47s
+[sweep] T_THREAT        ×2.0  = 1.000    coop=1.0000 gini=0.6357 a2=2.1127 wall=2.47s
+
+[sweep] U_UNCERT        ×0.5  = 0.150    coop=0.9767 gini=0.4970 a2=2.1053 wall=2.64s
+[sweep] U_UNCERT        ×1.0  = 0.300    coop=0.9882 gini=0.5635 a2=2.1065 wall=2.65s
+[sweep] U_UNCERT        ×2.0  = 0.600    coop=1.0000 gini=0.6427 a2=2.1104 wall=2.49s
+
+[sweep] SM_DEFECT       ×0.5  = 0.250    coop=0.9865 gini=0.5677 a2=1.9693 wall=2.66s
+[sweep] SM_DEFECT       ×1.0  = 0.500    coop=0.9882 gini=0.5635 a2=2.1065 wall=2.48s
+[sweep] SM_DEFECT       ×2.0  = 1.000    coop=0.9884 gini=0.5560 a2=2.2611 wall=2.65s
+
+[sweep] SN_STATUS       ×0.5  = 0.150    coop=0.9878 gini=0.5655 a2=2.0530 wall=2.65s
+[sweep] SN_STATUS       ×1.0  = 0.300    coop=0.9882 gini=0.5635 a2=2.1065 wall=2.52s
+[sweep] SN_STATUS       ×2.0  = 0.600    coop=0.9882 gini=0.5602 a2=2.1893 wall=2.62s
+
+[sweep] SP_PUNISH       ×0.5  = 0.150    coop=0.9882 gini=0.5635 a2=2.1065 wall=2.49s
+[sweep] SP_PUNISH       ×1.0  = 0.300    coop=0.9882 gini=0.5635 a2=2.1065 wall=2.48s
+[sweep] SP_PUNISH       ×2.0  = 0.600    coop=0.9882 gini=0.5635 a2=2.1065 wall=2.46s
+
+[sweep] SAL_GAIN        ×0.5  = 0.100    coop=0.9873 gini=0.5628 a2=2.1013 wall=2.46s
+[sweep] SAL_GAIN        ×1.0  = 0.200    coop=0.9882 gini=0.5635 a2=2.1065 wall=2.65s
+[sweep] SAL_GAIN        ×2.0  = 0.400    coop=0.9891 gini=0.5613 a2=2.1020 wall=2.48s
+
+[sweep] LAMBDA_NORM_A   ×0.5  = 0.500    coop=0.9647 gini=0.5641 a2=2.1074 wall=2.47s
+[sweep] LAMBDA_NORM_A   ×1.0  = 1.000    coop=0.9882 gini=0.5635 a2=2.1065 wall=2.65s
+[sweep] LAMBDA_NORM_A   ×2.0  = 2.000    coop=1.0000 gini=0.5621 a2=2.1069 wall=2.47s
+
+[sweep] N_DISTRESS      ×0.5  = 0.500    coop=0.9882 gini=0.5634 a2=2.1064 wall=2.65s
+[sweep] N_DISTRESS      ×1.0  = 1.000    coop=0.9882 gini=0.5635 a2=2.1065 wall=2.48s
+[sweep] N_DISTRESS      ×2.0  = 2.000    coop=0.9882 gini=0.5634 a2=2.1065 wall=2.63s
+
+[sweep] TRUST_K         ×0.5  = 1.500    coop=1.0000 gini=0.5643 a2=2.0119 wall=2.50s
+[sweep] TRUST_K         ×1.0  = 3.000    coop=0.9882 gini=0.5635 a2=2.1065 wall=2.47s
+[sweep] TRUST_K         ×2.0  = 6.000    coop=0.9818 gini=0.5419 a2=2.1217 wall=2.64s
+
+=== SENSITIVITY (max |Δ| from base) ===
+  TAU_BASE         Δcoop=0.0207  Δgini=0.1609  Δa2=0.0084  score=0.1900
+  KAPPA_DECAY      Δcoop=0.0007  Δgini=0.0089  Δa2=0.0066  score=0.0162
+  C_BOOST          Δcoop=0.0009  Δgini=0.0054  Δa2=0.0019  score=0.0082
+  E_ENGAGE         Δcoop=0.0189  Δgini=0.0743  Δa2=0.0063  score=0.0996
+  A_INHIB          Δcoop=0.0032  Δgini=0.0125  Δa2=0.0015  score=0.0171
+  T_THREAT         Δcoop=0.0182  Δgini=0.1164  Δa2=0.0062  score=0.1408
+  U_UNCERT         Δcoop=0.0118  Δgini=0.0792  Δa2=0.0039  score=0.0949
+  SM_DEFECT        Δcoop=0.0017  Δgini=0.0075  Δa2=0.1546  score=0.1638
+  SN_STATUS        Δcoop=0.0004  Δgini=0.0033  Δa2=0.0828  score=0.0865
+  SP_PUNISH        Δcoop=0.0000  Δgini=0.0000  Δa2=0.0000  score=0.0000
+  SAL_GAIN         Δcoop=0.0009  Δgini=0.0021  Δa2=0.0052  score=0.0082
+  LAMBDA_NORM_A    Δcoop=0.0235  Δgini=0.0014  Δa2=0.0009  score=0.0259
+  N_DISTRESS       Δcoop=0.0000  Δgini=0.0001  Δa2=0.0001  score=0.0002
+  TRUST_K          Δcoop=0.0118  Δgini=0.0216  Δa2=0.0946  score=0.1280
+
+=== TOP-3 LOAD-BEARING: ['TAU_BASE', 'SM_DEFECT', 'T_THREAT'] ===
+[sweep] TAU_BASE        ×0.5  = 1.000    coop=0.9731 gini=0.4023 a2=2.0995 wall=2.01s
+[sweep] TAU_BASE        ×1.0  = 2.000    coop=0.9611 gini=0.5627 a2=2.1110 wall=1.96s
+[sweep] TAU_BASE        ×2.0  = 4.000    coop=0.9571 gini=0.7118 a2=2.1107 wall=1.93s
+
+[sweep] SM_DEFECT       ×0.5  = 0.250    coop=0.9241 gini=0.5666 a2=1.9741 wall=2.00s
+[sweep] SM_DEFECT       ×1.0  = 0.500    coop=0.9611 gini=0.5627 a2=2.1110 wall=1.87s
+[sweep] SM_DEFECT       ×2.0  = 1.000    coop=0.9826 gini=0.5562 a2=2.2677 wall=2.00s
+
+[sweep] T_THREAT        ×0.5  = 0.250    coop=0.9740 gini=0.4468 a2=2.1064 wall=1.90s
+[sweep] T_THREAT        ×1.0  = 0.500    coop=0.9611 gini=0.5627 a2=2.1110 wall=1.97s
+[sweep] T_THREAT        ×2.0  = 1.000    coop=0.9286 gini=0.6292 a2=2.1120 wall=1.98s
+
+Saved: /home/kian/projects/xai_project/work_env/sweep_p2h.json
