@@ -1,0 +1,39 @@
+Rows read:                  18192
+After [1,5]-integer filter: 17740
+Elapsed:                    0.2s
+
+=== Cronbach's alpha (reverse-keyed) ===
+  Machiavellianism  0.8606   (published ~0.71-0.79)
+  Narcissism        0.8050   (published ~0.71-0.77)
+  Psychopathy       0.7978   (published ~0.63-0.75)
+
+=== Subscales raw (range 9-45) ===
+            Mach       Narc       Psyc
+count  17740.000  17740.000  17740.000
+mean      33.418     27.633     25.335
+std        7.111      6.926      7.260
+min        9.000      9.000      9.000
+25%       29.000     23.000     20.000
+50%       34.000     27.000     25.000
+75%       39.000     32.000     30.000
+max       45.000     45.000     45.000
+
+=== Subscales normalized (range 0-1) ===
+           Mach_n      Narc_n      Psyc_n
+count  17740.0000  17740.0000  17740.0000
+mean       0.6783      0.5176      0.4538
+std        0.1975      0.1924      0.2017
+min        0.0000      0.0000      0.0000
+25%        0.5556      0.3889      0.3056
+50%        0.6944      0.5000      0.4444
+75%        0.8333      0.6389      0.5833
+max        1.0000      1.0000      1.0000
+
+=== Subscale correlations ===
+       Mach   Narc   Psyc
+Mach  1.000  0.514  0.673
+Narc  0.514  1.000  0.567
+Psyc  0.673  0.567  1.000
+
+Range checks OK
+Saved: sd3_items_raw.csv + sd3_items_revkeyed.csv + sd3_subscales.csv/.pkl
