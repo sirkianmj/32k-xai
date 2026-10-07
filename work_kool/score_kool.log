@@ -1,0 +1,6 @@
+=== Loading ===
+  200 subjects loaded
+
+=== Fitting 200 real subjects (parallel, -1 jobs) ===
+[Parallel(n_jobs=-1)]: Using backend LokyBackend with 6 concurrent workers.
+[Parallel(n_jobs=-1)]: Done  38 tasks      | elapsed:  1.1min

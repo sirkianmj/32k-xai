@@ -1,0 +1,10 @@
+N_SIM=500
+T_TRIALS=200
+rho_w=0.8622
+p_w=3.404e-149
+bias_w=-0.0174
+rmse_w=0.1544
+rho_lr=0.9182
+rho_lam=0.5601
+rho_b=0.8563
+pass=YES
