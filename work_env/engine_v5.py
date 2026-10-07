@@ -160,8 +160,14 @@ def make_step(neighbors, P):
 
         # ---- 5. stage-2 action (unified 4 categories) ----
         q_s2_actions = Q_s2[idx, s2, :]  # (N, 4)
-        # Dark Triad bias: shift logits toward low-index (selfish) actions
-        dark_bias = -SM_b - SN_b + SP_b * 0.0
+        # S_P (psychopathy): reduces punishment sensitivity. Negative Q values
+        # are pulled toward zero by factor (1 - SP_b*0.5). Positive Q unaffected.
+        q_s2_actions = jnp.where(
+            q_s2_actions < 0.0,
+            q_s2_actions * (1.0 - SP_b[:, None] * 0.5),
+            q_s2_actions)
+        # S_M (Machiavellianism) + S_N (narcissism): bias toward selfish (low-index)
+        dark_bias = -SM_b - SN_b
         action_bonus = jnp.stack(
             [dark_bias, dark_bias * 0.5, jnp.zeros_like(dark_bias), jnp.zeros_like(dark_bias)],
             axis=-1)
@@ -229,23 +235,29 @@ def make_step(neighbors, P):
         interacting = (a1 == 0) & (a1[chosen] == 0) & is_mutual
         reward = jnp.where(interacting, reward, 0.0)
 
-        # ---- 9. Q updates ----
+        # ---- 9. Q updates (gated on interacting) ----
+        # Non-interacting agents did not act on the environment; their
+        # Q-values must not be nudged toward zero.
+        update_mask = interacting.astype(jnp.float32)
+
         Q_s2_prev = Q_s2[idx, s2, a2]
-        Q_s2_new_ = jnp.clip(Q_s2_prev + lr * (reward - Q_s2_prev), -GRAD_CLIP, GRAD_CLIP)
+        Q_s2_new_ = jnp.clip(
+            Q_s2_prev + update_mask * lr * (reward - Q_s2_prev),
+            -GRAD_CLIP, GRAD_CLIP)
         Q_s2_new = Q_s2.at[idx, s2, a2].set(Q_s2_new_)
 
         Q_mf_prev = Q_mf[idx, a1]
         v_next = jnp.max(Q_mf, axis=-1)
         Q_mf_new_ = jnp.clip(
-            Q_mf_prev + lr * (reward + gamma * v_next - Q_mf_prev),
+            Q_mf_prev + update_mask * lr * (reward + gamma * v_next - Q_mf_prev),
             -GRAD_CLIP, GRAD_CLIP)
         Q_mf_new = Q_mf.at[idx, a1].set(Q_mf_new_)
 
-        # ---- 10. P_hat update ----
+        # ---- 10. P_hat update (gated on interacting) ----
         one_hot = jnp.stack([1.0 - s2.astype(jnp.float32),
                              s2.astype(jnp.float32)], axis=-1)
         P_at = P_hat[idx, a1, :]
-        P_upd = P_at + eta_vol[:, None] * (one_hot - P_at)
+        P_upd = P_at + update_mask[:, None] * eta_vol[:, None] * (one_hot - P_at)
         P_upd = jnp.clip(P_upd, 1e-4, 1.0)
         P_upd = P_upd / jnp.sum(P_upd, axis=-1, keepdims=True)
         P_hat_new = P_hat.at[idx, a1, :].set(P_upd)
