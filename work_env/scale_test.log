@@ -1,0 +1,40 @@
+Device: cuda:0  Backend: gpu
+copula: (32000, 4)  mu(alpha)=0.3661  mu(beta)=4.6474  mu(w_MB)=0.6210  mu(dist)=0.4625
+
+===== N = 32,000 =====
+  graph built in 0.16s  degree min=3 max=10 mean=6.000
+  wall = 1.590s  VRAM_use_MB = 5.6
+
+===== N = 100,000 =====
+  graph built in 0.55s  degree min=3 max=10 mean=6.000
+  wall = 1.786s  VRAM_use_MB = 17.5
+
+===== N = 500,000 =====
+  graph built in 2.79s  degree min=3 max=11 mean=6.000
+  wall = 4.360s  VRAM_use_MB = 102.5
+
+===== N = 1,000,000 =====
+  graph built in 5.41s  degree min=3 max=11 mean=6.000
+  wall = 6.714s  VRAM_use_MB = 205.0
+
+===== N = 2,000,000 =====
+  graph built in 11.09s  degree min=3 max=12 mean=6.000
+  wall = 11.748s  VRAM_use_MB = 412.1
+
+
+=== SCALE LADDER SUMMARY ===
+         N    wall_s    vram_MB     coop     gini   distress   defect   reward
+    32,000     1.590        5.6   0.7683   0.1724    0.00635      209   0.2166
+   100,000     1.786       17.5   0.7919   0.1734    0.00636      577   0.2196
+   500,000     4.360      102.5   0.7788   0.1730    0.00631     3098   0.2181
+ 1,000,000     6.714      205.0   0.7742   0.1732    0.00635     6278   0.2152
+ 2,000,000    11.748      412.1   0.7754   0.1734    0.00633    12491   0.2156
+
+=== SCALE-INVARIANCE vs N=32000 (per-tick RMSE, normalised) ===
+         N    RMSE_coop    RMSE_gini    RMSE_dist   max|dCoop|   max|dGini|
+   100,000      0.01575      0.00103      0.00008      0.05740      0.00266
+   500,000      0.01423      0.00071      0.00014      0.04164      0.00310
+ 1,000,000      0.01404      0.00092      0.00013      0.04197      0.00288
+ 2,000,000      0.01395      0.00093      0.00014      0.04362      0.00305
+
+Saved: /home/kian/projects/xai_project/work_env/scale_test_results.json
