@@ -1,0 +1,36 @@
+Parsed: 9791 trials, 111 subjects, 4.1s
+Fits done: 111 subjects, 6.8s
+
+=== Real-data estimates ===
+          alpha       tau  accept_rate  n_trials
+count  111.0000  111.0000     111.0000  111.0000
+mean     0.1036   25.0235       0.6550   88.2072
+std      0.2940   11.4911       0.2300   16.9910
+min      0.0000    3.7103       0.2660   42.0000
+25%      0.0334   15.1056       0.4865   94.0000
+50%      0.0365   26.5994       0.5745   96.0000
+75%      0.0720   34.8944       0.9323   96.0000
+max      1.9932   45.9436       1.0000   96.0000
+
+alpha at lower bound 0:  13 / 111
+alpha at upper bound 10: 0 / 111
+corr(alpha, accept_rate) = -0.3026
+
+
+=== Recovery test N=500 ===
+  sim 0/500  elapsed 0.0s
+  sim 50/500  elapsed 0.4s
+  sim 100/500  elapsed 0.8s
+  sim 150/500  elapsed 1.1s
+  sim 200/500  elapsed 1.4s
+  sim 250/500  elapsed 1.7s
+  sim 300/500  elapsed 2.2s
+  sim 350/500  elapsed 2.5s
+  sim 400/500  elapsed 3.0s
+  sim 450/500  elapsed 3.4s
+
+N_valid = 500/500
+alpha recovery: rho=0.4919  p=7.951e-32  bias=1.0545  rmse=2.8581
+Pass (rho>0.5): NO
+
+Saved to /home/kian/projects/xai_project/work_fs

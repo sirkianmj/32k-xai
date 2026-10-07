@@ -1,0 +1,6 @@
+N_SIM=500
+N_valid=500
+rho_alpha=0.4919
+p_alpha=7.951e-32
+bias_alpha=1.0545
+rmse_alpha=2.8581

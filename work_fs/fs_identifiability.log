@@ -1,0 +1,9 @@
+=== Recovery by true-alpha regime (same design as UGR, 500 sims each) ===
+  narrow_low  [0.02,0.30]           N=500  rho=0.8096  bias=+0.0409  rmse=0.0761  (8.4s)
+  narrow_low  [0.02,0.50]           N=500  rho=0.7198  bias=-0.0067  rmse=0.0796  (7.6s)
+  lowmid      [0.20,0.80]           N=500  rho=0.7581  bias=+3.0571  rmse=5.0470  (3.8s)
+  mid         [0.50,1.50]           N=500  rho=0.1025  bias=+5.5976  rmse=6.7565  (1.4s)
+  wide        [0.02,3.00]           N=500  rho=0.4682  bias=+3.8538  rmse=5.5185  (2.4s)
+  log-uniform [0.02,3.00]           N=500  rho=0.9249  bias=+2.0202  rmse=4.0308  (6.0s)
+
+Saved to /home/kian/projects/xai_project/work_fs/fs_identifiability.txt
