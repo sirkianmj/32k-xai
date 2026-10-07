@@ -1,27 +1,41 @@
 Found 266 stop-signal files
 Processed: 266   Skipped: 0
-Elapsed:   1.1s
+Elapsed:   1.7s
 
 === Per-subject distributions ===
-       n_go_correct  n_stop  p_respond  mean_ssd_all  go_rt_mean      ssrt
-count      266.0000   266.0   266.0000      266.0000    265.0000  264.0000
-mean        92.3421    32.0     0.5191        0.2711      0.5178    0.2279
-std          7.9232     0.0     0.0942        0.1114      0.1169    0.0613
-min          0.0000    32.0     0.3125        0.0073      0.3202    0.1113
-25%         92.0000    32.0     0.4688        0.1986      0.4380    0.1849
-50%         95.0000    32.0     0.5312        0.2686      0.4900    0.2171
-75%         96.0000    32.0     0.5625        0.3417      0.5775    0.2605
-max         96.0000    32.0     1.0000        0.7632      1.0061    0.4228
+       n_go_responded  n_go_omissions  n_go_choice_err  n_stop  p_respond  mean_ssd_all  go_rt_mean      ssrt
+count        266.0000        266.0000            266.0   266.0   266.0000      266.0000    265.0000  264.0000
+mean          92.3421          1.7406              0.0    32.0     0.5191        0.2711      0.5178    0.2338
+std            7.9232          5.0720              0.0     0.0     0.0942        0.1114      0.1169    0.0782
+min            0.0000          0.0000              0.0    32.0     0.3125        0.0073      0.3202    0.1113
+25%           92.0000          0.0000              0.0    32.0     0.4688        0.1986      0.4380    0.1851
+50%           95.0000          0.0000              0.0    32.0     0.5312        0.2686      0.4900    0.2174
+75%           96.0000          1.0000              0.0    32.0     0.5625        0.3417      0.5775    0.2644
+max           96.0000         46.0000              0.0    32.0     1.0000        0.7632      1.0061    0.9437
 
 === SSRT quality ===
 SSRT computable:  264 / 266
-Flagged subjects: 7 / 266
+Flagged (any):    19 / 266
+Race violation:   14 / 266
 
 === Flag breakdown ===
-  P_HIGH        6
-  FEW_GO        1
+  RACE_VIOLATION    14
+  P_HIGH            6
+  FEW_GO            1
 
-=== SSRT distribution (valid only) ===
+=== SSRT canonical (integration, with replacement) ===
+count    264.0000
+mean       0.2338
+std        0.0782
+min        0.1113
+5%         0.1476
+25%        0.1851
+50%        0.2174
+75%        0.2644
+95%        0.3528
+max        0.9437
+
+=== SSRT sensitivity: no replacement ===
 count    264.0000
 mean       0.2279
 std        0.0613
@@ -33,21 +47,23 @@ min        0.1113
 95%        0.3528
 max        0.4228
 
-SSRT <= 0 (implausible):  0
-SSRT >  1.0s (implausible): 0
-
-=== SSRT with positive SSD only (sensitivity) ===
+=== SSRT sensitivity: positive SSD only ===
 count    264.0000
-mean       0.2017
-std        0.0705
+mean       0.2076
+std        0.0845
 min       -0.0122
 5%         0.1006
 25%        0.1579
-50%        0.1933
-75%        0.2454
-95%        0.3219
-max        0.4037
+50%        0.1954
+75%        0.2470
+95%        0.3325
+max        0.8795
 
-corr(ssrt, ssrt_pos) = 0.8778
+corr(ssrt, ssrt_noreplace) = 0.8965
+corr(ssrt, ssrt_pos)       = 0.9168
 
-Saved: ssrt_subjects.csv + .pkl (266 rows)
+ssrt <= 0:           0
+ssrt_noreplace <= 0: 0
+ssrt_pos <= 0:       1
+
+Saved: 266 rows -> ssrt_subjects.csv + .pkl
