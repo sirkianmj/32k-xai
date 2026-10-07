@@ -1,0 +1,32 @@
+Parameter,Construct,Work dir,Raw dataset,License / DUA status,Provenance notes,Has evidence
+O,Openness,work_ipip,IPIP-FFM-data-8Nov2018,Open Psychometrics public,"score_ipip.py; 603,322 IPC=1 subjects",True
+C,Conscientiousness,work_ipip,IPIP-FFM-data-8Nov2018,Open Psychometrics public,score_ipip.py; 50-item Big Five,True
+E,Extraversion,work_ipip,IPIP-FFM-data-8Nov2018,Open Psychometrics public,score_ipip.py,True
+A,Agreeableness,work_ipip,IPIP-FFM-data-8Nov2018,Open Psychometrics public,score_ipip.py,True
+N,Neuroticism,work_ipip,IPIP-FFM-data-8Nov2018,Open Psychometrics public,score_ipip.py; anti-double-count with DASS subscale applies,True
+D,General Dark Core,work_sd3,SD3,Open Psychometrics public,score_sd3.py + work_g3/cfa_sd3.py (bifactor),True
+S_M,Machiavellianism,work_sd3,SD3,Open Psychometrics public,score_sd3.py; alpha=0.861,True
+S_P,Psychopathy,work_sd3,SD3,Open Psychometrics public,score_sd3.py; alpha=0.798,True
+S_N,Narcissism,work_sd3,SD3,Open Psychometrics public,score_sd3.py; alpha=0.805,True
+general_distress,DASS general factor,work_g4,XAI_Mental_Health_DASS,Open Psychometrics public,"cfa_dass.py (bifactor); 39,775 subjects",True
+DASS_Dep,DASS depression specific,work_dass,XAI_Mental_Health_DASS,Open Psychometrics public,score_dass.py; secondary modulator,True
+DASS_Anx,DASS anxiety specific,work_dass,XAI_Mental_Health_DASS,Open Psychometrics public,score_dass.py; secondary modulator,True
+DASS_Str,DASS stress specific,work_dass,XAI_Mental_Health_DASS,Open Psychometrics public,score_dass.py; secondary modulator,True
+w_MB,Model-based arbitration,work_n500,XAI_Markov_TwoStep_Data,Academic (Zorowitz & Niv 2021),fit_and_recover.py; rho=0.7824 N=500,True
+alpha_R,Learning rate (collapsed),work_n500,XAI_Markov_TwoStep_Data,Academic,fit_and_recover.py; [COLLAPSED-LR],True
+beta_choice,Inverse temperature,work_n500,XAI_Markov_TwoStep_Data,Academic,fit_and_recover.py; [COLLAPSED-LR],True
+phi_per,Perseveration,work_n500,XAI_Markov_TwoStep_Data,Academic,fit_and_recover.py,True
+k_DD,Delay discounting,work_dd,XAI_Delay_Discounting_Data,"Unknown - Qualtrics export, no license stated",score_dd.py; [ADAPTIVE-DESIGN] [NO-REFIT],True
+a_inhib,SSRT (inhibitory control),work_ssrt,XAI_Risk_Impulsivity_Data,HCP restricted DUA,score_ssrt.py; integration method per Verbruggen 2019,True
+lambda_ineq,Inequity aversion (alpha only),work_fs,XAI_Social_Games_Data,HCP restricted DUA,score_fs.py; [SIMPLIFIED MODEL] [ENVY-ONLY],True
+theta_T,Threat sensitivity,,,NO SOURCE,[SYNTHETIC PRIOR] literature-derived,False
+u_U,Uncertainty aversion,,,NO SOURCE,[SYNTHETIC PRIOR] literature-derived,False
+eta_vol,Volatility update,,,NO SOURCE,[SYNTHETIC PRIOR] literature-derived,False
+omega_social,Social value weight,,,NO SOURCE,[SYNTHETIC PRIOR] literature-derived,False
+lambda_norm,Moral norm sensitivity,,,NO SOURCE,[SYNTHETIC PRIOR] literature-derived,False
+s_spite,Spite sensitivity,,,NO SOURCE,[SYNTHETIC PRIOR] literature-derived,False
+tau_sens,Sensory precision,,,NO SOURCE,[SYNTHETIC PRIOR] literature-derived,False
+gamma_sal,Salience gain,,,NO SOURCE,[SYNTHETIC PRIOR] literature-derived,False
+kappa_ctx,Context integration,,,NO SOURCE,[SYNTHETIC PRIOR] literature-derived,False
+m_t,Mood/state,,,NO SOURCE,[SYNTHETIC PRIOR] AR(1) state model,False
+beta_FS,Fehr-Schmidt guilt,,XAI_Social_Games_Data,NOT IDENTIFIABLE,[NOT-IDENTIFIABLE-IN-HCP-UGR] no advantageous-inequity offers,False

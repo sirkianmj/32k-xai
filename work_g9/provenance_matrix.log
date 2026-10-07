@@ -1,0 +1,45 @@
+=== G9 provenance audit ===
+Total parameters in dictionary: 31
+With evidence (work_*/notes.md exists): 20
+
+Parameters per work dir:
+  work_dass    3
+  work_dd      1
+  work_fs      1
+  work_g4      1
+  work_ipip    5
+  work_n500    4
+  work_sd3     4
+  work_ssrt    1
+
+=== Data directories on disk ===
+  3T_TFMRI_inscanner_performance_data
+  IPIP-FFM-data-8Nov2018
+  SD3
+  XAI_Behavioral_Data
+  XAI_Delay_Discounting_Data
+  XAI_Markov_TwoStep_Data
+  XAI_Mental_Health_DASS
+  XAI_Risk_Impulsivity_Data
+  XAI_Social_Games_Data
+  cmdstan-2.36.0
+
+=== License status ===
+  Open Psychometrics public                     13
+  NO SOURCE                                     10
+  Academic                                      3
+  HCP restricted DUA                            2
+  Academic (Zorowitz & Niv 2021)                1
+  Unknown - Qualtrics export, no license stated 1
+  NOT IDENTIFIABLE                              1
+
+Saved provenance_matrix.csv
+Saved provenance_matrix.md
+
+=== G9 verdict ===
+  Extracted with evidence:        20
+  Synthetic priors (documented):  10
+  Not identifiable (documented):  1
+  Parameters without any status:  0
+  G9 criterion: no parameter without a documented source.
+  Result: PASS
