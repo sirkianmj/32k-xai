@@ -1,0 +1,12 @@
+n_agents=32000
+n_ticks=500
+seed=42
+wall_time_s=1.7112
+state_hash=114f00abcd6df2b76cf124ea4a44bde23f2ecedec497d01e7b0e1c17cc7cd7e2
+final_coop_rate=0.788313
+final_gini=0.173242
+final_mean_distress=0.006363
+final_mean_w_mb_eff=0.617872
+final_defection_count=192.000000
+final_mean_abs_Q_net=0.158805
+final_mean_reward=0.223438
