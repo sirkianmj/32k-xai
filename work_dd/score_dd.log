@@ -1,0 +1,88 @@
+=== per-trial non-null + SS/LL split ===
+  trial  1  idx= 12  answered= 476  SS=  43  LL= 433
+  trial  2  idx= 17  answered=  43  SS=   3  LL=  40
+  trial  3  idx= 22  answered= 433  SS= 320  LL= 113
+  trial  4  idx= 27  answered=   3  SS=   2  LL=   1
+  trial  5  idx= 32  answered= 320  SS= 145  LL= 175
+  trial  6  idx= 37  answered= 113  SS=  73  LL=  40
+  trial  7  idx= 42  answered=  40  SS=  14  LL=  26
+  trial  8  idx= 47  answered=   2  SS=   1  LL=   1
+  trial  9  idx= 52  answered=  14  SS=   3  LL=  11
+  trial 10  idx= 57  answered= 175  SS= 104  LL=  71
+  trial 11  idx= 62  answered= 145  SS=  74  LL=  71
+  trial 12  idx= 67  answered=  73  SS=  40  LL=  33
+  trial 13  idx= 72  answered=  40  SS=  20  LL=  20
+  trial 14  idx= 77  answered=  26  SS=  12  LL=  14
+  trial 15  idx= 82  answered=   1  SS=   1  LL=   0
+  trial 16  idx= 87  answered=   1  SS=   1  LL=   0
+  trial 17  idx= 92  answered=   1  SS=   1  LL=   0
+  trial 18  idx= 97  answered=   3  SS=   3  LL=   0
+  trial 19  idx=102  answered=  12  SS=   6  LL=   6
+  trial 20  idx=107  answered=  74  SS=  18  LL=  56
+  trial 21  idx=112  answered=  71  SS=  49  LL=  22
+  trial 22  idx=117  answered= 104  SS=  64  LL=  40
+  trial 23  idx=122  answered=  71  SS=  29  LL=  42
+  trial 24  idx=127  answered=  40  SS=  19  LL=  21
+  trial 25  idx=132  answered=  20  SS=  18  LL=   2
+  trial 26  idx=137  answered=  20  SS=   4  LL=  16
+  trial 27  idx=142  answered=  33  SS=  16  LL=  17
+  trial 28  idx=147  answered=  14  SS=   7  LL=   7
+  trial 29  idx=152  answered=  11  SS=   8  LL=   3
+  trial 30  idx=157  answered=   0  SS=   0  LL=   0
+  trial 31  idx=162  answered=   1  SS=   0  LL=   1
+
+Rows read:                 478
+After preview drop:        476
+After k>0 finite filter:   476
+Elapsed:                   0.0s
+
+=== k distribution ===
+count    476.000000
+mean       0.102871
+std        1.167081
+min        0.000110
+5%         0.000279
+25%        0.001936
+50%        0.006706
+75%        0.013412
+95%        0.116642
+max       24.000000
+
+=== log k distribution (for copula marginal) ===
+count    476.0000
+mean      -5.2205
+std        1.9170
+min       -9.1150
+25%       -6.2472
+50%       -5.0048
+75%       -4.3116
+max        3.1781
+
+=== n_answered per subject ===
+count    476.0
+mean       5.0
+std        0.0
+min        5.0
+25%        5.0
+50%        5.0
+75%        5.0
+max        5.0
+
+=== n_SS per subject ===
+count    476.00
+mean       2.31
+std        0.91
+min        0.00
+25%        2.00
+50%        2.00
+75%        3.00
+max        5.00
+
+subjects with all 31 trials:  0
+subjects with 20-30 trials:   0
+subjects with <20 trials:     476
+
+corr(k, n_SS) on all subjects      (n=476) = 0.1716
+
+Range check: all k > 0  OK
+Saved: dd_k_subjects.csv + .pkl
