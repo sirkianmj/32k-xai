@@ -1,0 +1,29 @@
+# === Data (never commit) ===
+Data_Xai32kProje/
+
+# === Virtual envs ===
+.venv/
+venv/
+env/
+
+# === Python bytecode ===
+__pycache__/
+*.py[cod]
+
+# === OS junk ===
+.DS_Store
+._*
+.AppleDouble
+
+# === Large derived data ===
+work_ipip/ipip_ocean_ipc1.csv
+work_ipip/ipip_ocean_ipc1.pkl
+*.parquet
+
+# === Transient install logs ===
+jax_install.log
+
+# === Misleading backups and stale logs ===
+*.md.v2.1.bak
+pip_upgrade.log
+/score_ipip.log

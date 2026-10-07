@@ -1,0 +1,9 @@
+N_SIM=500
+T=201
+MODEL=ts_par4_MLE
+PARALLEL=joblib
+rho=0.7824
+p=1.652e-104
+bias=-0.0051
+rmse=0.2070
+pass=YES

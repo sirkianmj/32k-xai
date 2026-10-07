@@ -1,0 +1,121 @@
+# Project 32k-XAI
+
+> A mechanistically interpretable multi-agent platform for causal, glass-box
+> interrogation of emergent social phenomena — trust breakdown, economic
+> segregation, cooperation collapse — traced to specific cognitive parameters
+> at the individual level.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.14](https://img.shields.io/badge/python-3.14-blue.svg)](https://www.python.org/)
+[![JAX CUDA](https://img.shields.io/badge/JAX-CUDA%2013-76B900.svg)](https://github.com/google/jax)
+
+---
+
+## Overview
+
+32,000 autonomous cognitive agents governed by **hand-written decision equations** —
+Temporal Difference learning, forward-planning MDP solvers, Fehr–Schmidt social
+utility, and softmax action selection. **No neural networks. No LLMs. No black
+boxes in the decision loop.** Every action, betrayal, and trust allocation is
+traceable to a named, measurable psychological parameter, conditional on its
+documented measurement uncertainty.
+
+**Epistemological position:** within-agent deterministic, between-agent stochastic,
+parameterized by a fixed random seed. Transparency is *uncertainty-aware* — every
+mechanistic trace carries confidence intervals, recovery metrics, and reliability
+flags.
+
+---
+
+## Sprint 0 Status (07 October 2026)
+
+| Component | Status | Evidence |
+| :--- | :--- | :--- |
+| GPU / JAX / CUDA | ✅ Verified | `jax.devices() == [CudaDevice(id=0)]` on GTX 1660 Ti |
+| G7 — Stop-Signal RT audit | ✅ PASS | 266 SS subjects, 263 BART, 257 intersect; trial-level RTs present |
+| w_MB recovery (Daw, N=500) | ✅ PASS | ρ = 0.7824, p = 1.65e−104, bias = −0.0051, RMSE = 0.2070 |
+| OCEAN extraction (IPIP-FFM) | ✅ PASS | 603,322 IPC=1 subjects, all values ∈ [0,1] |
+| G5 — Kool paradigm | ⏳ PENDING | Kool dataset not yet in asset inventory |
+| G1 — 21-parameter recovery | 🔶 PARTIAL | 9 of 21 parameters estimated |
+
+**Gate rule:** No 32k simulation runs until all gates G1–G9 pass. The 32k
+simulation is a *scale-up of validated components*, not a validation step.
+
+---
+
+## Repository Structure
+.
+├── work_n500/ # w_MB two-step fitting + recovery (N=500)
+│ ├── fit_and_recover.py # self-contained pipeline
+│ ├── fit_and_recover_n500.log
+│ ├── w_mb_real.csv # 149-subject real-data estimates
+│ ├── recovery.txt # formal recovery metrics
+│ └── recovery_scatter.csv # true vs. recovered w_MB
+├── work_ipip/ # IPIP-FFM OCEAN scoring
+│ ├── score_ipip.py # self-contained scoring script
+│ ├── score_ipip.log
+│ └── ipip_ocean_ipc1_sample50k.csv
+├── Master Technical Specification_ Project 32k-XAI Cognitive Simulation Platform.md
+├── LICENSE
+└── README.md
+
+text
+
+**Not included:** raw behavioral data (BIDS, BART, Stop-Signal, IPIP-FFM).
+This repo contains **code, logs, and derived parameter estimates only.**
+
+---
+
+## Quick Start
+
+```bash
+# 1. Create and activate the environment
+python3 -m venv .venv
+source .venv/bin/activate
+pip install "jax[cuda13]" numpy scipy pandas matplotlib joblib
+
+# 2. Verify GPU
+python -c "import jax; print(jax.devices())"
+# → [CudaDevice(id=0)]
+
+# 3. Reproduce w_MB recovery (N=500)
+cd work_n500 && python fit_and_recover.py
+
+# 4. Reproduce OCEAN extraction
+cd ../work_ipip && python score_ipip.py
+Hardware target: Windows 11 + WSL2/Ubuntu, Intel i5-9400F, 32 GB RAM,
+NVIDIA GTX 1660 Ti (6 GB VRAM, CUDA compute capability 7.5).
+
+Key Scientific Constraints
+No DNNs, no LLMs in the decision-making loop. Every decision is a
+closed-form or iterative mathematical function.
+
+Empirical grounding: population parameters are tethered to real human
+covariance structures via a Vine Copula (D-Vine or R-Vine), not arbitrary
+synthetic generation.
+
+Uncertainty-aware transparency: every XAI trace includes confidence
+intervals, recovery metrics, and reliability flags. No bare point estimates.
+
+Bifactor structures: the Dark Triad is modeled as one general Dark Core
+(D) plus three specific factors (S_M, S_P, S_N); DASS-21 uses a general
+distress factor plus three specific factors.
+
+Reproducibility: every fitting run writes its script, its stdout log, and
+its output CSVs to the same directory in the same invocation.
+
+Citation
+If you use this code, please cite:
+
+Khorshidi, S., & Mansouri Jamshidi, K. (2026). The Dark Triad as a
+Multi-Layered Structure: A Triangulation of Classical Psychometrics and
+Explainable Machine Learning. SSRN Electronic Journal.
+https://ssrn.com/abstract=7306299
+
+Contact
+Kian Mansouri Jamshidi — Lead AI Architect, XAI Protocol Engineering, HPC
+
+Sabihe Khorshidi — Lead Cognitive Psychologist, Psychometric Mapping
+
+License
+This project is licensed under the MIT License — see LICENSE for details.
