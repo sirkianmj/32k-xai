@@ -1,0 +1,19 @@
+=== G8: JAX vectorized two-step engine benchmark ===
+Device:  cuda:0
+Backend: gpu
+T_STEPS: 100
+
+Warm-up compile: 1.49s
+
+  N=  100  first=  1.01s  cached= 0.003s  R_mean=0.597  A1_shape=(100, 100)
+  N=  500  first=  1.03s  cached= 0.004s  R_mean=0.602  A1_shape=(500, 100)
+  N= 1000  first=  1.00s  cached= 0.004s  R_mean=0.605  A1_shape=(1000, 100)
+  N= 2000  first=  1.01s  cached= 0.013s  R_mean=0.605  A1_shape=(2000, 100)
+
+=== G8 verdict ===
+  N=500 x 100 steps, first (compile+run) = 1.03s
+  Budget: < 60s per 100 steps
+  Result: PASS
+  Cached execution = 0.004s
+
+Saved bench_500_results.pkl + .txt

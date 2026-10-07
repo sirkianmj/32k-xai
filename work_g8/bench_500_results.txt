@@ -1,0 +1,9 @@
+device=cuda:0
+backend=gpu
+T_STEPS=100
+N_agents	first_s	cached_s	R_mean	A1_frac_action0	error
+100	1.0074	0.0029	0.5970	0.5058	None
+500	1.0326	0.0038	0.6020	0.5068	None
+1000	1.0001	0.0038	0.6051	0.5057	None
+2000	1.0085	0.0132	0.6055	0.5067	None
+gate_verdict=PASS
