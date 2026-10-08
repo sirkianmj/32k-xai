@@ -4,7 +4,7 @@ os.environ.setdefault("XLA_PYTHON_CLIENT_MEM_FRACTION", "0.85")
 import hashlib, pickle
 from pathlib import Path
 import numpy as np, pandas as pd
-from engine_v5 import run, WS_N
+from engine_v5 import run, WS_N, PARAM_PROVENANCE, SYNTHETIC_PRIOR_PARAMS
 
 OUT = Path(__file__).parent
 PARAMS = Path.home() / "projects/xai_project/work_g2/synthetic_32k.pkl"
@@ -40,6 +40,8 @@ if __name__ == "__main__":
         for k in ['coop_rate','gini','mean_distress','mean_w_mb_eff',
                   'defection','mean_abs_Q_net','mean_reward','mean_a2']:
             f.write(f"final_{k}={metrics[k][-1]:.6f}\n")
+        f.write(f"n_synthetic_prior_params={len(SYNTHETIC_PRIOR_PARAMS)}\n")
+        f.write(f"synthetic_prior_params={','.join(SYNTHETIC_PRIOR_PARAMS)}\n")
     print(f"[run_v5] state_hash      = {h}")
     print(f"[run_v5] wall_s          = {metrics['wall_s']:.3f}")
     print(f"[run_v5] final coop      = {metrics['coop_rate'][-1]:.4f}")

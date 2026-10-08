@@ -50,7 +50,8 @@ def _make_traced_step(neighbors, P, agent_i):
     beta_guilt = P['A']
     s_spite    = P['s_spite']
     lr         = P['alpha_R']
-    gamma      = 0.5 + 0.45 * jnp.tanh(P['k_DD'] / 3.0)
+    k_DD_true  = jnp.exp(jnp.clip(P['k_DD'], -10.0, 5.0))
+    gamma      = 1.0 / (1.0 + k_DD_true)
     beta_soft  = P['beta_choice']
     phi        = P['phi_per']
     w_mb_base  = P['w_MB']
@@ -272,4 +273,12 @@ def trace_agent(ckpt_path, target_tick, agent_i, params_pkl, N=None):
         "values": np.asarray(traces),
         "aggregates": np.asarray(aggregates),
         "final_state_hash": state_hash(final_dict),
+        "provenance": E.PARAM_PROVENANCE,
+        "synthetic_priors_in_effect": E.SYNTHETIC_PRIOR_PARAMS,
+        "active_flags": [
+            "SYNTHETIC_PRIOR_PARAMS=" + ",".join(E.SYNTHETIC_PRIOR_PARAMS),
+            "COPULA-COLUMN-IS-LOG-K-DD",
+            "MF-GENERALIZED",
+            "REWARD-SCALE-ASYMMETRY",
+        ],
     }

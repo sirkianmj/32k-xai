@@ -59,6 +59,40 @@ PARAM_NAMES = ['O','C','E','A','N','S_M','S_P','S_N','DASS_Dep','DASS_Anx',
                'lambda_norm','s_spite','tau_sens','gamma_sal','kappa_ctx',
                'm_t','D','general_distress']
 
+PARAM_PROVENANCE = {
+    'O': 'empirical_large_603k_ipip',
+    'C': 'empirical_large_603k_ipip',
+    'E': 'empirical_large_603k_ipip',
+    'A': 'empirical_large_603k_ipip',
+    'N': 'empirical_large_603k_ipip',
+    'S_M': 'empirical_medium_17k_sd3',
+    'S_P': 'empirical_medium_17k_sd3',
+    'S_N': 'empirical_medium_17k_sd3',
+    'DASS_Dep': 'empirical_large_40k_dass',
+    'DASS_Anx': 'empirical_large_40k_dass',
+    'DASS_Str': 'empirical_large_40k_dass',
+    'alpha_R': 'empirical_tiny_149_twostep',
+    'beta_choice': 'empirical_tiny_149_twostep',
+    'phi_per': 'empirical_tiny_149_twostep',
+    'w_MB': 'empirical_tiny_149_twostep',
+    'k_DD': 'empirical_small_476_delaydisc_LOG_SCALE',
+    'a_inhib': 'empirical_small_264_ssrt',
+    'lambda_ineq': 'empirical_small_111_ultimatum',
+    'theta_T': 'SYNTHETIC_PRIOR',
+    'u_U': 'SYNTHETIC_PRIOR',
+    'eta_vol': 'SYNTHETIC_PRIOR',
+    'omega_social': 'SYNTHETIC_PRIOR',
+    'lambda_norm': 'SYNTHETIC_PRIOR',
+    's_spite': 'SYNTHETIC_PRIOR',
+    'tau_sens': 'SYNTHETIC_PRIOR',
+    'gamma_sal': 'SYNTHETIC_PRIOR',
+    'kappa_ctx': 'SYNTHETIC_PRIOR',
+    'm_t': 'SYNTHETIC_PRIOR',
+    'D': 'composite_of_S_M_S_P_S_N',
+    'general_distress': 'composite_of_DASS_specifics',
+}
+SYNTHETIC_PRIOR_PARAMS = [k for k, v in PARAM_PROVENANCE.items() if v == 'SYNTHETIC_PRIOR']
+
 def load_all(pkl_path):
     df = pd.read_pickle(pkl_path)
     out = {}
@@ -95,9 +129,13 @@ def make_step(neighbors, P):
     beta_guilt = P['A']
     s_spite    = P['s_spite']
     lr         = P['alpha_R']
-    k_DD_raw   = P['k_DD']
-    # [COPULA-DEFECT-k_DD] and [TANH-GAMMA-PROVISIONAL] flags from P2d apply
-    gamma      = 0.5 + 0.45 * jnp.tanh(k_DD_raw / 3.0)
+    # The copula column `k_DD` is log(k_DD) (see work_g2/notes.md Layer 1).
+    # The spec §3.5 range is k_DD > 0 log-normal. Exponentiating recovers
+    # the true positive k. Canonical gamma = 1/(1+k_DD) per spec §2.5.
+    # [TANH-GAMMA-PROVISIONAL] retired.
+    # [COPULA-COLUMN-IS-LOG-K-DD] documented in engine notes.
+    k_DD_true  = jnp.exp(jnp.clip(P['k_DD'], -10.0, 5.0))
+    gamma      = 1.0 / (1.0 + k_DD_true)
     beta_soft  = P['beta_choice']
     phi        = P['phi_per']
     w_mb_base  = P['w_MB']
