@@ -1,0 +1,213 @@
+{
+  "baseline": {
+    "platform": [
+      0.39458367228507996,
+      0.12024557590484619,
+      0.4831819236278534,
+      0.3341001272201538,
+      0.44285348057746887
+    ],
+    "audit": {
+      "scenario_name": "baseline",
+      "description": "No shocks. Calibrated reference run.",
+      "N": 32000,
+      "T": 500,
+      "seed": 42,
+      "copula": "/home/kian/projects/xai_project/work_g2/synthetic_32k_p6d.pkl",
+      "theta": {
+        "TAU_BASE": 1.788896071378759,
+        "BETA_OFF": 1.5725436979719754,
+        "BETA_SEND": 1.9643939015369272,
+        "BETA_ACC": 2.9217083931844234,
+        "BETA_RET": 1.4333498327913152,
+        "BIAS_OFF": 0.4965079287369516,
+        "BIAS_SEND": -0.03587884623977938,
+        "BIAS_RET": -0.07232300791143675,
+        "LAMBDA_FS": 2.424231652732562
+      },
+      "shocks": [],
+      "wall_s": 4.282789945602417,
+      "platform": [
+        0.39458367228507996,
+        0.12024557590484619,
+        0.4831819236278534,
+        0.3341001272201538,
+        0.44285348057746887
+      ],
+      "benchmark_names": [
+        "UG mean offer",
+        "UG rejection",
+        "TG mean send",
+        "TG mean return",
+        "Final Gini"
+      ]
+    }
+  },
+  "resource_crisis": {
+    "platform": [
+      0.3921195864677429,
+      0.14868372678756714,
+      0.4891236424446106,
+      0.3343728184700012,
+      0.47151437401771545
+    ],
+    "audit": {
+      "scenario_name": "resource_crisis",
+      "description": "Resource scarcity 0.6 for all agents, ticks 200-350. Economic stress condition.",
+      "N": 32000,
+      "T": 500,
+      "seed": 42,
+      "copula": "/home/kian/projects/xai_project/work_g2/synthetic_32k_p6d.pkl",
+      "theta": {
+        "TAU_BASE": 1.788896071378759,
+        "BETA_OFF": 1.5725436979719754,
+        "BETA_SEND": 1.9643939015369272,
+        "BETA_ACC": 2.9217083931844234,
+        "BETA_RET": 1.4333498327913152,
+        "BIAS_OFF": 0.4965079287369516,
+        "BIAS_SEND": -0.03587884623977938,
+        "BIAS_RET": -0.07232300791143675,
+        "LAMBDA_FS": 2.424231652732562
+      },
+      "shocks": [
+        {
+          "tick": 200,
+          "duration": 150,
+          "type": "resource_scarcity",
+          "magnitude": 0.6,
+          "target_frac": null,
+          "target_seed": 0
+        }
+      ],
+      "wall_s": 2.8601768016815186,
+      "platform": [
+        0.3921195864677429,
+        0.14868372678756714,
+        0.4891236424446106,
+        0.3343728184700012,
+        0.47151437401771545
+      ],
+      "benchmark_names": [
+        "UG mean offer",
+        "UG rejection",
+        "TG mean send",
+        "TG mean return",
+        "Final Gini"
+      ]
+    }
+  },
+  "widespread_distress": {
+    "platform": [
+      0.3959876298904419,
+      0.12338393926620483,
+      0.4842957556247711,
+      0.33610999584198,
+      0.45139992237091064
+    ],
+    "audit": {
+      "scenario_name": "widespread_distress",
+      "description": "Distress injection 0.8 on 70% of agents, ticks 150-350. Psychological stress condition.",
+      "N": 32000,
+      "T": 500,
+      "seed": 42,
+      "copula": "/home/kian/projects/xai_project/work_g2/synthetic_32k_p6d.pkl",
+      "theta": {
+        "TAU_BASE": 1.788896071378759,
+        "BETA_OFF": 1.5725436979719754,
+        "BETA_SEND": 1.9643939015369272,
+        "BETA_ACC": 2.9217083931844234,
+        "BETA_RET": 1.4333498327913152,
+        "BIAS_OFF": 0.4965079287369516,
+        "BIAS_SEND": -0.03587884623977938,
+        "BIAS_RET": -0.07232300791143675,
+        "LAMBDA_FS": 2.424231652732562
+      },
+      "shocks": [
+        {
+          "tick": 150,
+          "duration": 200,
+          "type": "distress_injection",
+          "magnitude": 0.8,
+          "target_frac": 0.7,
+          "target_seed": 3
+        }
+      ],
+      "wall_s": 2.803542137145996,
+      "platform": [
+        0.3959876298904419,
+        0.12338393926620483,
+        0.4842957556247711,
+        0.33610999584198,
+        0.45139992237091064
+      ],
+      "benchmark_names": [
+        "UG mean offer",
+        "UG rejection",
+        "TG mean send",
+        "TG mean return",
+        "Final Gini"
+      ]
+    }
+  },
+  "compound_stress": {
+    "platform": [
+      0.39160022139549255,
+      0.13980704545974731,
+      0.4842087924480438,
+      0.3317022919654846,
+      0.4556889235973358
+    ],
+    "audit": {
+      "scenario_name": "compound_stress",
+      "description": "Resource scarcity 0.4 all agents from tick 100, plus distress injection 0.6 on 50% from tick 150. Simultaneous economic and psychological stress.",
+      "N": 32000,
+      "T": 500,
+      "seed": 42,
+      "copula": "/home/kian/projects/xai_project/work_g2/synthetic_32k_p6d.pkl",
+      "theta": {
+        "TAU_BASE": 1.788896071378759,
+        "BETA_OFF": 1.5725436979719754,
+        "BETA_SEND": 1.9643939015369272,
+        "BETA_ACC": 2.9217083931844234,
+        "BETA_RET": 1.4333498327913152,
+        "BIAS_OFF": 0.4965079287369516,
+        "BIAS_SEND": -0.03587884623977938,
+        "BIAS_RET": -0.07232300791143675,
+        "LAMBDA_FS": 2.424231652732562
+      },
+      "shocks": [
+        {
+          "tick": 100,
+          "duration": 200,
+          "type": "resource_scarcity",
+          "magnitude": 0.4,
+          "target_frac": null,
+          "target_seed": 0
+        },
+        {
+          "tick": 150,
+          "duration": 200,
+          "type": "distress_injection",
+          "magnitude": 0.6,
+          "target_frac": 0.5,
+          "target_seed": 7
+        }
+      ],
+      "wall_s": 2.739283323287964,
+      "platform": [
+        0.39160022139549255,
+        0.13980704545974731,
+        0.4842087924480438,
+        0.3317022919654846,
+        0.4556889235973358
+      ],
+      "benchmark_names": [
+        "UG mean offer",
+        "UG rejection",
+        "TG mean send",
+        "TG mean return",
+        "Final Gini"
+      ]
+    }
+  }
+}
