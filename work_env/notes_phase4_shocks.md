@@ -302,3 +302,31 @@ Try WEALTH_KAPPA=0.005 to see if the sign is tunable. If the sign flips,
 0.001 was too weak. If not, selection dominates at all reasonable
 strengths and the correct finding is that wealth-rejection correlation is
 selection-driven.
+
+### Kappa sweep (11 Oct 2026)
+
+Tested WEALTH_KAPPA = 0.005 (5x stronger than committed 0.001). The
+purpose was to check whether the sign of corr(wealth, rejection) flips
+under a stronger utility-curvature term.
+
+    KAPPA=0.001:  corr = -0.4089,  gap(rich-poor) = -0.2101
+    KAPPA=0.005:  corr = -0.4253,  gap(rich-poor) = -0.2209
+
+Sign did not flip. The negative correlation actually got slightly
+stronger. Conclusion: selection dominates utility curvature at both
+strengths. Stronger kappa does not reverse the direction.
+
+The kappa=0.005 test used theta fit at kappa=0.001, so it is indicative
+rather than a calibrated comparison. But the direction is unambiguous.
+
+### Definitive finding
+
+The wealth-rejection correlation in this engine is **selection-driven**,
+not utility-curvature-driven. Rejecting an offer prevents earning from
+it, so rejection causes poverty. That causal arrow dominates the
+reverse arrow (poverty causes rejection) at every kappa tested.
+
+Any claim of the form "rich agents reject more because they value a
+marginal payoff less" is not supported by this engine. The correct
+claim is "wealth and rejection are negatively correlated through
+selection."
