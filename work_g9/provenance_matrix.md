@@ -36,10 +36,10 @@
 | u_U | Uncertainty aversion | - | - | NO SOURCE | [SYNTHETIC PRIOR] literature-derived |
 | eta_vol | Volatility update | - | - | NO SOURCE | [SYNTHETIC PRIOR] literature-derived |
 | omega_social | Social value weight | - | - | NO SOURCE | [SYNTHETIC PRIOR] literature-derived |
-| lambda_norm | Moral norm sensitivity | - | - | NO SOURCE | [SYNTHETIC PRIOR] literature-derived |
-| s_spite | Spite sensitivity | - | - | NO SOURCE | [SYNTHETIC PRIOR] literature-derived |
-| tau_sens | Sensory precision | - | - | NO SOURCE | [SYNTHETIC PRIOR] literature-derived |
+| lambda_norm | Moral norm sensitivity | - | - | NO SOURCE | [SYNTHETIC PRIOR] literature-derived `[INERT-IN-CALIBRATED-ENGINE]` |
+| s_spite | Spite sensitivity | - | - | NO SOURCE | [SYNTHETIC PRIOR] literature-derived `[INERT-IN-CALIBRATED-ENGINE]` |
+| tau_sens | Sensory precision | - | - | NO SOURCE | [SYNTHETIC PRIOR] literature-derived `[INERT-IN-CALIBRATED-ENGINE]` |
 | gamma_sal | Salience gain | - | - | NO SOURCE | [SYNTHETIC PRIOR] literature-derived |
-| kappa_ctx | Context integration | - | - | NO SOURCE | [SYNTHETIC PRIOR] literature-derived |
+| kappa_ctx | Context integration | - | - | NO SOURCE | [SYNTHETIC PRIOR] literature-derived `[INERT-IN-CALIBRATED-ENGINE]` |
 | m_t | Mood/state | - | - | NO SOURCE | [SYNTHETIC PRIOR] AR(1) state model |
 | beta_FS | Fehr-Schmidt guilt | - | XAI_Social_Games_Data | NOT IDENTIFIABLE | [NOT-IDENTIFIABLE-IN-HCP-UGR] no advantageous-inequity offers |

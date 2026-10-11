@@ -1,0 +1,35 @@
+==============================================================================
+P6d EXTERNAL DATA — API reconnaissance
+==============================================================================
+
+=== OSF: CORTEX  (node jhbe8) ===
+  [ERR] https://api.osf.io/v2/nodes/jhbe8/files/osfstorage/: HTTP Error 403: Forbidden
+
+=== OSF: ERP CORE  (node thsqg) ===
+  [ERR] https://api.osf.io/v2/nodes/thsqg/files/osfstorage/: HTTP Error 403: Forbidden
+
+=== Zenodo: MFQ-30  (record 21251296) ===
+  title : Bridging Intuition and Reason: Exploring Ethical Decision-Making Through Instructional Design in Case-Based Learning
+  access: open
+  license: cc-by-4.0
+  3 file(s):
+    - ethicapp_wide.csv  (1.06 MB)
+        https://zenodo.org/api/records/21251296/files/ethicapp_wide.csv/content
+    - README.md  (8.4 KB)
+        https://zenodo.org/api/records/21251296/files/README.md/content
+    - mfq_raw.csv  (66.0 KB)
+        https://zenodo.org/api/records/21251296/files/mfq_raw.csv/content
+
+=== Zenodo: Sapey-Triomphe 2023  (record 10683141) ===
+  title : Dataset article: GABA and Glx predict EEG responses of visual sensitivity in autism
+  access: open
+  license: cc-by-4.0
+  2 file(s):
+    - MRS_processing.m  (2.6 KB)
+        https://zenodo.org/api/records/10683141/files/MRS_processing.m/content
+    - Data.zip  (9629.47 MB)
+        https://zenodo.org/api/records/10683141/files/Data.zip/content
+
+==============================================================================
+END
+==============================================================================

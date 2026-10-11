@@ -1,0 +1,33 @@
+Study2B_Data.csv: 401 rows, 63 columns
+
+=== PANAS scales ===
+  panas_pos_pre         n= 401  mean= 30.0599  sd=  9.4795  min=  10.000  max=  50.000  q25=23.000  q75=37.000
+  panas_pos_post        n= 401  mean= 31.5387  sd=  9.4228  min=  10.000  max=  50.000  q25=25.000  q75=38.000
+  panas_neg_pre         n= 401  mean= 14.2569  sd=  7.7163  min=  10.000  max=  50.000  q25=10.000  q75=14.000
+  panas_neg_post        n= 401  mean= 13.6958  sd=  7.3958  min=  10.000  max=  50.000  q25=10.000  q75=13.000
+
+=== Inclusion / exclusion flags ===
+  exclude values: ['0', '1']
+  bot.detect values: ['0', '1']
+
+=== all panas-like columns ===
+  panas_pos_change
+  panas_pos_pre
+  panas_pos_post
+  panas_pos_change
+  panas_neg_pre
+  panas_neg_post
+
+=== Candidate m_t = standardized (panas_pos_pre - panas_neg_pre) ===
+  valid rows: 401 / 401
+  raw    mean=  15.803  sd=  11.152  min= -13.000  max=  40.000
+  z      mean= -0.0000  sd=  1.0000  min=  -2.583  max=   2.170
+  clip   mean= -0.0000  sd=  1.0000  min=  -2.583  max=   2.170
+
+=== Current copula m_t (for comparison) ===
+  n= 32000  mean= -0.0093  sd=  0.9904  min=  -4.300  max=   3.878
+
+VERDICT:
+  m_t is GROUNDABLE. N=401 PANAS responses.
+  Current copula m_t: mean=-0.009 sd=0.990
+  Candidate m_t:      mean=-0.000 sd=1.000

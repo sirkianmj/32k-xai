@@ -1,0 +1,315 @@
+==============================================================================
+P6d SCOPE 2 — column-level reconnaissance of task files
+==============================================================================
+
+--- 1. HCP 3T_tfMRI task stats files (headers) ---
+  === 100307_tfMRI_EMOTION_LR_Stats.csv ===
+      Value,ConditionName,Measure
+      1.0,FACE,ACC
+
+  === 100307_tfMRI_GAMBLING_LR_Stats.csv ===
+      Value,ConditionName,Measure
+      0.4375,REWARD,PROP_LARGER
+
+  === 100307_tfMRI_LANGUAGE_LR_Stats.csv ===
+      Value,ConditionName,Measure
+      3256.5,STORY,MEDIAN_RT
+
+  === 100307_tfMRI_RELATIONAL_LR_Stats.csv ===
+      Value,ConditionName,Measure
+      0.933333333333,MATCH,ACC
+
+  === 100307_tfMRI_SOCIAL_LR_Stats.csv ===
+      Value,ConditionName,Measure
+      1.0,RANDOM,PROP_RANDOM
+
+  === 100307_tfMRI_WM_LR_Stats.csv ===
+      Value,ConditionName,Measure
+      1.0,0BK_BODY,ACC
+
+  unique tasks seen: ['EMOTION', 'GAMBLING', 'LANGUAGE', 'RELATIONAL', 'SOCIAL', 'WM']
+
+--- 2. XAI_Mental_Health_DASS/data.csv (header only) ---
+  1 columns
+      [ 0] Q1A	Q1I	Q1E	Q2A	Q2I	Q2E	Q3A	Q3I	Q3E	Q4A	Q4I	Q4E	Q5A	Q5I	Q5E	Q6A	Q6I	Q6E	Q7A	Q7I	Q7E	Q8A	Q8I	Q8E	Q9A	Q9I	Q9E	Q10A	Q10I	Q10E	Q11A	Q11I	Q11E	Q12A	Q12I	Q12E	Q13A	Q13I	Q13E	Q14A	Q14I	Q14E	Q15A	Q15I	Q15E	Q16A	Q16I	Q16E	Q17A	Q17I	Q17E	Q18A	Q18I	Q18E	Q19A	Q19I	Q19E	Q20A	Q20I	Q20E	Q21A	Q21I	Q21E	Q22A	Q22I	Q22E	Q23A	Q23I	Q23E	Q24A	Q24I	Q24E	Q25A	Q25I	Q25E	Q26A	Q26I	Q26E	Q27A	Q27I	Q27E	Q28A	Q28I	Q28E	Q29A	Q29I	Q29E	Q30A	Q30I	Q30E	Q31A	Q31I	Q31E	Q32A	Q32I	Q32E	Q33A	Q33I	Q33E	Q34A	Q34I	Q34E	Q35A	Q35I	Q35E	Q36A	Q36I	Q36E	Q37A	Q37I	Q37E	Q38A	Q38I	Q38E	Q39A	Q39I	Q39E	Q40A	Q40I	Q40E	Q41A	Q41I	Q41E	Q42A	Q42I	Q42E	country	source	introelapse	testelapse	surveyelapse	TIPI1	TIPI2	TIPI3	TIPI4	TIPI5	TIPI6	TIPI7	TIPI8	TIPI9	TIPI10	VCL1	VCL2	VCL3	VCL4	VCL5	VCL6	VCL7	VCL8	VCL9	VCL10	VCL11	VCL12	VCL13	VCL14	VCL15	VCL16	education	urban	gender	engnat	age	screensize	uniquenetworklocation	hand	religion	orientation	race	voted	married	familysize	major
+
+--- 3. XAI_Mental_Health_DASS/codebook.txt (full, 80 lines) ---
+      This data was collected with an on-line version of the Depression Anxiety Stress Scales (DASS), see http://www2.psy.unsw.edu.au/dass/
+      
+      The survey was open to anyone and people were motivated to take it to get personalized results. At the end of the test they also were given the option to complete a short research survey. This datatset comes from those who agreed to complete the research survey and answered yes to the question "Have you given accurate answers and may they be used for research?" at the end.
+      
+      This data was collected 2017 - 2019.
+      
+      The following items were included in the survey:
+      
+      Q1	I found myself getting upset by quite trivial things.
+      Q2	I was aware of dryness of my mouth.
+      Q3	I couldn't seem to experience any positive feeling at all.
+      Q4	I experienced breathing difficulty (eg, excessively rapid breathing, breathlessness in the absence of physical exertion).
+      Q5	I just couldn&#39;t seem to get going.
+      Q6	I tended to over-react to situations.
+      Q7	I had a feeling of shakiness (eg, legs going to give way).
+      Q8	I found it difficult to relax.
+      Q9	I found myself in situations that made me so anxious I was most relieved when they ended.
+      Q10	I felt that I had nothing to look forward to.
+      Q11	I found myself getting upset rather easily.
+      Q12	I felt that I was using a lot of nervous energy.
+      Q13	I felt sad and depressed.
+      Q14	I found myself getting impatient when I was delayed in any way (eg, elevators, traffic lights, being kept waiting).
+      Q15	I had a feeling of faintness.
+      Q16	I felt that I had lost interest in just about everything.
+      Q17	I felt I wasn&#39;t worth much as a person.
+      Q18	I felt that I was rather touchy.
+      Q19	I perspired noticeably (eg, hands sweaty) in the absence of high temperatures or physical exertion.
+      Q20	I felt scared without any good reason.
+      Q21	I felt that life wasn&#39;t worthwhile.
+      Q22	I found it hard to wind down.
+      Q23	I had difficulty in swallowing.
+      Q24	I couldn&#39;t seem to get any enjoyment out of the things I did.
+      Q25	I was aware of the action of my heart in the absence of physical exertion (eg, sense of heart rate increase, heart missing a beat).
+      Q26	I felt down-hearted and blue.
+      Q27	I found that I was very irritable.
+      Q28	I felt I was close to panic.
+      Q29	I found it hard to calm down after something upset me.
+      Q30	I feared that I would be &quot;thrown&quot; by some trivial but unfamiliar task.
+      Q31	I was unable to become enthusiastic about anything.
+      Q32	I found it difficult to tolerate interruptions to what I was doing.
+      Q33	I was in a state of nervous tension.
+      Q34	I felt I was pretty worthless.
+      Q35	I was intolerant of anything that kept me from getting on with what I was doing.
+      Q36	I felt terrified.
+      Q37	I could see nothing in the future to be hopeful about.
+      Q38	I felt that life was meaningless.
+      Q39	I found myself getting agitated.
+      Q40	I was worried about situations in which I might panic and make a fool of myself.
+      Q41	I experienced trembling (eg, in the hands).
+      Q42	I found it difficult to work up the initiative to do things.
+      
+      Each item was presented one at a time in a random order for each new participant along with a 4 point rating scale asking the user to indicate how often that had been true of them in the past week where
+      
+      1 = Did not apply to me at all
+      2 = Applied to me to some degree, or some of the time
+      3 = Applied to me to a considerable degree, or a good part of the time
+      4 = Applied to me very much, or most of the time
+      
+      (see the file demo1.png for how this looked)
+      
+      This response is stored in variable A (e.g. Q1A). Also recorded was the time taken in milliseconds to answer that question (E) and that question's position in the survey (I).
+      
+      These other durations were also recorded (measured on the server's side):
+      
+      introelapse		The time spent on the introduction/landing page (in seconds)
+      testelapse		The time spent on all the DASS questions (should be equivalent to the time elapsed on all the indiviudal questions combined)
+      surveyelapse	The time spent answering the rest of the demographic and survey questions
+      
+      On the next page was a generic demographics survey with many different questions.
+      
+      The Ten Item Personality Inventory was administered (see Gosling, S. D., Rentfrow, P. J., & Swann, W. B., Jr. (2003). A Very Brief Measure of the Big Five Personality Domains. Journal of Research in Personality, 37, 504-528.):
+      
+      TIPI1	Extraverted, enthusiastic.
+      TIPI2	Critical, quarrelsome.
+      TIPI3	Dependable, self-disciplined.
+      TIPI4	Anxious, easily upset.
+      TIPI5	Open to new experiences, complex.
+      TIPI6	Reserved, quiet.
+      TIPI7	Sympathetic, warm.
+      TIPI8	Disorganized, careless.
+      ...(truncated)
+
+--- 4. XAI_Risk_Impulsivity_Data ---
+  participants.tsv: 16 cols
+      participant_id
+      diagnosis
+      age
+      gender
+      bart
+      bht
+      dwi
+      pamenc
+      pamret
+      rest
+      scap
+      stopsignal
+      T1w
+      taskswitch
+      ScannerSerialNumber
+      ghost_NoGhost
+
+  === sample BART: sub-10159_task-bart_events.tsv ===
+      onset	duration	reaction_time	trial_number	trial_type	button_pressed	action	explode_trial	trial_value	trial_cumulative_value	payoff_level	onset_noTriggerAdjust
+      2.03216603999999	1.20839207400013	1.20839207400013	1	BALOON	5	ACCEPT	1	5	5	5	0.0321660399999928
+      5.87107120700011	0.625477546000184	0.625477546000184	1	BALOON	5	ACCEPT	1	5	10	5	3.87107120700011
+      8.76679230200034	0.561760724999658	0.561760724999658	1	BALOON	5	ACCEPT	1	5	15	5	6.76679230200034
+      11.1826955680003	0	0	1	BALOON	n/a	EXPLODE	1	0	15	5	9.18269556800033
+      14.9222235540001	0.470330939000178	0.470330939000178	2	BALOON	5	ACCEPT	0	5	5	5	12.9222235540001
+      18.1488673030003	0.435673596000015	0.435673596000015	2	BALOON	5	ACCEPT	0	5	10	5	16.1488673030003
+      20.7632696780001	0.885306566000054	0.885306566000054	2	BALOON	28	CASHOUT	0	0	10	5	18.7632696780001
+      ...
+
+  === sample stopsignal: sub-10159_task-stopsignal_events.tsv ===
+      onset	duration	trial_type	PresentedStimulusArrowDirection	ReactionTime	SubjectResponseButton	SubjectResponseButtonCode	SubjectResponseCorrectness	TrialOutcome	StopSignalDelay	LadderNumber	LadderTime	LadderMovement	TimeCourse	onset_noTriggerAdjust	TimeCourse_noTriggerAdjust
+      0.00613421399975778	1.5	GO	LEFT	0.416274123999756	LEFT	5	CorrectResponse	SuccessfulGo	0	0	0	0	0	0.00613421399975778	0
+      0	2.25	NULL	BLANKSCREEN	0	n/a	0	n/a	n/a	0	0	0	0	1.5	0	1.5
+      3.76259497899991	1.5	GO	RIGHT	0.395369797000058	RIGHT	28	CorrectResponse	SuccessfulGo	0	0	0	0	3.75	3.76259497899991	3.75
+      0	0.75	NULL	BLANKSCREEN	0	n/a	0	n/a	n/a	0	0	0	0	5.25	0	5.25
+      6.01305639299972	1.5	GO	LEFT	0.397905727999841	LEFT	5	CorrectResponse	SuccessfulGo	0	0	0	0	6	6.01305639299972	6
+      0	0.625	NULL	BLANKSCREEN	0	n/a	0	n/a	n/a	0	0	0	0	7.5	0	7.5
+      8.13091354699964	1.5	GO	RIGHT	0.402115894999952	RIGHT	28	CorrectResponse	SuccessfulGo	0	0	0	0	8.125	8.13091354699964	8.125
+      ...
+
+--- 5. XAI_Social_Games_Data ---
+  participants.tsv: 10 cols
+      participant_id
+      age
+      sex
+      race
+      ethnicity
+      weight
+      height
+      BMI
+      handedness
+      group
+
+  === sample socialReward: sub-1001_ses-1_task-socialReward_doorsA2_events.tsv ===
+      onset	duration	trial_type	rt	resp	gender	image_left	image_right
+      0.6013748999685049	3.000828400021419	decision	2.035339900001418	left	S	SD001.jpg	SD002.jpg
+      4.155072399997152	1.0010338999563828	win	n/a	n/a	n/a	SD001.jpg	SD002.jpg
+      11.078846299962606	3.0012798000243492	decision	2.535318400012329	right	S	SD003.jpg	SD004.jpg
+      14.632536899996921	1.0011128999758512	loss	n/a	n/a	n/a	SD003.jpg	SD004.jpg
+      17.352022399951238	3.0023802000214346	decision	1.7839569000061601	left	S	SD005.jpg	SD006.jpg
+      20.905454899999313	1.0010831999825314	win	n/a	n/a	n/a	SD005.jpg	SD006.jpg
+      23.625006199989002	3.0023639000137337	decision	2.5349806000012904	left	D	DD001.jpg	DD002.jpg
+      ...
+
+  === sample sharedreward: sub-10317_task-sharedreward_run-1_events.tsv ===
+      onset	duration	trial_type	response_time
+      4.020756	5.026165	event_stranger_reward	1.651557
+      4.020756	1.651557	stranger_face	1.651557
+      9.862146	5.831893	event_computer_punish	1.444148
+      9.862146	1.444148	computer_non-faceclea	1.444148
+      18.141800	4.214698	event_friend_neutral	0.830533
+      18.141800	0.830533	friend_face	0.830533
+      23.178858	5.023023	event_stranger_punish	0.826710
+      ...
+
+  unique tasks in XAI_Social_Games_Data: ['doors', 'sharedreward', 'socialReward', 'socialdoors', 'trust', 'ugr']
+
+--- 6. XAI_Behavioral_Data — unique tasks ---
+  unique tasks: ['ultimatum']
+
+  === sample ultimatum: sub-104_task-ultimatum_run-01_events.tsv ===
+      onset	duration	trial_type	response_time	Offer	IsFairBlock
+      4.008220	3.515540	event_accept_outgroup	1.297310	8	1
+      4.008220	3.515540	event_outgroup	1.297310	8	1
+      4.008220	33.500000	block_outgroup_fair	n/a	n/a	n/a
+      8.281520	3.515420	event_accept_outgroup	1.728010	7	1
+      8.281520	3.515420	event_outgroup	1.728010	7	1
+      8.281520	0	event_RT	1.728010	7	1
+      12.555700	3.516360	event_accept_outgroup	1.657320	9	1
+      ...
+
+--- 7. SD3/codebook.txt (full) ---
+      This data was collected with an interactive version of the Short Dark Triad (see Paulhus, D. L., & Jones, D. N. (2011, January). Introducing a short measure of the Dark Triad. Poster presented at the meeting of the Society for Personality and Social Psychology, San Antonio.).
+      
+      Only participants who indicated that their answers were accurate and agreed to allow their data to be used for research are included.
+      
+      The following items were rated on a five point scale with the labels: 1=disagree, 3=neutral, 5=agree
+      
+      M1	It's not wise to tell your secrets.
+      M2	I like to use clever manipulation to get my way.
+      M3	Whatever it takes, you must get the important people on your side.
+      M4	Avoid direct conflict with others because they may be useful in the future.
+      M5	It�s wise to keep track of information that you can use against people later.
+      M6	You should wait for the right time to get back at people.
+      M7	There are things you should hide from other people because they don�t need to know.
+      M8	Make sure your plans benefit you, not others.
+      M9	Most people can be manipulated.
+      N1	People see me as a natural leader.
+      N2	I hate being the center of attention.
+      N3	Many group activities tend to be dull without me.
+      N4	I know that I am special because everyone keeps telling me so.
+      N5	I like to get acquainted with important people.
+      N6	I feel embarrassed if someone compliments me.
+      N7	I have been compared to famous people.
+      N8	I am an average person.
+      N9	I insist on getting the respect I deserve.
+      P1	I like to get revenge on authorities.
+      P2	I avoid dangerous situations.
+      P3	Payback needs to be quick and nasty.
+      P4	People often say I�m out of control.
+      P5	It�s true that I can be mean to others.
+      P6	People who mess with me always regret it.
+      P7	I have never gotten into trouble with the law.
+      P8	I enjoy having sex with people I hardly know
+      P9	I�ll say anything to get what I want.
+      
+      And these other values were calculated from technical information:
+      
+      source	How the user came to take the test. 1=from front page of website, 2=Google search, 3=other (based on HTTP referrer).
+      country	Using MaxMind GeoLite.
+
+--- 8. XAI_Delay_Discounting_Data header ---
+  174 columns
+      Start Date
+      End Date
+      Response Type
+      Progress
+      Duration (in seconds)
+      Finished
+      Recorded Date
+      Response ID
+      Distribution Channel
+      User Language
+      Subject Number:
+      "Overall
+       my mood is: - -10 represents ""very unpleasant""
+       and 10 represents ""very pleasant"""
+      Which would you rather have?
+      Timing - First Click
+      Timing - Last Click
+      Timing - Page Submit
+      Timing - Click Count
+      Which would you rather have?
+      Timing - First Click
+      Timing - Last Click
+      Timing - Page Submit
+      Timing - Click Count
+      Which would you rather have?
+      Timing - First Click
+      Timing - Last Click
+      Timing - Page Submit
+      Timing - Click Count
+      Which would you rather have?
+      Timing - First Click
+      Timing - Last Click
+      Timing - Page Submit
+      Timing - Click Count
+      Which would you rather have?
+      Timing - First Click
+      Timing - Last Click
+      Timing - Page Submit
+      Timing - Click Count
+      Which would you rather have?
+      ... (+134 more)
+
+==============================================================================
+P6d SCOPE 2 — FINAL ASSESSMENT
+==============================================================================
+
+The by-name search found no on-disk candidate for 9 of the 10 synthetic
+priors. The 10th (omega_social) has many files, but every candidate
+lives in XAI_Social_Games_Data, which is the same source that produced
+lambda_ineq. Using the same dataset for two parameters is not independent
+grounding.
+
+This reconnaissance block reads the actual COLUMN headers of every
+task file to check for hidden variables. If, for example, the BART task
+contains a "pump_decision_after_loss" column, that could proxy u_U. If
+the HCP EMOTION task contains a "fear_face_accuracy" column, that could
+proxy theta_T. If the DASS item set contains items that map onto a
+transient mood construct distinct from general distress, that could
+proxy m_t.
+
+Without column-level evidence, the honest conclusion is that P6d-Rebuild
+requires external data acquisition for 9 of the 10 priors.
+

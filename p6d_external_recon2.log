@@ -1,0 +1,45 @@
+==============================================================================
+P6d EXTERNAL — corrected reconnaissance (round 2)
+==============================================================================
+
+--- 1. OSF retry with browser UA ---
+  === CORTEX (node jhbe8) ===
+    https://api.osf.io/v2/nodes/jhbe8/
+      ERR: HTTP Error 403: Forbidden
+    https://api.osf.io/v2/nodes/jhbe8/files/osfstorage/
+      ERR: HTTP Error 403: Forbidden
+
+  === ERP CORE (node thsqg) ===
+    https://api.osf.io/v2/nodes/thsqg/
+      ERR: HTTP Error 403: Forbidden
+    https://api.osf.io/v2/nodes/thsqg/files/osfstorage/
+      ERR: HTTP Error 403: Forbidden
+
+--- 2. CORTEX DOI resolution ---
+  10.17605/OSF.IO/JHBE8  ERR: HTTP Error 403: Forbidden
+  10.17605/osf.io/jhbe8  ERR: HTTP Error 403: Forbidden
+
+--- 3. OSF download redirect test ---
+  https://osf.io/jhbe8/download  HTTP 403  location=?
+  https://osf.io/jhbe8/  HTTP 403  location=?
+  https://osf.io/thsqg/download  HTTP 403  location=?
+  https://osf.io/thsqg/  HTTP 403  location=?
+
+--- 4. MFQ record 21251296: README + CSV head ---
+  README ERR: HTTP Error 403: Forbidden
+
+  CSV ERR: HTTP Error 403: Forbidden
+
+--- 5. Zenodo search: tactile precision / Sapey-Triomphe ---
+  query 'Sapey-Triomphe tactile'  ERR: HTTP Error 403: Forbidden
+  query 'sensory precision autism'  ERR: HTTP Error 403: Forbidden
+  query 'tactile discrimination precision'  ERR: HTTP Error 403: Forbidden
+
+--- 6. OSF search by keyword ---
+  query 'CORTEX bandit'  ERR: HTTP Error 403: Forbidden
+  query 'ERP CORE P300'  ERR: HTTP Error 403: Forbidden
+  query 'Kappenman ERP CORE'  ERR: HTTP Error 403: Forbidden
+
+==============================================================================
+END
+==============================================================================

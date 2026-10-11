@@ -1,0 +1,47 @@
+Total rows: 401
+
+After exclude==0: 331 rows
+
+  of which bot.detect==1: 2
+After bot.detect==0: 329 rows
+
+Valid PANAS pre responses: 329
+  pos mean=30.085 sd=9.416
+  neg mean=14.155 sd=7.544
+
+Candidate m_t (PANAS pos-pre minus neg-pre, standardized, clipped [-3, 3]):
+  n    = 329
+  mean = -0.0000
+  sd   = 1.0000
+  min  = -2.5874
+  max  = 2.1527
+  q01  = -2.3083
+  q05  = -1.5141
+  q10  = -1.2458
+  q25  = -0.7092
+  q50  = 0.0063
+  q75  = 0.6323
+  q90  = 1.2762
+  q95  = 1.7592
+  q99  = 2.1527
+
+Comparison at matched quantiles:
+     q     PANAS_m_t   current_copula       delta
+     1       -2.3083          -2.2908     -0.0175
+     5       -1.5141          -1.6457     +0.1315
+    10       -1.2458          -1.2695     +0.0236
+    25       -0.7092          -0.6697     -0.0395
+    50        0.0063          -0.0233     +0.0295
+    75        0.6323           0.6567     -0.0244
+    90        1.2762           1.2538     +0.0224
+    95        1.7592           1.6495     +0.1097
+    99        2.1527           2.3257     -0.1730
+
+Saved candidate m_t to: /home/kian/projects/xai_project/Data_Xai32kProje/P6d_External/m_t_panas_pre.npy
+  shape=(329,)  bytes=2760
+
+Tail comparison:
+  PANAS_m_t  fraction |x|>2: 0.0456
+  current    fraction |x|>2: 0.0441
+  PANAS_m_t  fraction |x|>3: 0.0000  (0 because clipped)
+  current    fraction |x|>3: 0.0025

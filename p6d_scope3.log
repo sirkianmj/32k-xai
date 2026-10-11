@@ -1,0 +1,62 @@
+==============================================================================
+P6d SCOPE 3 — HCP 3T_tfMRI (task, condition, measure) enumeration
+==============================================================================
+
+=== EMOTION (482 subjects) ===
+  conditions: ['FACE', 'SHAPE']
+    FACE                 measures=['ACC', 'MEDIAN_RT']
+    SHAPE                measures=['ACC', 'MEDIAN_RT']
+
+=== GAMBLING (491 subjects) ===
+  conditions: ['PUNISH', 'REWARD']
+    PUNISH               measures=['MEDIAN_RT_LARGER', 'MEDIAN_RT_SMALLER', 'PROP_LARGER', 'PROP_NLR', 'PROP_SMALLER']
+    REWARD               measures=['MEDIAN_RT_LARGER', 'MEDIAN_RT_SMALLER', 'PROP_LARGER', 'PROP_NLR', 'PROP_SMALLER']
+
+=== LANGUAGE (482 subjects) ===
+  conditions: ['MATH', 'STORY']
+    MATH                 measures=['ACC', 'AVG_DIFFICULTY_LEVEL', 'MEDIAN_RT']
+    STORY                measures=['ACC', 'AVG_DIFFICULTY_LEVEL', 'MEDIAN_RT']
+
+=== RELATIONAL (481 subjects) ===
+  conditions: ['MATCH', 'REL']
+    MATCH                measures=['ACC', 'MEDIAN_RT']
+    REL                  measures=['ACC', 'MEDIAN_RT']
+
+=== SOCIAL (483 subjects) ===
+  conditions: ['RANDOM', 'TOM']
+    RANDOM               measures=['MEDIAN_RT_RANDOM', 'MEDIAN_RT_TOM', 'MEDIAN_RT_UNSURE', 'PROP_NLR', 'PROP_RANDOM', 'PROP_TOM', 'PROP_UNSURE']
+    TOM                  measures=['MEDIAN_RT_RANDOM', 'MEDIAN_RT_TOM', 'MEDIAN_RT_UNSURE', 'PROP_NLR', 'PROP_RANDOM', 'PROP_TOM', 'PROP_UNSURE']
+
+=== WM (492 subjects) ===
+  conditions: ['0BK_BODY', '0BK_FACE', '0BK_PLACE', '0BK_TOOL', '2BK_BODY', '2BK_FACE', '2BK_PLACE', '2BK_TOOL']
+    0BK_BODY             measures=['ACC', 'ACC_NONTARGET', 'ACC_TARGET', 'MEDIAN_RT', 'MEDIAN_RT_NONTARGET', 'MEDIAN_RT_TARGET']
+    0BK_FACE             measures=['ACC', 'ACC_NONTARGET', 'ACC_TARGET', 'MEDIAN_RT', 'MEDIAN_RT_NONTARGET', 'MEDIAN_RT_TARGET']
+    0BK_PLACE            measures=['ACC', 'ACC_NONTARGET', 'ACC_TARGET', 'MEDIAN_RT', 'MEDIAN_RT_NONTARGET', 'MEDIAN_RT_TARGET']
+    0BK_TOOL             measures=['ACC', 'ACC_NONTARGET', 'ACC_TARGET', 'MEDIAN_RT', 'MEDIAN_RT_NONTARGET', 'MEDIAN_RT_TARGET']
+    2BK_BODY             measures=['ACC', 'ACC_NONTARGET', 'ACC_TARGET', 'MEDIAN_RT', 'MEDIAN_RT_NONTARGET', 'MEDIAN_RT_TARGET']
+    2BK_FACE             measures=['ACC', 'ACC_NONTARGET', 'ACC_TARGET', 'MEDIAN_RT', 'MEDIAN_RT_NONTARGET', 'MEDIAN_RT_TARGET']
+    2BK_PLACE            measures=['ACC', 'ACC_NONTARGET', 'ACC_TARGET', 'MEDIAN_RT', 'MEDIAN_RT_NONTARGET', 'MEDIAN_RT_TARGET']
+    2BK_TOOL             measures=['ACC', 'ACC_NONTARGET', 'ACC_TARGET', 'MEDIAN_RT', 'MEDIAN_RT_NONTARGET', 'MEDIAN_RT_TARGET']
+
+--- n subjects with each task ---
+  EMOTION      482
+  GAMBLING     491
+  LANGUAGE     482
+  RELATIONAL   481
+  SOCIAL       483
+  WM           492
+
+--- XAI_Social_Games: tasks × suffixes ---
+  doors: 1 file variants
+  sharedreward: 2 file variants
+  socialReward: 29 file variants
+  socialdoors: 1 file variants
+  trust: 2 file variants
+  ugr: 2 file variants
+
+--- XAI_Delay_Discounting: row count + mood column values ---
+  rows: 478
+  mood column index: 11
+  header at mood_col: Overall, my mood is: - -10 represents "very unpleasant", and 10 represents "very
+  mood n=432 mean=5.623 sd=3.552 min=-10.00 max=10.00
+

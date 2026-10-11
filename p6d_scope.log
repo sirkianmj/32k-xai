@@ -1,0 +1,393 @@
+==============================================================================
+P6d SCOPE — reconnaissance of Data_Xai32kProje/
+==============================================================================
+
+--- 1. TOP LEVEL ---
+  9 directories, 30 files
+    3T_TFMRI_inscanner_performance_data/  (5809 entries)
+    IPIP-FFM-data-8Nov2018/  (3 entries)
+    SD3/  (2 entries)
+    XAI_Behavioral_Data/  (162 entries)
+    XAI_Delay_Discounting_Data/  (1 entries)
+    XAI_Markov_TwoStep_Data/  (3 entries)
+    XAI_Mental_Health_DASS/  (3 entries)
+    XAI_Risk_Impulsivity_Data/  (532 entries)
+    XAI_Social_Games_Data/  (1144 entries)
+
+    HCP_YA_subjects_2026_10_06_10_54_40.csv  (3539068 B)
+    cmdstan-2.36.0.tar.gz  (43437905 B)
+    fit_and_recover.log  (965 B)
+    fit_and_recover.py  (5470 B)
+    fit_two_step.py  (6110 B)
+    participants.tsv  (1079 B)
+    recovery_final.py  (6344 B)
+    recovery_final_v2.py  (5615 B)
+    recovery_final_v3.py  (5589 B)
+    recovery_hba.py  (5433 B)
+    recovery_rpy2.py  (6244 B)
+    recovery_subprocess.py  (4739 B)
+    recovery_v4.py  (7115 B)
+    run_final_pipeline.log  (7419 B)
+    run_final_pipeline.sh  (8196 B)
+    run_final_pipeline_v3.log  (3742 B)
+    run_final_v4.log  (4958 B)
+    run_final_v4.sh  (9485 B)
+    run_recovery_final.log  (0 B)
+    run_recovery_log.txt  (155 B)
+    run_recovery_r_log.txt  (1239 B)
+    run_recovery_subprocess.log  (129 B)
+    run_recovery_v3.log  (2338 B)
+    run_recovery_v4.log  (3520 B)
+    run_ts.R  (1308 B)
+    run_ts_par7.R  (1258 B)
+    setup_and_run.log  (98082 B)
+    setup_and_run.sh  (2519 B)
+    w_mb_per_subject.csv  (23834 B)
+    w_mb_recovery.txt  (92 B)
+
+--- 2. PER-DIRECTORY SUMMARIES ---
+  3T_TFMRI_inscanner_performance_data/  (5809 entries)
+      extensions: {'.csv': 5809}
+      - 100307_tfMRI_EMOTION_LR_Stats.csv  (109 B)
+      - 100307_tfMRI_EMOTION_RL_Stats.csv  (120 B)
+      - 100307_tfMRI_GAMBLING_LR_Stats.csv  (296 B)
+      - 100307_tfMRI_GAMBLING_RL_Stats.csv  (284 B)
+      - 100307_tfMRI_LANGUAGE_LR_Stats.csv  (193 B)
+      ... (+5804 more)
+
+  IPIP-FFM-data-8Nov2018/  (3 entries)
+      extensions: {'(no-ext)': 1, '.csv': 1, '.txt': 1}
+      - .directory  (60 B)
+      - codebook.txt  (3951 B)
+      - data-final.csv  (416273844 B)
+
+  SD3/  (2 entries)
+      extensions: {'.csv': 1, '.txt': 1}
+      - codebook.txt  (2136 B)
+      - data.csv  (1091615 B)
+
+  XAI_Behavioral_Data/  (162 entries)
+      extensions: {'.tsv': 162}
+      - participants.tsv  (1079 B)
+      - sub-104_task-ultimatum_run-01_events.tsv  (10078 B)
+      - sub-104_task-ultimatum_run-02_events.tsv  (10072 B)
+      - sub-105_task-ultimatum_run-02_events.tsv  (10063 B)
+      - sub-106_task-ultimatum_run-01_events.tsv  (10077 B)
+      ... (+157 more)
+
+  XAI_Delay_Discounting_Data/  (1 entries)
+      extensions: {'.csv': 1}
+      - Delay Discounting Task_March 21, 2018.csv  (361037 B)
+
+  XAI_Markov_TwoStep_Data/  (3 entries)
+      extensions: {'.csv': 2, '.md': 1}
+      - README.md  (2829 B)
+      - data.csv  (1744061 B)
+      - demographics.csv  (12400 B)
+
+  XAI_Mental_Health_DASS/  (3 entries)
+      extensions: {'.csv': 1, '.png': 1, '.txt': 1}
+      - codebook.txt  (7507 B)
+      - data.csv  (20780183 B)
+      - demo1.png  (21092 B)
+
+  XAI_Risk_Impulsivity_Data/  (532 entries)
+      extensions: {'.tsv': 530, '.json': 2}
+      - participants.tsv  (16387 B)
+      - sub-10159_task-bart_events.tsv  (13520 B)
+      - sub-10159_task-stopsignal_events.tsv  (23876 B)
+      - sub-10171_task-bart_events.tsv  (14975 B)
+      - sub-10171_task-stopsignal_events.tsv  (23837 B)
+      ... (+527 more)
+
+  XAI_Social_Games_Data/  (1144 entries)
+      extensions: {'.tsv': 1139, '.json': 5}
+      - participants.tsv  (10293 B)
+      - sub-1001_ses-1_task-socialReward_doorsA2_events.tsv  (6603 B)
+      - sub-1001_ses-1_task-socialReward_facesA2_events.tsv  (6605 B)
+      - sub-1001_ses-1_task-socialReward_facespractice1_events.tsv  (235 B)
+      - sub-10050_ses-1_task-socialReward_doorsA_events.tsv  (5063 B)
+      ... (+1139 more)
+
+--- 3. participants.tsv HEADERS ---
+  XAI_Behavioral_Data/participants.tsv  (4 columns)
+      participant_id
+      age
+      sex
+      group
+
+  XAI_Risk_Impulsivity_Data/participants.tsv  (16 columns)
+      participant_id
+      diagnosis
+      age
+      gender
+      bart
+      bht
+      dwi
+      pamenc
+      pamret
+      rest
+      scap
+      stopsignal
+      T1w
+      taskswitch
+      ScannerSerialNumber
+      ghost_NoGhost
+
+  XAI_Social_Games_Data/participants.tsv  (10 columns)
+      participant_id
+      age
+      sex
+      race
+      ethnicity
+      weight
+      height
+      BMI
+      handedness
+      group
+
+--- 4. CODEBOOKS AND READMEs (first 40 lines each) ---
+  === IPIP-FFM-data-8Nov2018/codebook.txt ===
+      This data was collected (2016-2018) through an interactive on-line personality test.
+      The personality test was constructed with the "Big-Five Factor Markers" from the IPIP. https://ipip.ori.org/newBigFive5broadKey.htm
+      Participants were informed that their responses would be recorded and used for research at the beginning of the test, and asked to confirm their consent at the end of the test.
+      
+      The following items were presented on one page and each was rated on a five point scale using radio buttons. The order on page was was EXT1, AGR1, CSN1, EST1, OPN1, EXT2, etc.
+      The scale was labeled 1=Disagree, 3=Neutral, 5=Agree
+      
+      EXT1	I am the life of the party.
+      EXT2	I don't talk a lot.
+      EXT3	I feel comfortable around people.
+      EXT4	I keep in the background.
+      EXT5	I start conversations.
+      EXT6	I have little to say.
+      EXT7	I talk to a lot of different people at parties.
+      EXT8	I don't like to draw attention to myself.
+      EXT9	I don't mind being the center of attention.
+      EXT10	I am quiet around strangers.
+      EST1	I get stressed out easily.
+      EST2	I am relaxed most of the time.
+      EST3	I worry about things.
+      EST4	I seldom feel blue.
+      EST5	I am easily disturbed.
+      EST6	I get upset easily.
+      EST7	I change my mood a lot.
+      EST8	I have frequent mood swings.
+      EST9	I get irritated easily.
+      EST10	I often feel blue.
+      AGR1	I feel little concern for others.
+      AGR2	I am interested in people.
+      AGR3	I insult people.
+      AGR4	I sympathize with others' feelings.
+      AGR5	I am not interested in other people's problems.
+      AGR6	I have a soft heart.
+      AGR7	I am not really interested in others.
+      AGR8	I take time out for others.
+      AGR9	I feel others' emotions.
+      AGR10	I make people feel at ease.
+      CSN1	I am always prepared.
+      CSN2	I leave my belongings around.
+      CSN3	I pay attention to details.
+      ...(truncated)
+
+  === SD3/codebook.txt ===
+      This data was collected with an interactive version of the Short Dark Triad (see Paulhus, D. L., & Jones, D. N. (2011, January). Introducing a short measure of the Dark Triad. Poster presented at the meeting of the Society for Personality and Social Psychology, San Antonio.).
+      
+      Only participants who indicated that their answers were accurate and agreed to allow their data to be used for research are included.
+      
+      The following items were rated on a five point scale with the labels: 1=disagree, 3=neutral, 5=agree
+      
+      M1	It's not wise to tell your secrets.
+      M2	I like to use clever manipulation to get my way.
+      M3	Whatever it takes, you must get the important people on your side.
+      M4	Avoid direct conflict with others because they may be useful in the future.
+      M5	It�s wise to keep track of information that you can use against people later.
+      M6	You should wait for the right time to get back at people.
+      M7	There are things you should hide from other people because they don�t need to know.
+      M8	Make sure your plans benefit you, not others.
+      M9	Most people can be manipulated.
+      N1	People see me as a natural leader.
+      N2	I hate being the center of attention.
+      N3	Many group activities tend to be dull without me.
+      N4	I know that I am special because everyone keeps telling me so.
+      N5	I like to get acquainted with important people.
+      N6	I feel embarrassed if someone compliments me.
+      N7	I have been compared to famous people.
+      N8	I am an average person.
+      N9	I insist on getting the respect I deserve.
+      P1	I like to get revenge on authorities.
+      P2	I avoid dangerous situations.
+      P3	Payback needs to be quick and nasty.
+      P4	People often say I�m out of control.
+      P5	It�s true that I can be mean to others.
+      P6	People who mess with me always regret it.
+      P7	I have never gotten into trouble with the law.
+      P8	I enjoy having sex with people I hardly know
+      P9	I�ll say anything to get what I want.
+      
+      And these other values were calculated from technical information:
+      
+      source	How the user came to take the test. 1=from front page of website, 2=Google search, 3=other (based on HTTP referrer).
+      country	Using MaxMind GeoLite.
+
+  === XAI_Markov_TwoStep_Data/README.md ===
+      # Zorowitz & Niv (unpublished)
+      
+      Data from N=149 participants who completed a gamified version of the two-step task under one of three conditions:
+      
+      - Experiment 1: Stimuli from both first- and second-state choices were randomly assigned to right/left positions on the screen on every trial.
+      - Experiment 2: Stimuli from both first- and second-state choices were assigned fixed right/left positions on the screen (i.e., unchanging across trials).
+      - Experiment 3: Stimuli from first-state choices were randomly assigned to right/left positions on the screen on every trial. Second-state stimuli were assigned fixed right/left positions on the screen (i.e., unchanging across trials).
+      
+      Data were collected for task piloting purposes.
+      
+      ## Methods
+      
+      149 participants were recruited from Prolific Academic (https://www.prolific.co/) to participate in an online behavioral experiment betwen August - December, 2021. Participants were eligible participate if they were at least 18 years old and resided in the United States or Canada. The study was approved by the Institutional Review Board of Princeton University (#11968), and all participants provided informed consent. Total study duration was approximately 15-20 minutes. Participants received monetary compensation for their time (rate USD 12/hr), plus an incentive-compatible bonus up to $1.00 based on task performance.
+      
+      Participants completed 201 trials of the two-step task (DOI: 10.1016/j.neuron.2011.02.027). Here we used a "space-themed" version of the task (developed in previous research; DOI: 10.1177/0956797616639301) in order to improve task comprehension and encourage motivated responding. The task was programmed using jsPsych (DOI: 10.3758/s13428-014-0458-y). The code for the task is available at: https://github.com/nivlab/jspsych-demos/tree/main/tasks/two-step. A playable demo of the task is available at: https://nivlab.github.io/jspsych-demos/tasks/two-step/experiment.html.
+      
+      ## Data dictionary
+      
+      - subject:        de-identified participant identifier
+      - experiment:     version of experiment (1 = complete randomization, 2 = no randomization, 3 = s1 randomization only)
+      - trial:          trial number
+      - drift_ix:       set of drifting probabilities (1, 2, 3, 4)
+      - state_1_key:    state 1, side of choice (left = 0, right = 1)
+      - state_1_choice: state 1, identity of choice (0, 1)
+      - state_1_rt:     state 1, response time (in seconds)
+      - transition:     transition type (common [70%] = 1, uncommon [30%] = 0)
+      - state_2:        identity of second state (0, 1)
+      - state_2_key:    state 2, side of choice (left = 0, right = 1)
+      - state_2_choice: state 2, identity of choice (0, 1, 2, 3)
+      - state_2_rt:     state 2, response time (in seconds)
+      - outcome:        state 2, outcome (reward = 1, nonreward = 0)
+      
+      ## Contact
+      
+      Sam Zorowitz (zorowitz [at] princeton [dot] edu)
+
+  === XAI_Mental_Health_DASS/codebook.txt ===
+      This data was collected with an on-line version of the Depression Anxiety Stress Scales (DASS), see http://www2.psy.unsw.edu.au/dass/
+      
+      The survey was open to anyone and people were motivated to take it to get personalized results. At the end of the test they also were given the option to complete a short research survey. This datatset comes from those who agreed to complete the research survey and answered yes to the question "Have you given accurate answers and may they be used for research?" at the end.
+      
+      This data was collected 2017 - 2019.
+      
+      The following items were included in the survey:
+      
+      Q1	I found myself getting upset by quite trivial things.
+      Q2	I was aware of dryness of my mouth.
+      Q3	I couldn't seem to experience any positive feeling at all.
+      Q4	I experienced breathing difficulty (eg, excessively rapid breathing, breathlessness in the absence of physical exertion).
+      Q5	I just couldn&#39;t seem to get going.
+      Q6	I tended to over-react to situations.
+      Q7	I had a feeling of shakiness (eg, legs going to give way).
+      Q8	I found it difficult to relax.
+      Q9	I found myself in situations that made me so anxious I was most relieved when they ended.
+      Q10	I felt that I had nothing to look forward to.
+      Q11	I found myself getting upset rather easily.
+      Q12	I felt that I was using a lot of nervous energy.
+      Q13	I felt sad and depressed.
+      Q14	I found myself getting impatient when I was delayed in any way (eg, elevators, traffic lights, being kept waiting).
+      Q15	I had a feeling of faintness.
+      Q16	I felt that I had lost interest in just about everything.
+      Q17	I felt I wasn&#39;t worth much as a person.
+      Q18	I felt that I was rather touchy.
+      Q19	I perspired noticeably (eg, hands sweaty) in the absence of high temperatures or physical exertion.
+      Q20	I felt scared without any good reason.
+      Q21	I felt that life wasn&#39;t worthwhile.
+      Q22	I found it hard to wind down.
+      Q23	I had difficulty in swallowing.
+      Q24	I couldn&#39;t seem to get any enjoyment out of the things I did.
+      Q25	I was aware of the action of my heart in the absence of physical exertion (eg, sense of heart rate increase, heart missing a beat).
+      Q26	I felt down-hearted and blue.
+      Q27	I found that I was very irritable.
+      Q28	I felt I was close to panic.
+      Q29	I found it hard to calm down after something upset me.
+      Q30	I feared that I would be &quot;thrown&quot; by some trivial but unfamiliar task.
+      Q31	I was unable to become enthusiastic about anything.
+      Q32	I found it difficult to tolerate interruptions to what I was doing.
+      ...(truncated)
+
+--- 5. KEYWORD HITS IN FILE HEADERS (per prior) ---
+  theta_T        (threat, fear, harm, danger, anxiety)
+      no hits
+
+  u_U            (uncertainty, intolerance, ambiguity, IUS)
+      no hits
+
+  eta_vol        (volatil, changepoint, switch, dynamic)
+      HIT: XAI_Risk_Impulsivity_Data/participants.tsv  (matched 'switch')
+
+  omega_social   (social value, svor, prosocial, altruism, reward)
+      no hits
+
+  lambda_norm    (moral, norm, MFQ, fairness, justice)
+      no hits
+
+  s_spite        (spite, suspicio, paranoi, antagonis)
+      no hits
+
+  tau_sens       (percept, precision, sensor, detection)
+      no hits
+
+  gamma_sal      (salien, oddball, attention, relevan)
+      no hits
+
+  kappa_ctx      (context, integration, binding)
+      no hits
+
+  m_t            (mood, affect, POMS, PANAS, depress, state)
+      HIT: XAI_Delay_Discounting_Data/Delay Discounting Task_March 21, 2018.csv  (matched 'mood')
+      HIT: XAI_Markov_TwoStep_Data/data.csv  (matched 'state')
+
+--- 6. FILES WITH SUGGESTIVE NAMES ---
+  omega_social   XAI_Social_Games_Data/sub-10812_task-sharedreward_run-1_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10801_ses-1_task-socialReward_facesA2_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10969_task-sharedreward_run-2_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10863_ses-1_task-socialReward_facesB2_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10541_task-sharedreward_run-2_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10930_ses-1_task-socialReward_doorsA2_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10918_ses-1_task-socialReward_doorsA1_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10608_ses-1_task-socialReward_doorsA1_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10636_task-sharedreward_run-2_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10572_task-sharedreward_run-1_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10674_ses-1_task-socialReward_facesA2_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10767_ses-1_task-socialReward_facesB1_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10827_ses-1_task-socialReward_doorsB1_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10774_ses-1_task-socialReward_facesA2_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10952_ses-1_task-socialReward_facesB2_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10581_ses-1_task-socialReward_doorsA2_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-2002_ses-1_task-socialReward_facespractice4_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10929_ses-1_task-socialReward_facesA2_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10838_task-sharedreward_run-2_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10642_ses-1_task-socialReward_facesA2_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10589_task-sharedreward_run-1_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10887_ses-1_task-socialReward_facesA1_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10919_ses-1_task-socialReward_doorsA2_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10529_ses-1_task-socialReward_facesB3_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10802_task-sharedreward_run-2_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10590_task-sharedreward_run-2_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10720_task-sharedreward_run-2_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10977_task-sharedreward_run-2_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10940_task-sharedreward_run-1_events.tsv
+  omega_social   XAI_Social_Games_Data/sub-10589_task-sharedreward_run-2_events.tsv
+  ... (+458 more)
+
+--- 7. DATASET COVERAGE SUMMARY ---
+  prior           on-disk candidate     status         
+  theta_T           0 name matches     NO-DATASET-ON-DISK
+  u_U               0 name matches     NO-DATASET-ON-DISK
+  eta_vol           0 name matches     NO-DATASET-ON-DISK
+  omega_social    488 name matches     candidate-found
+  lambda_norm       0 name matches     NO-DATASET-ON-DISK
+  s_spite           0 name matches     NO-DATASET-ON-DISK
+  tau_sens          0 name matches     NO-DATASET-ON-DISK
+  gamma_sal         0 name matches     NO-DATASET-ON-DISK
+  kappa_ctx         0 name matches     NO-DATASET-ON-DISK
+  m_t               0 name matches     NO-DATASET-ON-DISK
+
+==============================================================================
+END OF P6d SCOPE RECONNAISSANCE
+==============================================================================
