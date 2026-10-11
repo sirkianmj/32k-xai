@@ -63,7 +63,7 @@ SEED_COUNT    = 3      # multi-seed averaging
 _SRC = E.load_all(PARAMS, required=False)
 _N_ALL = len(_SRC["O"])
 
-def build_simulator(N, T, trace_agent_i=None):
+def build_simulator(N, T, trace_agent_i=None, shocks=None):
     idx = np.random.default_rng(SEED).integers(0, _N_ALL, size=N)
     P = {k: jnp.asarray(v[idx]) for k, v in _SRC.items()}
 
@@ -105,7 +105,38 @@ def build_simulator(N, T, trace_agent_i=None):
     W0      = jnp.full((N,), E.WEALTH_INIT, jnp.float32)
     LAST0   = jnp.full((N,), -1, jnp.int32)
 
-    def step(carry, tk):
+    # ---- Phase 4: shock precomputation ----
+    # shocks: list of dicts, each with keys tick, duration, type, magnitude,
+    # target_frac (None or float in (0,1]), target_seed (int).
+    #   resource_scarcity: multiplicative reduction on the reward modifier
+    #   distress_injection: additive bump on the per-agent baseline distress
+    if shocks:
+        resource_mod_np = np.ones((T, N), np.float32)
+        baseline_mod_np = np.zeros((T, N), np.float32)
+        for s in shocks:
+            t0 = int(s["tick"]); dur = int(s["duration"])
+            mag = float(s["magnitude"]); frac = s.get("target_frac")
+            ts = int(s.get("target_seed", 0))
+            if frac is None:
+                mask = np.ones(N, dtype=bool)
+            else:
+                rng = np.random.default_rng(ts)
+                mask = rng.random(N) < float(frac)
+            t1 = min(T, t0 + dur)
+            if s["type"] == "resource_scarcity":
+                resource_mod_np[t0:t1, mask] *= (1.0 - mag)
+            elif s["type"] == "distress_injection":
+                baseline_mod_np[t0:t1, mask] += mag
+            else:
+                raise ValueError(f"unknown shock type: {s['type']}")
+        resource_mod_jax = jnp.asarray(resource_mod_np)
+        baseline_mod_jax = jnp.asarray(baseline_mod_np)
+    else:
+        resource_mod_jax = jnp.ones((T, N), jnp.float32)
+        baseline_mod_jax = jnp.zeros((T, N), jnp.float32)
+
+    def step(carry, scan_in):
+        tk, rm_t, bm_t = scan_in
         calib, Q_mf, Q_off, Q_send, Q_acc, Q_ret, P_hat, wealth, dist, last_a1 = carry
         TAU_B, B_OFF, B_SEND, B_ACC, B_RET, BI_OFF, BI_SEND, BI_RET, LAMB_FS = (
             calib[0], calib[1], calib[2], calib[3],
@@ -184,7 +215,7 @@ def build_simulator(N, T, trace_agent_i=None):
         r_send = jnp.where(isR, -my_send + E.TRUST_K * rec_rm * my_send, 0.0)
         r_ret = jnp.where(isP, E.TRUST_K * rec_send * (1.0 - my_rm / E.TRUST_K), 0.0)
 
-        mult = omega * (1.0 + sal + 0.05 * mood)
+        mult = omega * (1.0 + sal + 0.05 * mood) * rm_t
         r_off_m = jnp.clip(r_off * mult, -E.REWARD_CLIP, E.REWARD_CLIP)
         r_acc_m = jnp.clip(r_acc * mult, -E.REWARD_CLIP, E.REWARD_CLIP)
         r_send_m = jnp.clip(r_send * mult, -E.REWARD_CLIP, E.REWARD_CLIP)
@@ -227,7 +258,8 @@ def build_simulator(N, T, trace_agent_i=None):
         P_hatn = P_hat.at[AR, a1, :].set(Pu)
 
         rej = isR & inter & (my_reject == 1)
-        dn = (E.DISTRESS_DECAY * dist + E.DISTRESS_PULL * baseline
+        baseline_eff = jnp.clip(baseline + bm_t, 0.0, 5.0)
+        dn = (E.DISTRESS_DECAY * dist + E.DISTRESS_PULL * baseline_eff
               + (1.0 + N_sens * E.N_DISTRESS) * rej.astype(jnp.float32) * 0.05)
         wn = jnp.maximum(wealth + total_r, 0.0)
 
@@ -277,7 +309,7 @@ def build_simulator(N, T, trace_agent_i=None):
                 inter[ti].astype(jnp.float32),
                 rej[ti].astype(jnp.float32),
                 mut[ti].astype(jnp.float32),
-                dist[ti], baseline[ti], wealth[ti],
+                dist[ti], baseline_eff[ti], wealth[ti],
             ])
             return (calib, Q_mfn, Q_off_n, Q_send_n, Q_acc_n, Q_ret_n,
                     P_hatn, wn, dn, a1), (cap, trace_vec)
@@ -288,7 +320,7 @@ def build_simulator(N, T, trace_agent_i=None):
         keys = random.split(random.PRNGKey(seed_val), T)
         carry0 = (calib_vec, Q_MF0, Q_OFF0, Q_SEND0, Q_ACC0, Q_RET0,
                   P_HAT0, W0, baseline, LAST0)
-        final, _scan_out = lax.scan(step, carry0, keys)
+        final, _scan_out = lax.scan(step, carry0, (keys, resource_mod_jax, baseline_mod_jax))
         if trace_agent_i is not None:
             cap, traces = _scan_out
         else:
