@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/home/kian/projects/xai_project/work_env/p6a_amortized_bf312.py", line 24, in <module>
+    import jax
+ModuleNotFoundError: No module named 'jax'

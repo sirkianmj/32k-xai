@@ -1,0 +1,35 @@
+======================================================================
+HBA FITTER — Full forward-simulated likelihood, NumPyro NUTS
+======================================================================
+Device: cuda:0
+Config: N_AGENTS=50  N_TICKS=40  chains=2  samples=400  warmup=200
+
+[1/3] Simulating observation dataset...
+      wall = 2.91s
+      true w_MB            mean=+0.6621  std=0.3333  min=+0.0002  max=+0.9999
+      true alpha_R         mean=+0.3410  std=0.2609  min=+0.0000  max=+0.9549
+      true beta_choice     mean=+4.7859  std=2.5741  min=+0.6725  max=+14.7340
+      true phi_per         mean=+0.2712  std=0.2752  min=-0.0946  max=+1.2110
+
+[2/3] Building NumPyro model...
+[3/3] Running NUTS MCMC (this will take several minutes)...
+/home/kian/projects/xai_project/work_env/hba_fitter.py:375: UserWarning: There are not enough devices to run parallel chains: expected 2 but got 1. Chains will be drawn sequentially. If you are running MCMC in CPU, consider using `numpyro.set_host_device_count(2)` at the beginning of your program. You can double-check how many devices are available in your system using `jax.local_device_count()`.
+  mcmc = MCMC(kernel,
+  0%|          | 0/600 [00:00<?, ?it/s]warmup:   5%|▌         | 30/600 [00:12<03:49,  2.48it/s, 63 steps of size 1.93e-02. acc. prob=0.72]warmup:  10%|█         | 60/600 [00:21<03:08,  2.86it/s, 63 steps of size 3.31e-02. acc. prob=0.76]warmup:  15%|█▌        | 90/600 [00:31<02:52,  2.96it/s, 63 steps of size 3.14e-02. acc. prob=0.77]warmup:  20%|██        | 120/600 [00:41<02:42,  2.96it/s, 63 steps of size 1.23e-01. acc. prob=0.77]warmup:  25%|██▌       | 150/600 [00:51<02:29,  3.00it/s, 63 steps of size 9.28e-02. acc. prob=0.78]warmup:  30%|███       | 180/600 [00:59<02:12,  3.17it/s, 63 steps of size 9.48e-02. acc. prob=0.77]sample:  35%|███▌      | 210/600 [01:08<02:02,  3.17it/s, 63 steps of size 4.51e-02. acc. prob=0.88]sample:  40%|████      | 240/600 [01:18<01:52,  3.21it/s, 63 steps of size 4.51e-02. acc. prob=0.86]sample:  45%|████▌     | 270/600 [01:27<01:42,  3.22it/s, 63 steps of size 4.51e-02. acc. prob=0.87]sample:  50%|█████     | 300/600 [01:36<01:33,  3.21it/s, 63 steps of size 4.51e-02. acc. prob=0.85]sample:  55%|█████▌    | 330/600 [01:46<01:24,  3.21it/s, 63 steps of size 4.51e-02. acc. prob=0.86]sample:  60%|██████    | 360/600 [01:55<01:15,  3.18it/s, 63 steps of size 4.51e-02. acc. prob=0.87]sample:  65%|██████▌   | 390/600 [02:05<01:06,  3.17it/s, 63 steps of size 4.51e-02. acc. prob=0.86]sample:  70%|███████   | 420/600 [02:14<00:56,  3.17it/s, 63 steps of size 4.51e-02. acc. prob=0.87]sample:  75%|███████▌  | 450/600 [02:24<00:47,  3.15it/s, 63 steps of size 4.51e-02. acc. prob=0.87]sample:  80%|████████  | 480/600 [02:33<00:37,  3.17it/s, 63 steps of size 4.51e-02. acc. prob=0.86]sample:  85%|████████▌ | 510/600 [02:42<00:28,  3.18it/s, 63 steps of size 4.51e-02. acc. prob=0.85]sample:  90%|█████████ | 540/600 [02:52<00:18,  3.19it/s, 63 steps of size 4.51e-02. acc. prob=0.85]sample:  95%|█████████▌| 570/600 [03:01<00:09,  3.21it/s, 63 steps of size 4.51e-02. acc. prob=0.85]sample: 100%|██████████| 600/600 [03:11<00:00,  3.18it/s, 63 steps of size 4.51e-02. acc. prob=0.86]sample: 100%|██████████| 600/600 [03:11<00:00,  3.14it/s, 63 steps of size 4.51e-02. acc. prob=0.86]
+  0%|          | 0/600 [00:00<?, ?it/s]warmup:   5%|▌         | 30/600 [00:07<02:21,  4.01it/s, 63 steps of size 3.44e-02. acc. prob=0.73]warmup:  10%|█         | 60/600 [00:17<02:36,  3.45it/s, 63 steps of size 2.68e-02. acc. prob=0.76]warmup:  15%|█▌        | 90/600 [00:26<02:34,  3.31it/s, 63 steps of size 1.88e-02. acc. prob=0.76]warmup:  20%|██        | 120/600 [00:34<02:19,  3.43it/s, 31 steps of size 1.40e-01. acc. prob=0.77]warmup:  25%|██▌       | 150/600 [00:43<02:12,  3.40it/s, 63 steps of size 1.02e-01. acc. prob=0.78]warmup:  30%|███       | 180/600 [00:51<01:56,  3.59it/s, 31 steps of size 3.75e-02. acc. prob=0.77]sample:  35%|███▌      | 210/600 [00:59<01:48,  3.60it/s, 63 steps of size 8.60e-02. acc. prob=0.69]sample:  40%|████      | 240/600 [01:08<01:44,  3.45it/s, 63 steps of size 8.60e-02. acc. prob=0.79]sample:  45%|████▌     | 270/600 [01:19<01:40,  3.28it/s, 63 steps of size 8.60e-02. acc. prob=0.77]sample:  50%|█████     | 300/600 [01:28<01:32,  3.24it/s, 63 steps of size 8.60e-02. acc. prob=0.78]sample:  55%|█████▌    | 330/600 [01:37<01:23,  3.24it/s, 63 steps of size 8.60e-02. acc. prob=0.77]sample:  60%|██████    | 360/600 [01:47<01:14,  3.24it/s, 63 steps of size 8.60e-02. acc. prob=0.76]sample:  65%|██████▌   | 390/600 [01:56<01:05,  3.22it/s, 63 steps of size 8.60e-02. acc. prob=0.76]sample:  70%|███████   | 420/600 [02:05<00:55,  3.24it/s, 63 steps of size 8.60e-02. acc. prob=0.77]sample:  75%|███████▌  | 450/600 [02:14<00:46,  3.26it/s, 63 steps of size 8.60e-02. acc. prob=0.77]sample:  80%|████████  | 480/600 [02:24<00:36,  3.25it/s, 63 steps of size 8.60e-02. acc. prob=0.77]sample:  85%|████████▌ | 510/600 [02:33<00:27,  3.24it/s, 63 steps of size 8.60e-02. acc. prob=0.76]sample:  90%|█████████ | 540/600 [02:42<00:18,  3.25it/s, 63 steps of size 8.60e-02. acc. prob=0.77]sample:  95%|█████████▌| 570/600 [02:51<00:09,  3.28it/s, 63 steps of size 8.60e-02. acc. prob=0.77]sample: 100%|██████████| 600/600 [03:00<00:00,  3.28it/s, 63 steps of size 8.60e-02. acc. prob=0.77]sample: 100%|██████████| 600/600 [03:00<00:00,  3.32it/s, 63 steps of size 8.60e-02. acc. prob=0.77]
+      MCMC wall = 380.34s
+
+======================================================================
+PARAMETER RECOVERY (posterior mean vs. true)
+======================================================================
+param               rho          p       bias       rmse    verdict
+----------------------------------------------------------------------
+w_MB            -0.0923   5.24e-01    -0.2962     0.4446       FAIL
+alpha_R          0.0187   8.98e-01    -0.0971     0.2784       FAIL
+beta_choice      0.8647   5.84e-16     0.2137     1.5868       PASS
+phi_per          0.5238   9.46e-05    -0.0195     0.2536       FAIL
+
+======================================================================
+OVERALL: 1/4 parameters recovered with rho > 0.6
+======================================================================
+Saved: /home/kian/projects/xai_project/work_env/hba_recovery_results.json

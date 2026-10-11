@@ -1,0 +1,56 @@
+{
+  "platform": {
+    "ug_mean_offer": 5.269103527069092,
+    "ug_rejection_rate": 0.05632048845291138,
+    "tg_mean_send": 0.6002880930900574,
+    "tg_mean_return": 2.009963035583496,
+    "final_gini": 0.6205079555511475,
+    "n_offers": 213457,
+    "n_responses": 213457,
+    "n_sends": 213457,
+    "n_trustees": 213457
+  },
+  "benchmarks": {
+    "UG mean offer (frac)": {
+      "platform": 0.5269103646278381,
+      "human": 0.4,
+      "abs_diff": 0.12691035866737366,
+      "combined_se": 0.03007797839431878,
+      "verdict": "FAIL"
+    },
+    "UG rejection rate": {
+      "platform": 0.05632048845291138,
+      "human": 0.16,
+      "abs_diff": 0.10367950797080994,
+      "combined_se": 0.03007797839431878,
+      "verdict": "FAIL"
+    },
+    "TG mean send (frac)": {
+      "platform": 0.6002880930900574,
+      "human": 0.502,
+      "abs_diff": 0.09828811883926392,
+      "combined_se": 0.12401888882057083,
+      "verdict": "PASS"
+    },
+    "TG mean return (frac)": {
+      "platform": 0.669987678527832,
+      "human": 0.372,
+      "abs_diff": 0.2979876697063446,
+      "combined_se": 0.11402054544813013,
+      "verdict": "FAIL"
+    },
+    "Final wealth Gini": {
+      "platform": 0.6205079555511475,
+      "human": 0.4,
+      "abs_diff": 0.22050794959068298,
+      "combined_se": 0.1000234211786875,
+      "verdict": "FAIL"
+    }
+  },
+  "wall_s": 1.8716657161712646,
+  "config": {
+    "N": 32000,
+    "T": 500,
+    "SEED": 42
+  }
+}

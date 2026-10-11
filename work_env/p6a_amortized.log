@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/home/kian/projects/xai_project/work_env/p6a_amortized.py", line 27, in <module>
+    import bayesflow as bf
+ModuleNotFoundError: No module named 'bayesflow'

@@ -1,0 +1,35 @@
+========================================================================
+PHASE 6b — HUMAN BENCHMARK VALIDATION
+========================================================================
+Device: cuda:0  N=32000  T=500
+
+Running 32k agents x 500 ticks ...
+  wall = 1.87s
+  captured shape = (500, 32000, 11)
+
+========================================================================
+PLATFORM OUTPUTS
+========================================================================
+  Ultimatum proposer offers   n=  213457  mean offer = 5.269 of E
+  Ultimatum responder ticks   n=  213457  rejection rate = 0.0563
+  Trust send events           n=  213457  mean send = 0.6003 of E
+  Trust return events         n=  213457  mean return frac = 2.0100
+  Final wealth                Gini = 0.6205
+
+  UG offer as fraction: 0.5269
+  TG return as fraction: 0.6700
+
+========================================================================
+COMPARISON vs. PUBLISHED HUMAN BENCHMARKS
+========================================================================
+benchmark                platform      human   emp_SE  combined_SE   |diff|    verdict
+------------------------------------------------------------------------
+UG mean offer (frac)       0.5269     0.4000   0.0300       0.0301   0.1269       FAIL
+UG rejection rate          0.0563     0.1600   0.0300       0.0301   0.1037       FAIL
+TG mean send (frac)        0.6003     0.5020   0.1240       0.1240   0.0983       PASS
+TG mean return (frac)      0.6700     0.3720   0.1140       0.1140   0.2980       FAIL
+Final wealth Gini          0.6205     0.4000   0.1000       0.1000   0.2205       FAIL
+------------------------------------------------------------------------
+OVERALL: 1/5 benchmarks PASS (|platform - human| < 1 combined SE)
+
+Saved: /home/kian/projects/xai_project/work_env/p6b_results.json

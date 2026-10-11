@@ -1,0 +1,14 @@
+Building small simulator (8000 x 250) ...
+  compile wall = 4.4s
+Building full simulator (32k x 500) ...
+  compile wall = 3.5s
+========================================================================
+PHASE 6c v4 — FS accept + 9 calibration scalars
+========================================================================
+Device: cuda:0
+
+Loss at init = 8.201
+
+Differential evolution (popsize=12, maxiter=20, no polish) ...
+  gen   3  loss = 0.0000  wall = 18.4s
+  gen   6  loss = 0.0000  wall = 31.3s
