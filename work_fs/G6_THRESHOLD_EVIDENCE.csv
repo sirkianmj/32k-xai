@@ -1,0 +1,10 @@
+metric,value,threshold,verdict,notes
+N_SIM,500,,,"recovery simulation sample size"
+N_valid,500,,,"valid subjects retained"
+rho_alpha,0.4919,0.5,FAIL,"G6 rank-order recovery of Fehr-Schmidt alpha"
+p_alpha,7.951e-32,,,"Spearman p-value; highly significant but rho below threshold"
+bias_alpha,1.0545,,,"recovered minus true alpha"
+rmse_alpha,2.8581,,,"root mean squared error of recovered alpha"
+rho_beta,,0.5,NOT-ESTIMABLE,"HCP UGR data has no advantageous-inequity offers"
+gate_G6_overall,,,NON-COMPLIANT,"spec-mandated simplification triggered"
+spec_action,,,SIMPLIFIED-MODEL-APPLIED,"single-parameter inequity aversion, per Spec 2.4"
