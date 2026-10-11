@@ -207,7 +207,10 @@ def build_simulator(N, T, trace_agent_i=None, shocks=None, return_diag=False):
         diff = other_payoff - my_payoff
         inequity_neg = jnp.maximum( diff, 0.0)   # other better off
         inequity_pos = jnp.maximum(-diff, 0.0)   # I better off
-        U_accept = my_payoff - alpha_e * inequity_neg - beta_g * inequity_pos
+        # [WEALTH-MODERATED-FS] diminishing marginal utility:
+        # rich responder values a given payoff less; FS utility scales down.
+        wealth_scale = 1.0 / (1.0 + E.WEALTH_KAPPA * wealth)
+        U_accept = wealth_scale * (my_payoff - alpha_e * inequity_neg - beta_g * inequity_pos)
 
         L_acc_accept = B_ACC * Q_acc[AR, s2, 0] + LAMB_FS * U_accept
         L_acc_reject = B_ACC * Q_acc[AR, s2, 1]

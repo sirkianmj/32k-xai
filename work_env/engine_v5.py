@@ -48,6 +48,7 @@ SN_STATUS      = 0.3
 SP_PUNISH      = 0.3
 SAL_GAIN       = 0.2
 N_DISTRESS     = 1.0
+WEALTH_KAPPA   = 0.001     # per-unit wealth scale on FS utility (diminishing marginal utility)
 LAMBDA_NORM_A  = 1.0
 GRAD_CLIP      = 100.0
 LOGIT_CLIP     = 30.0
