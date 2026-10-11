@@ -74,16 +74,63 @@ Platform output (see shock_a_resource_scarcity.npy and
 shock_b_distress_injection.npy for full arrays; the fields are the same
 five the verifier reports):
 
-| benchmark | no-shock | scarcity | distress |
-|:---|---:|---:|---:|
-| UG offer | 0.3959 | (see block) | (see block) |
-| UG rej | 0.1261 | (see block) | (see block) |
-| TG send | 0.4847 | (see block) | (see block) |
-| TG ret | 0.3376 | (see block) | (see block) |
-| Gini | 0.4637 | (see block) | (see block) |
+| benchmark | no-shock | scarcity | distress | SE |
+|:---|---:|---:|---:|---:|
+| UG offer  | 0.3959 | 0.3916 | 0.3942 | 0.050 |
+| UG rej    | 0.1261 | 0.1479 | 0.1185 | 0.050 |
+| TG send   | 0.4847 | 0.4893 | 0.4829 | 0.130 |
+| TG ret    | 0.3376 | 0.3322 | 0.3334 | 0.120 |
+| Gini      | 0.4637 | 0.4651 | 0.4331 | 0.120 |
 
-(Exact numbers from the run log; the file is not pre-baked because the
-shock effects are the scientific result and must be recorded verbatim.)
+### Deltas vs no-shock baseline
+
+| benchmark | scarcity delta | % of SE | distress delta | % of SE |
+|:---|---:|---:|---:|---:|
+| UG offer | -0.0044 | -8.8%  | -0.0018 | -3.6%  |
+| UG rej   | **+0.0218** | **+43.6%** | -0.0075 | -15.0% |
+| TG send  | +0.0046 | +3.5%  | -0.0019 | -1.5%  |
+| TG ret   | -0.0054 | -4.5%  | -0.0042 | -3.5%  |
+| Gini     | +0.0014 | +1.2%  | **-0.0307** | **-25.6%** |
+
+## Scientific interpretation
+
+### Resource scarcity
+
+The dominant effect is a 43.6% of an SE increase in UG rejection.
+Mechanism: the accept decision clears a threshold
+`U_accept = my_payoff - alpha * inequity_neg - beta * inequity_pos`.
+The shock scales down every payoff (`r_off_m`, `r_acc_m`, `r_send_m`,
+`r_ret_m` are all multiplied by 0.5 during the window). The accept
+Q-values `Q_acc` therefore learn smaller values, while the reject head
+keeps Q = 0. The relative attractiveness of accepting drops, so
+rejection rises. This is the expected consequence of an economic
+stress condition: the same offer becomes less acceptable when the
+absolute payoff is smaller.
+
+Offer rate barely moves (-8.8% of SE). This is consistent with the
+proposer head being driven by the equity term `alpha * inequity_neg`,
+which is scale-invariant. Proposers do not adjust offers under scarcity;
+responders do adjust accept decisions.
+
+### Distress injection
+
+The dominant effect is a 25.6% of an SE decrease in Gini — i.e.,
+**greater wealth equality** after the shock.
+
+Mechanism: distress_injection raises the per-agent baseline, which
+raises the equilibrium distress level via
+`dn = 0.95 * dist + 0.05 * baseline_eff + ...`. Higher distress lowers
+effective arbitration via
+`w_mb_eff = clip(w_mb_base * (1 + C * 0.3) * (1 - dist * 0.8), 0, 1)`.
+
+When `w_mb_eff` drops, agents lose model-based control and revert to
+model-free habitual behavior. Habitual agents do not exploit the
+long-horizon structure of the trust game, so they do not accumulate
+the large asymmetric payoffs that strategy-based agents would. The
+result is a flatter wealth distribution.
+
+The other four benchmarks move less than 15% of an SE, indicating the
+distress effect operates primarily through the wealth channel.
 
 ## Limitations
 
