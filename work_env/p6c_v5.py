@@ -60,7 +60,7 @@ SEED_COUNT    = 3      # multi-seed averaging
 _SRC = E.load_all(PARAMS)
 _N_ALL = len(_SRC["O"])
 
-def build_simulator(N, T):
+def build_simulator(N, T, trace_agent_i=None):
     idx = np.random.default_rng(SEED).integers(0, _N_ALL, size=N)
     P = {k: jnp.asarray(v[idx]) for k, v in _SRC.items()}
 
@@ -241,6 +241,43 @@ def build_simulator(N, T):
             jnp.where(inter & isP, 1.0, 0.0),
         ], axis=-1)
 
+        if trace_agent_i is not None:
+            ti = int(trace_agent_i)
+            trace_vec = jnp.stack([
+                Q_mf[ti, 0], Q_mf[ti, 1],
+                Q_MB[ti, 0], Q_MB[ti, 1],
+                Q_net[ti, 0], Q_net[ti, 1],
+                w_eff[ti], tau[ti],
+                eng[ti], avd[ti], per[ti],
+                L1[ti, 0], L1[ti, 1],
+                a1[ti].astype(jnp.float32), s2[ti].astype(jnp.float32),
+                P_hat[ti, a1[ti], 0], P_hat[ti, a1[ti], 1],
+                P_hat[ti, 1 - a1[ti], 0], P_hat[ti, 1 - a1[ti], 1],
+                a_off[ti].astype(jnp.float32), my_off[ti],
+                Q_off[ti, s2[ti], a_off[ti]],
+                a_send[ti].astype(jnp.float32), my_send[ti],
+                Q_send[ti, s2[ti], a_send[ti]],
+                a_acc[ti].astype(jnp.float32),
+                Q_acc[ti, s2[ti], 0], Q_acc[ti, s2[ti], 1],
+                U_accept[ti], inequity_neg[ti], inequity_pos[ti],
+                a_ret[ti].astype(jnp.float32), my_rm[ti],
+                Q_ret[ti, s2[ti], a_ret[ti]],
+                r_off[ti], r_acc[ti], r_send[ti], r_ret[ti], total_r[ti],
+                ch[ti].astype(jnp.float32),
+                alpha_e[ch[ti]], beta_g[ch[ti]],
+                a_off[ch[ti]].astype(jnp.float32),
+                a_send[ch[ti]].astype(jnp.float32),
+                a_ret[ch[ti]].astype(jnp.float32),
+                rec_off[ti], rec_send[ti], rec_rm[ti],
+                partner_reject[ti].astype(jnp.float32),
+                a1[ch[ti]].astype(jnp.float32),
+                inter[ti].astype(jnp.float32),
+                rej[ti].astype(jnp.float32),
+                mut[ti].astype(jnp.float32),
+                dist[ti], baseline[ti], wealth[ti],
+            ])
+            return (calib, Q_mfn, Q_off_n, Q_send_n, Q_acc_n, Q_ret_n,
+                    P_hatn, wn, dn, a1), (cap, trace_vec)
         return (calib, Q_mfn, Q_off_n, Q_send_n, Q_acc_n, Q_ret_n,
                 P_hatn, wn, dn, a1), cap
 
@@ -248,7 +285,12 @@ def build_simulator(N, T):
         keys = random.split(random.PRNGKey(seed_val), T)
         carry0 = (calib_vec, Q_MF0, Q_OFF0, Q_SEND0, Q_ACC0, Q_RET0,
                   P_HAT0, W0, baseline, LAST0)
-        final, cap = lax.scan(step, carry0, keys)
+        final, _scan_out = lax.scan(step, carry0, keys)
+        if trace_agent_i is not None:
+            cap, traces = _scan_out
+        else:
+            cap = _scan_out
+            traces = None
 
         wealth = final[7]
         c0=cap[:,:,0]; c1=cap[:,:,1]; c2=cap[:,:,2]
@@ -277,7 +319,10 @@ def build_simulator(N, T):
         cum = jnp.cumsum(ws); tot = cum[-1]
         gini = jnp.where(tot>0, (n+1 - 2.0*jnp.sum(cum)/tot)/n, 0.5)
 
-        return jnp.stack([ug_offer, ug_rej, tg_send, ret_frac, gini])
+        metrics = jnp.stack([ug_offer, ug_rej, tg_send, ret_frac, gini])
+        if trace_agent_i is not None:
+            return metrics, traces
+        return metrics
 
     def simulate(calib_vec, seed_val=SEED):
         return _run_with_seed(calib_vec, seed_val)
