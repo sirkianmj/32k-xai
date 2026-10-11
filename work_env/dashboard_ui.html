@@ -1139,6 +1139,8 @@ function renderDesignResults(data) {
       <button class="btn secondary" onclick="downloadFile('experiment.csv', ${JSON.stringify(JSON.stringify(csv))}, 'text/csv')">Download CSV</button>
       <button class="btn secondary" onclick="goTo('scenarios')">Try a pre-built scenario</button>
     </div>
+    ${renderSubgroups(data)}
+    ${renderTimeseries(data)}
     <details style="margin-top:20px;">
       <summary style="cursor:pointer;color:var(--ink-2);font-size:13px;">Show audit trail</summary>
       <pre style="font-size:11px;background:#f6f7f9;padding:14px;border-radius:8px;overflow:auto;max-height:400px;margin-top:10px;">${escapeHtml(JSON.stringify(data.audit, null, 2))}</pre>
