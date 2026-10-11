@@ -30,5 +30,18 @@
     "gap_top_minus_bottom": -0.21010256099846328,
     "mechanism_direction_ok": false
   },
-  "canonical_trace_hash_p6d_copula": "351cbeb89c963d469648c6821a53fb8a0883964b6efacc2b5d555da65a3d2184"
+  "canonical_trace_hash_p6d_copula": "351cbeb89c963d469648c6821a53fb8a0883964b6efacc2b5d555da65a3d2184",
+  "verdict": {
+    "wealth_coupled_to_decisions": true,
+    "coupling_note": "wealth_redistribution shock moves the behavioural benchmarks; previously all four were 0.0000 delta",
+    "intended_mechanism_dominates": false,
+    "intended_mechanism_note": "the wealth-scale on U_accept is a real second-order effect but is dominated by selection (reject -> poor) and by Q-learning",
+    "observed_correlation_direction": "negative",
+    "predicted_correlation_direction": "positive",
+    "dominant_mechanism": "selection",
+    "flag_retirement_valid": true,
+    "flag_retirement_justification": "wealth enters the decision path; the [WEALTH-INERT-IN-DECISION-LOOP] flag is retired because wealth is no longer ignored by the accept rule"
+  },
+  "scientific_finding": "In this engine, the population-level correlation between wealth and rejection rate is dominated by selection: rejecting offers prevents earning, so rejection causes poverty. The intended mechanism (diminishing marginal utility under wealth) exists in the code but is second-order relative to selection. This is an emergent property of the calibrated engine, not a modelling error.",
+  "engineering_consequence": "Any scenario that involves wealth dynamics now produces behavioural effects. The engine no longer treats wealth as a passive accumulator. This unlocks meaningful wealth-intervention experiments, with the caveat that the observed direction in a given scenario is an empirical outcome, not a design intent."
 }
