@@ -27,7 +27,10 @@ from scipy.optimize import differential_evolution
 import engine_v5 as E
 
 OUT = Path(__file__).parent
-PARAMS = Path.home() / "projects/xai_project/work_g2/synthetic_32k.pkl"
+PARAMS = Path(os.environ.get(
+    "P6C_PARAMS",
+    str(Path.home() / "projects/xai_project/work_g2/synthetic_32k.pkl"),
+))
 SEED = 42
 
 CALIB_NAMES = ["TAU_BASE", "BETA_OFF", "BETA_SEND", "BETA_ACC",
@@ -57,7 +60,7 @@ SE_HOLD       = SE_ALL[HOLDOUT_IDX]
 L2_LAMBDA     = 0.02   # regularization strength
 SEED_COUNT    = 3      # multi-seed averaging
 
-_SRC = E.load_all(PARAMS)
+_SRC = E.load_all(PARAMS, required=False)
 _N_ALL = len(_SRC["O"])
 
 def build_simulator(N, T, trace_agent_i=None):

@@ -1,0 +1,57 @@
+===== 1. BACKUPS =====
+'work_env/engine_v5.py' -> 'work_env/engine_v5.py.pre_p6d_retire'
+'work_env/p6c_v5.py' -> 'work_env/p6c_v5.py.pre_p6d_retire'
+'work_g2/synthetic_32k.pkl' -> 'work_g2/synthetic_32k.pkl.pre_p6d_retire'
+
+===== 2. PATCH engine_v5.load_all: skip missing columns (non-breaking) =====
+  engine_v5.load_all: added required=True/False parameter
+
+===== 3. PATCH p6c_v5: PARAMS overridable via env var P6C_PARAMS =====
+  p6c_v5: PARAMS is now env-overridable; load_all uses required=False
+
+===== 4. SYNTAX + IMPORT CHECK =====
+engine_v5 AST OK
+p6c_v5 AST OK
+Building small simulator (8000 x 250) ...
+  compile wall = 4.4s
+imports OK
+
+===== 5. BUILD 26-COLUMN COPULA =====
+  source: (32000, 30) cols=30
+  wrote: work_g2/synthetic_32k_p6d.pkl
+  shape: (32000, 26)  cols=26
+  dropped: ['lambda_norm', 's_spite', 'tau_sens', 'kappa_ctx']
+  kept: ['O', 'C', 'E', 'A', 'N', 'S_M', 'S_P', 'S_N', 'DASS_Dep', 'DASS_Anx', 'DASS_Str', 'alpha_R', 'beta_choice', 'phi_per', 'w_MB', 'k_DD', 'a_inhib', 'lambda_ineq', 'theta_T', 'u_U', 'eta_vol', 'omega_social', 'gamma_sal', 'm_t', 'D', 'general_distress']
+
+===== 6. VERIFY p6c_verify2 WITH NEW COPULA =====
+Building small simulator (8000 x 250) ...
+  compile wall = 3.2s
+Building 32k x 500 simulator ...
+  compile wall = 4.0s
+  run wall = 0.26s
+
+========================================================================
+FULL-SCALE VERIFICATION (32k x 500)
+========================================================================
+benchmark                platform      human       SE   |diff|  verdict
+------------------------------------------------------------------------
+UG mean offer              0.3946     0.4000   0.0500   0.0054     PASS
+UG rejection               0.1202     0.1600   0.0500   0.0398     PASS
+TG mean send               0.4832     0.5020   0.1300   0.0188     PASS
+TG mean return             0.3341     0.3720   0.1200   0.0379     PASS
+Final Gini                 0.4429     0.4000   0.1200   0.0429     PASS
+------------------------------------------------------------------------
+OVERALL: 5/5 PASS
+Saved: p6c_final.json
+
+===== 7. COMPARE TO COMMITTED p6c_final.json =====
+  got      = [0.39458367228507996, 0.12024557590484619, 0.4831819236278534, 0.3341001272201538, 0.44285348057746887]
+  expected = [0.39458367228507996, 0.12024557590484619, 0.4831819236278534, 0.3341001272201538, 0.44285348057746887]
+  n_pass   = 5
+  byte-identical: True
+
+===== 8. ROLLBACK COMMANDS (if step 7 shows FAIL) =====
+  cp work_env/engine_v5.py.pre_p6d_retire work_env/engine_v5.py
+  cp work_env/p6c_v5.py.pre_p6d_retire    work_env/p6c_v5.py
+  cp work_g2/synthetic_32k.pkl.pre_p6d_retire work_g2/synthetic_32k.pkl
+  rm -f work_g2/synthetic_32k_p6d.pkl

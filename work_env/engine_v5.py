@@ -93,7 +93,15 @@ PARAM_PROVENANCE = {
 }
 SYNTHETIC_PRIOR_PARAMS = [k for k, v in PARAM_PROVENANCE.items() if v == 'SYNTHETIC_PRIOR']
 
-def load_all(pkl_path):
+def load_all(pkl_path, required=True):
+    """Load parameter columns from a copula pickle.
+
+    When required=True (default), every name in PARAM_NAMES must be present.
+    When required=False, missing columns are silently skipped. Used by the
+    P6d rebuild to load copulas from which the inert parameters have been
+    retired; the calibrated engine never reads those columns, so skipping
+    them is safe.
+    """
     df = pd.read_pickle(pkl_path)
     out = {}
     for name in PARAM_NAMES:
@@ -102,7 +110,9 @@ def load_all(pkl_path):
             cl = {c.lower(): c for c in df.columns}
             col = cl.get(name.lower())
         if col is None:
-            raise KeyError(f"missing {name}")
+            if required:
+                raise KeyError(f"missing {name}")
+            continue
         out[name] = np.asarray(df[col].values, np.float32)
     return out
 
