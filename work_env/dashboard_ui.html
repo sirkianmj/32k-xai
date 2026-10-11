@@ -1101,6 +1101,121 @@ async function runDesign() {
   }
 }
 
+// ---- Time series + subgroup rendering (Phase 5 step 3) ----
+function tsChart(ts, key, humanTarget, shockRanges, T) {
+  const W = 260, H = 110, PAD = 22;
+  const ys = ts[key];
+  const yMin = 0, yMax = Math.max(0.6, ...ys);
+  const sx = x => PAD + (x / Math.max(T - 1, 1)) * (W - 2 * PAD);
+  const sy = y => H - PAD - ((y - yMin) / (yMax - yMin)) * (H - 2 * PAD);
+  const pts = ys.map((y, i) => sx(i).toFixed(1) + ',' + sy(y).toFixed(1)).join(' ');
+  const targetY = humanTarget != null ? sy(humanTarget).toFixed(1) : null;
+  const shockRects = (shockRanges || []).map(s => {
+    const x0 = sx(s.tick), x1 = sx(Math.min(T - 1, s.tick + s.duration));
+    return '<rect x="' + x0.toFixed(1) + '" y="' + PAD + '" width="' +
+           (x1 - x0).toFixed(1) + '" height="' + (H - 2 * PAD) +
+           '" fill="rgba(255,159,10,0.12)"/>';
+  }).join('');
+  const targetLine = targetY
+    ? '<line x1="' + PAD + '" x2="' + (W - PAD) + '" y1="' + targetY +
+      '" y2="' + targetY + '" stroke="#8e8e93" stroke-width="1" stroke-dasharray="3,3"/>'
+    : '';
+  return '<svg class="ts-svg" viewBox="0 0 ' + W + ' ' + H + '">' +
+    shockRects +
+    '<line x1="' + PAD + '" x2="' + PAD + '" y1="' + PAD + '" y2="' + (H - PAD) + '" stroke="#e5e5ea"/>' +
+    '<line x1="' + PAD + '" x2="' + (W - PAD) + '" y1="' + (H - PAD) + '" y2="' + (H - PAD) + '" stroke="#e5e5ea"/>' +
+    targetLine +
+    '<polyline points="' + pts + '" fill="none" stroke="#0a84ff" stroke-width="1.5"/>' +
+    '<text x="' + (PAD + 2) + '" y="' + (H - 4) + '" font-size="9" fill="#8e8e93">0</text>' +
+    '<text x="' + (W - PAD - 22) + '" y="' + (H - 4) + '" font-size="9" fill="#8e8e93">' + (T - 1) + '</text>' +
+    '<text x="' + (PAD + 2) + '" y="' + (PAD + 8) + '" font-size="9" fill="#8e8e93">' + yMax.toFixed(2) + '</text>' +
+    '</svg>';
+}
+
+function renderTimeseries(data) {
+  const ts = data.timeseries_full;
+  if (!ts) return '';
+  const T = ts.ticks.length;
+  const ranges = data.shock_tick_ranges || [];
+  const specs = [
+    { key: 'ug_offer', label: 'Offer rate (per tick)',     target: 0.400 },
+    { key: 'ug_rej',   label: 'Rejection rate (per tick)', target: 0.160 },
+    { key: 'tg_send',  label: 'Send rate (per tick)',      target: 0.502 },
+    { key: 'tg_ret',   label: 'Return rate (per tick)',    target: 0.372 },
+  ];
+  const cards = specs.map(s => (
+    '<div class="ts-card">' +
+      '<div class="ts-title">' + s.label + '</div>' +
+      tsChart(ts, s.key, s.target, ranges, T) +
+      '<div class="ts-legend"><span>Simulation</span><span class="target">Human</span>' +
+      (ranges.length ? '<span class="shock">Intervention</span>' : '') +
+      '</div>' +
+    '</div>'
+  )).join('');
+  return '<h3>Time series</h3>' +
+    '<p style="color:var(--ink-3);font-size:13px;margin:0 0 6px;">' +
+    'How each behaviour evolves tick by tick. Shaded regions mark when an ' +
+    'intervention is active. Dashed line = human reference.</p>' +
+    '<div class="ts-grid">' + cards + '</div>';
+}
+
+function renderSubgroups(data) {
+  const sg = data.subgroups;
+  if (!sg) return '';
+  const keys = [
+    ['ug_offer', 'UG offer'], ['ug_rej', 'UG rejection'],
+    ['tg_send',  'TG send'],  ['tg_ret', 'TG return'],
+    ['gini',     'Gini'],
+  ];
+  const t = sg.treated_full, c = sg.control_full, e = sg.effect_full;
+  const tShock = sg.treated_shock, cShock = sg.control_shock, eShock = sg.effect_shock;
+  const fmt = x => (x >= 0 ? '+' : '') + x.toFixed(4);
+
+  const rowsFull = keys.map(([k, lbl]) => (
+    '<tr><td>' + lbl + '</td>' +
+    '<td class="num">' + t[k].toFixed(4) + '</td>' +
+    '<td class="num">' + c[k].toFixed(4) + '</td>' +
+    '<td class="effect">' + fmt(e[k]) + '</td></tr>'
+  )).join('');
+
+  const rowsShock = (tShock && cShock && eShock) ? keys.map(([k, lbl]) => (
+    '<tr><td>' + lbl + '</td>' +
+    '<td class="num">' + tShock[k].toFixed(4) + '</td>' +
+    '<td class="num">' + cShock[k].toFixed(4) + '</td>' +
+    '<td class="effect">' + fmt(eShock[k]) + '</td></tr>'
+  )).join('') : '';
+
+  return '<h3>Treatment vs control</h3>' +
+    '<p style="color:var(--ink-3);font-size:13px;margin:0 0 6px;">' +
+    sg.n_treated.toLocaleString() + ' agents received the intervention; ' +
+    sg.n_control.toLocaleString() + ' did not. Same run, same seed, same ' +
+    'random history — the only difference is who was targeted.</p>' +
+
+    '<div style="font-weight:600;font-size:14px;margin-top:14px;">Full simulation</div>' +
+    '<table class="tc">' +
+      '<thead><tr><th>Metric</th>' +
+      '<th style="text-align:right">Treated</th>' +
+      '<th style="text-align:right">Control</th>' +
+      '<th style="text-align:right">Effect</th></tr></thead>' +
+      '<tbody>' + rowsFull + '</tbody>' +
+    '</table>' +
+
+    (rowsShock
+      ? '<div style="font-weight:600;font-size:14px;margin-top:20px;">' +
+        'During the intervention window only</div>' +
+        '<p style="color:var(--ink-3);font-size:12.5px;margin:4px 0 0;">' +
+        'Restricted to ticks where at least one intervention was active. ' +
+        'Isolates the direct effect from any pre-existing differences.</p>' +
+        '<table class="tc">' +
+        '<thead><tr><th>Metric</th>' +
+        '<th style="text-align:right">Treated</th>' +
+        '<th style="text-align:right">Control</th>' +
+        '<th style="text-align:right">Effect</th></tr></thead>' +
+        '<tbody>' + rowsShock + '</tbody></table>'
+      : '');
+}
+
+
 function renderDesignResults(data) {
   const el = document.getElementById('design-results');
   const cards = data.benchmarks.map(b => {
