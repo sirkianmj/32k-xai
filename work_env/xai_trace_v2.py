@@ -91,11 +91,11 @@ def load_calibrated_theta(path=None):
     d = json.load(open(p))["calib"]
     return {k: float(d[k]) for k in p6c.CALIB_NAMES}
 
-def trace_agent(agent_i, N=32000, T=500, seed=42, theta=None, theta_path=None):
+def trace_agent(agent_i, N=32000, T=500, seed=42, theta=None, theta_path=None, shocks=None):
     if theta is None:
         theta = load_calibrated_theta(theta_path)
     theta_vec = jnp.array([theta[k] for k in p6c.CALIB_NAMES], jnp.float32)
-    _, SIM_TRACED = p6c.build_simulator(N, T, trace_agent_i=int(agent_i))
+    _, SIM_TRACED = p6c.build_simulator(N, T, trace_agent_i=int(agent_i), shocks=shocks)
     metrics, traces = SIM_TRACED(theta_vec, seed_val=int(seed))
     return {
         "agent_i": int(agent_i),
@@ -106,6 +106,7 @@ def trace_agent(agent_i, N=32000, T=500, seed=42, theta=None, theta_path=None):
         "theta": theta,
         "flags": list(FLAGS_ACTIVE),
         "synthetic_prior_params": list(SYNTHETIC_PRIOR_NAMES),
+        "shocks": shocks,
     }
 
 def format_tick(tr, tick_idx):
