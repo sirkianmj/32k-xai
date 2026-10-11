@@ -33,3 +33,9 @@ xai_trace_v2.py.pre_v3fix
 xai_trace_v2.py.pre_v3fix2
 _trace_hash_helper.py
 trace_agent100_seed42_v3.npy
+
+# Phase 5 step 3: engine backups from the restore attempts
+p6c_v5.py.broken_step3*
+p6c_v5.py.pre_diag
+dashboard.py.pre_diagfix
+dashboard_ui.html.pre_diag
