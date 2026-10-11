@@ -41,15 +41,36 @@ Full-scale verification at 32k x 500 (p6c_verify2.py):
 
 | benchmark | step-1 baseline | final P6d | delta | SE | % of SE |
 |:---|---:|---:|---:|---:|---:|
-| UG mean offer | 0.39458367 | 0.3940 | -6.0e-04 | 0.050 | 1.20% |
-| UG rejection | 0.12024558 | 0.1202 | -5.0e-05 | 0.050 | 0.10% |
-| TG mean send | 0.48318192 | 0.4832 | -1.0e-05 | 0.130 | 0.01% |
-| TG mean return | 0.33410013 | 0.3341 | -1.0e-05 | 0.120 | 0.01% |
-| Final Gini | 0.44285348 | 0.4429 | +5.0e-05 | 0.120 | 0.04% |
+| UG mean offer | 0.39458367 | 0.39593542 | +1.352e-03 | 0.050 | 2.70% |
+| UG rejection | 0.12024558 | 0.12607908 | +5.834e-03 | 0.050 | 11.67% |
+| TG mean send | 0.48318192 | 0.48474643 | +1.565e-03 | 0.130 | 1.20% |
+| TG mean return | 0.33410013 | 0.33758473 | +3.485e-03 | 0.120 | 2.90% |
+| Final Gini | 0.44285348 | 0.46371707 | +2.086e-02 | 0.120 | 17.39% |
 
-**5/5 PASS at every step.** Cumulative deltas at most 1.2% of the smallest
-SE. The calibration is not meaningfully affected by replacing the four
-marginals.
+**5/5 PASS at every step.** Maximum cumulative delta is 17.4% of the SE on
+Gini, followed by 11.7% on UG rejection. Both are under half an SE. The
+calibration remains valid but is measurably shifted by the omega_social
+and u_U swaps.
+
+### Per-step attribution
+
+| step | change | max delta on any benchmark |
+|:---|:---|---:|
+| 2 | m_t ← PANAS (direct) | 6.6e-05 |
+| 3 | theta_T ← HCP RT (proxy) | 9.1e-04 |
+| 4 | u_U ← HCP PROP_LARGER (proxy) | 1.1e-03 |
+| 5 | omega_social ← trust (proxy) | **2.1e-02** |
+
+The omega_social swap contributes ~90% of the total cumulative drift. This
+is consistent with omega_social's role in the engine: it is the sole
+multiplicative scaler on every reward (mult = omega * (1 + sal + 0.05 * mood)).
+Changes to its marginal propagate through every agent's learning trajectory.
+
+### Sensitivity note
+
+The omega_social proxy has the smallest source sample (N=113) of any of the
+four swaps and the largest calibration effect. If a future re-fit of theta
+is undertaken, the omega_social proxy is the first candidate to revisit.
 
 ## 5. Method
 
