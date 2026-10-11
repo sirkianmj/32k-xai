@@ -1,0 +1,23 @@
+Building small simulator (8000 x 250) ...
+  compile wall = 3.1s
+========================================================================
+PHASE 6c v5 — regularized + cross-validated calibration
+========================================================================
+Device: cuda:0
+Train targets (3):   offer=0.4, send=0.502, ret=0.372
+Holdout targets (2): rej=0.16, gini=0.4
+L2 lambda: 0.02, SEED_COUNT: 3
+
+Loss at init: train=1.7354  holdout=3.4207
+
+Differential evolution (popsize=15, maxiter=25, no polish) ...
+  gen   5  train=0.0000  holdout=1.0040  wall=136.9s
+  gen  10  train=0.0000  holdout=7.3168  wall=251.3s
+  gen  15  train=0.0000  holdout=1.5558  wall=365.8s
+  gen  20  train=0.0000  holdout=3.3181  wall=480.2s
+  gen  25  train=0.0000  holdout=1.1186  wall=594.5s
+  DE wall = 594.5s
+  best train loss = 0.0131
+  holdout loss    = 1.1186
+  θ = {'TAU_BASE': 1.7889, 'BETA_OFF': 1.5725, 'BETA_SEND': 1.9644, 'BETA_ACC': 2.9217, 'BETA_RET': 1.4333, 'BIAS_OFF': 0.4965, 'BIAS_SEND': -0.0359, 'BIAS_RET': -0.0723, 'LAMBDA_FS': 2.4242}
+Saved: /home/kian/projects/xai_project/work_env/p6c_results.json
