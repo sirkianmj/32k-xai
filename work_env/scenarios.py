@@ -89,17 +89,26 @@ def run_scenario(name, N=32000, T=500, seed=42,
     if theta_path is None:
         theta_path = here / "p6c_results.json"
 
-    # Load p6c_v5 as a module
+    # Set the copula path in the environment BEFORE importing p6c_v5.
+    # p6c_v5 reads P6C_PARAMS at module-execution time to set PARAMS and
+    # load _SRC. Setting it after exec_module is too late.
+    os.environ["P6C_PARAMS"] = str(copula)
+
+    # Load p6c_v5 as a fresh module
     p6c_path = here / "p6c_v5.py"
     s = importlib.util.spec_from_file_location("p6c_scenario", p6c_path)
     p6c = importlib.util.module_from_spec(s)
     sys.modules["p6c_scenario"] = p6c
     s.loader.exec_module(p6c)
 
-    # Override PARAMS before loading theta
-    os.environ["P6C_PARAMS"] = str(copula)
-    p6c.PARAMS = copula
-    _ = p6c._SRC  # trigger load
+    # Sanity check: the module should have loaded from `copula`, not the default
+    loaded_from = str(p6c.PARAMS)
+    if loaded_from != str(copula):
+        raise RuntimeError(
+            f"scenarios.py: copula override failed. "
+            f"p6c_v5.PARAMS={loaded_from}  expected={copula}"
+        )
+
     theta_dict = json.load(open(theta_path))["calib"]
     theta = jnp.array([theta_dict[k] for k in p6c.CALIB_NAMES], jnp.float32)
 
