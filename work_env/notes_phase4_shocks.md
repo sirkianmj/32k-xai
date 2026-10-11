@@ -247,3 +247,58 @@ This is the single most important scientific distinction from the Phase 4
 work: **only interventions that touch the decision loop produce causal
 effects on behaviour.** Wealth redistribution does not, in the current
 engine.
+
+---
+
+## Retired flag — [WEALTH-INERT-IN-DECISION-LOOP]
+
+**Engine change at f2fdd23**, evidence corrected at 97a3bd5.
+
+### What changed
+
+`engine_v5.WEALTH_KAPPA = 0.001`. The Fehr-Schmidt accept rule in
+`p6c_v5` gains a wealth multiplier:
+
+    wealth_scale = 1 / (1 + WEALTH_KAPPA * wealth)
+    U_accept = wealth_scale * (my_payoff - alpha_e*ineq_neg - beta_g*ineq_pos)
+
+Wealth now enters the accept decision. Before this change, `wealth` was
+accumulated but never read into any decision variable.
+
+### Evidence — two results
+
+**Positive:** wealth is coupled to decisions. A `wealth_redistribution`
+shock (mag 0.02, tick 50-450) at 32k x 500 now changes behavioural
+benchmarks. Before, all four were exactly 0.0000 delta.
+
+**Negative:** the intended mechanism direction does NOT hold at
+KAPPA=0.001. Predicted rich agents reject more; observed rich agents
+reject LESS:
+
+    corr(final_wealth, rejection_rate) = -0.4089
+    bottom-quartile (poor) rejection = 0.2844
+    top-quartile (rich) rejection    = 0.0743
+    gap (rich - poor)                = -0.2101
+
+### Interpretation
+
+The dominant mechanism is **selection**, not utility curvature. Agents
+who reject offers don't earn from them, so rejection causes poverty. The
+wealth_scale term on U_accept is a real effect but is dominated by:
+
+1. Selection feedback (reject -> don't earn -> stay poor).
+2. Q-learning (rich agents have learned accepting pays off).
+
+### Status
+
+- `[WEALTH-INERT-IN-DECISION-LOOP]` retired: wealth is no longer ignored.
+- The specific mechanism direction is NOT confirmed at KAPPA=0.001.
+- Any claim about wealth effects on behaviour must cite the *observed*
+  direction, not the intended one.
+
+### Open test
+
+Try WEALTH_KAPPA=0.005 to see if the sign is tunable. If the sign flips,
+0.001 was too weak. If not, selection dominates at all reasonable
+strengths and the correct finding is that wealth-rejection correlation is
+selection-driven.
