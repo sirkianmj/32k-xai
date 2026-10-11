@@ -1,0 +1,984 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>32k-XAI · Cognitive Simulation Platform</title>
+<style>
+:root {
+  --bg: #f6f7f9;
+  --panel: #ffffff;
+  --ink: #1c1c1e;
+  --ink-2: #48484a;
+  --ink-3: #8e8e93;
+  --line: #e5e5ea;
+  --accent: #0a84ff;
+  --accent-hi: #0071e3;
+  --ok: #30d158;
+  --ok-bg: #e7f9ec;
+  --warn: #ff9f0a;
+  --bad: #ff453a;
+  --bad-bg: #ffecea;
+  --shadow-1: 0 1px 2px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.03);
+  --shadow-2: 0 4px 16px rgba(0,0,0,0.06), 0 12px 32px rgba(0,0,0,0.06);
+  --radius: 14px;
+  --radius-s: 10px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Inter, system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.app { display: grid; grid-template-columns: 248px 1fr; min-height: 100vh; }
+
+/* ---- Sidebar ---- */
+.sidebar {
+  background: var(--panel);
+  border-right: 1px solid var(--line);
+  padding: 28px 16px;
+  position: sticky; top: 0; height: 100vh;
+  display: flex; flex-direction: column;
+}
+.brand { display: flex; align-items: center; gap: 10px; padding: 0 8px 28px; }
+.brand-logo {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: linear-gradient(135deg, #0a84ff, #5e5ce6);
+  display: grid; place-items: center; color: white; font-weight: 700; font-size: 13px;
+}
+.brand h1 { font-size: 16px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
+.brand .sub { font-size: 11px; color: var(--ink-3); margin-top: -2px; }
+.nav { display: flex; flex-direction: column; gap: 2px; }
+.nav button {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px; border-radius: 8px; border: 0;
+  background: transparent; color: var(--ink-2);
+  font-family: inherit; font-size: 14px; font-weight: 500;
+  cursor: pointer; text-align: left; width: 100%;
+  transition: background 0.15s, color 0.15s;
+}
+.nav button:hover { background: #f2f3f5; color: var(--ink); }
+.nav button.active { background: #eff6ff; color: var(--accent-hi); font-weight: 600; }
+.nav svg { width: 18px; height: 18px; flex: 0 0 auto; }
+.sidebar-foot { margin-top: auto; padding: 12px 8px; font-size: 11px; color: var(--ink-3); line-height: 1.5; }
+.sidebar-foot a { color: var(--ink-2); }
+
+/* ---- Main ---- */
+main { padding: 40px 48px 80px; max-width: 1180px; }
+.view { display: none; }
+.view.active { display: block; animation: fade 0.18s ease-out; }
+@keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+h2.page-title { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 6px; }
+p.page-sub { color: var(--ink-2); margin: 0 0 32px; font-size: 15px; }
+
+h3 { font-size: 17px; font-weight: 600; margin: 32px 0 14px; letter-spacing: -0.01em; }
+h3:first-child { margin-top: 0; }
+
+/* ---- Cards ---- */
+.card {
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow-1);
+}
+.card.interactive { cursor: pointer; transition: box-shadow 0.18s, transform 0.18s, border-color 0.18s; }
+.card.interactive:hover { box-shadow: var(--shadow-2); transform: translateY(-1px); border-color: #d8d8dc; }
+
+.grid { display: grid; gap: 16px; }
+.grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 900px) { .grid.cols-2, .grid.cols-3 { grid-template-columns: 1fr; } }
+
+/* ---- Hero ---- */
+.hero {
+  background: linear-gradient(135deg, #eff6ff 0%, #f5f0ff 100%);
+  border: 1px solid #dde7ff; border-radius: var(--radius);
+  padding: 40px 44px; margin-bottom: 32px;
+}
+.hero h2 { font-size: 32px; font-weight: 600; letter-spacing: -0.025em; margin: 0 0 10px; }
+.hero p { color: var(--ink-2); margin: 0 0 4px; max-width: 620px; }
+
+/* ---- Scenario cards ---- */
+.scenario-card { display: flex; flex-direction: column; gap: 8px; min-height: 128px; }
+.scenario-card .sc-name { font-size: 15px; font-weight: 600; }
+.scenario-card .sc-desc { font-size: 13.5px; color: var(--ink-2); flex: 1; }
+.scenario-card .sc-tag {
+  display: inline-block; font-size: 11px; padding: 2px 8px;
+  border-radius: 99px; background: #f2f3f5; color: var(--ink-2);
+  font-weight: 500; align-self: flex-start;
+}
+.sc-tag.stress    { background: #fff4e0; color: #a35b00; }
+.sc-tag.isolation { background: #ecf2ff; color: #1c4dba; }
+.sc-tag.wealth    { background: #ecfdef; color: #1a6b32; }
+.sc-tag.compound  { background: #ffe9f5; color: #9d0e6a; }
+.sc-tag.base      { background: #f1f1f3; color: #4a4a4c; }
+
+/* ---- Buttons ---- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px 18px; border-radius: 10px; border: 1px solid transparent;
+  font-family: inherit; font-size: 14px; font-weight: 500; cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  text-decoration: none;
+}
+.btn.primary { background: var(--accent); color: white; }
+.btn.primary:hover { background: var(--accent-hi); }
+.btn.secondary { background: var(--panel); color: var(--ink); border-color: var(--line); }
+.btn.secondary:hover { background: #f6f7f9; }
+.btn.tertiary { background: transparent; color: var(--accent-hi); padding: 6px 10px; }
+.btn.tertiary:hover { background: #eff6ff; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+
+/* ---- Form controls ---- */
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
+.field label { font-size: 13px; font-weight: 500; color: var(--ink-2); display: flex; align-items: center; gap: 6px; }
+.field .hint { font-size: 12px; color: var(--ink-3); font-weight: 400; }
+.field input[type="number"], .field select {
+  font-family: inherit; font-size: 14px; padding: 9px 12px;
+  border: 1px solid var(--line); border-radius: 8px; background: var(--panel);
+  color: var(--ink); outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+}
+.field input[type="number"]:focus, .field select:focus {
+  border-color: var(--accent); box-shadow: 0 0 0 3px rgba(10,132,255,0.12);
+}
+.field input[type="range"] { width: 100%; accent-color: var(--accent); }
+.slider-row { display: flex; align-items: center; gap: 14px; }
+.slider-row input[type="range"] { flex: 1; }
+.slider-row .value {
+  font-variant-numeric: tabular-nums; font-size: 13px; font-weight: 600;
+  min-width: 68px; text-align: right; color: var(--ink);
+  padding: 4px 10px; background: #f6f7f9; border-radius: 6px;
+}
+
+/* ---- Result cards (benchmark) ---- */
+.results-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-top: 16px; }
+.bench {
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow-1);
+}
+.bench .label { font-size: 12px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.04em; font-weight: 500; }
+.bench .value { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; margin: 6px 0 2px; font-variant-numeric: tabular-nums; }
+.bench .meta { font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.bench .pill {
+  display: inline-block; font-size: 11px; font-weight: 600;
+  padding: 2px 8px; border-radius: 99px; margin-left: 6px;
+  vertical-align: middle;
+}
+.pill.pass { background: var(--ok-bg); color: #1a6b32; }
+.pill.fail { background: var(--bad-bg); color: #a1150d; }
+
+/* Tolerance bar: shows how the achieved value sits relative to target ± SE */
+.tolbar { position: relative; height: 6px; margin-top: 12px; border-radius: 3px; background: #f2f3f5; overflow: hidden; }
+.tolbar .se-band { position: absolute; top: 0; bottom: 0; background: #e7f0ff; }
+.tolbar .target { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--ink-2); left: 50%; transform: translateX(-50%); }
+.tolbar .value-mark { position: absolute; top: -3px; bottom: -3px; width: 3px; border-radius: 2px; }
+.tolbar .value-mark.pass { background: var(--ok); }
+.tolbar .value-mark.fail { background: var(--bad); }
+
+/* ---- Trace ---- */
+.trace-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px 22px; margin-top: 14px; }
+.trace-group { margin-top: 22px; }
+.trace-group h4 {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--ink-3); font-weight: 600; margin: 0 0 10px;
+}
+.trace-row { display: flex; justify-content: space-between; font-size: 13.5px; padding: 4px 0; border-bottom: 1px solid #f2f3f5; }
+.trace-row:last-child { border-bottom: 0; }
+.trace-row .k { color: var(--ink-2); }
+.trace-row .v { font-variant-numeric: tabular-nums; font-weight: 500; color: var(--ink); }
+
+/* ---- Shock list ---- */
+.shock-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px; background: #f8f9fb;
+  border: 1px solid var(--line); border-radius: var(--radius-s);
+  margin-bottom: 8px; font-size: 13.5px;
+}
+.shock-item .icon { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: var(--panel); border: 1px solid var(--line); }
+.shock-item .info { flex: 1; }
+.shock-item .info .name { font-weight: 600; }
+.shock-item .info .meta { font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+
+/* ---- Notices ---- */
+.notice {
+  padding: 14px 18px; border-radius: var(--radius-s);
+  font-size: 14px; margin: 16px 0;
+}
+.notice.info { background: #eff6ff; color: #1c4dba; border: 1px solid #dde7ff; }
+.notice.error { background: var(--bad-bg); color: #a1150d; border: 1px solid #ffd6d3; }
+.notice.success { background: var(--ok-bg); color: #1a6b32; border: 1px solid #c6f0cf; }
+
+/* ---- Spinner ---- */
+.spinner {
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.35); border-top-color: white;
+  animation: spin 0.8s linear infinite; display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---- Table (compare) ---- */
+table.cmp { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 14px; }
+table.cmp th, table.cmp td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--line); }
+table.cmp th { font-size: 12px; text-transform: uppercase; color: var(--ink-3); letter-spacing: 0.04em; font-weight: 600; }
+table.cmp td.num { font-variant-numeric: tabular-nums; text-align: right; }
+table.cmp tr:last-child td { border-bottom: 0; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">32k</div>
+      <div>
+        <h1>32k-XAI</h1>
+        <div class="sub">Cognitive simulation</div>
+      </div>
+    </div>
+    <nav class="nav" id="nav">
+      <button data-view="home" class="active">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 9l7-6 7 6v8a1 1 0 01-1 1h-4v-5H8v5H4a1 1 0 01-1-1V9z" stroke-linejoin="round"/></svg>
+        Home
+      </button>
+      <button data-view="scenarios">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="6" height="6" rx="1.5"/><rect x="11" y="3" width="6" height="6" rx="1.5"/><rect x="3" y="11" width="6" height="6" rx="1.5"/><rect x="11" y="11" width="6" height="6" rx="1.5"/></svg>
+        Scenarios
+      </button>
+      <button data-view="build">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 4v12M4 10h12" stroke-linecap="round"/></svg>
+        Build a scenario
+      </button>
+      <button data-view="compare">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h12M4 10h8M4 14h12" stroke-linecap="round"/></svg>
+        Compare
+      </button>
+      <button data-view="about">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="M10 9v4M10 7h.01" stroke-linecap="round"/></svg>
+        About
+      </button>
+    </nav>
+    <div class="sidebar-foot">
+      Kian Mansouri Jamshidi<br>Sabihe Khorshidi<br>
+      <a href="https://github.com/sirkianmj/32k-xai" target="_blank" rel="noopener">Repository</a>
+    </div>
+  </aside>
+
+  <main>
+    <!-- HOME -->
+    <section id="view-home" class="view active">
+      <div class="hero">
+        <h2>Welcome to the 32k-XAI platform.</h2>
+        <p>A simulated population of 32,000 cognitive agents. Each agent has a transparent, mathematically explicit brain — no neural networks, no large language models, no black boxes.</p>
+        <p>You can run pre-designed experiments, build your own, and trace every decision back to a specific parameter. Everything below is safe to click.</p>
+      </div>
+
+      <h3>Start here</h3>
+      <div class="grid cols-3">
+        <div class="card interactive" onclick="goTo('scenarios')">
+          <div style="font-size:15px;font-weight:600;">Run a scenario</div>
+          <p style="color:var(--ink-2);font-size:13.5px;margin:8px 0 0;">
+            Pick one of eight pre-designed experiments — from a calm baseline to a resource crisis — and see the results in seconds.
+          </p>
+        </div>
+        <div class="card interactive" onclick="goTo('build')">
+          <div style="font-size:15px;font-weight:600;">Build your own scenario</div>
+          <p style="color:var(--ink-2);font-size:13.5px;margin:8px 0 0;">
+            Combine economic stress, psychological distress, social isolation, or wealth redistribution into a custom experiment.
+          </p>
+        </div>
+        <div class="card interactive" onclick="goTo('scenarios')">
+          <div style="font-size:15px;font-weight:600;">Trace a single decision</div>
+          <p style="color:var(--ink-2);font-size:13.5px;margin:8px 0 0;">
+            Pick any agent, any moment in time, and see every number that drove its choice. This is what makes the platform explainable.
+          </p>
+        </div>
+      </div>
+
+      <h3>What the platform simulates</h3>
+      <div class="grid cols-2">
+        <div class="card">
+          <div style="font-size:14px;font-weight:600;">Behaviours</div>
+          <ul style="margin:10px 0 0;padding-left:20px;color:var(--ink-2);font-size:13.5px;">
+            <li>Ultimatum game (fair offers vs. rejections)</li>
+            <li>Trust game (investment vs. reciprocity)</li>
+            <li>Wealth accumulation over time</li>
+            <li>Network formation and social connection</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div style="font-size:14px;font-weight:600;">Psychology</div>
+          <ul style="margin:10px 0 0;padding-left:20px;color:var(--ink-2);font-size:13.5px;">
+            <li>Big Five personality (IPIP)</li>
+            <li>Dark Triad (SD3, bifactor)</li>
+            <li>Depression, anxiety, stress (DASS-21)</li>
+            <li>Learning, mood, and social preferences</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCENARIOS -->
+    <section id="view-scenarios" class="view">
+      <h2 class="page-title">Scenarios</h2>
+      <p class="page-sub">Click any scenario to configure and run it. Every scenario is a documented, reproducible experiment.</p>
+      <div id="scenario-grid" class="grid cols-3">
+        <div class="card"><div class="spinner" style="border-color:#e5e5ea;border-top-color:#0a84ff;"></div></div>
+      </div>
+    </section>
+
+    <!-- RUN -->
+    <section id="view-run" class="view">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;">
+        <button class="btn tertiary" onclick="goTo('scenarios')">← Back to scenarios</button>
+      </div>
+      <h2 class="page-title" id="run-title">Run scenario</h2>
+      <p class="page-sub" id="run-desc"></p>
+
+      <h3>Settings</h3>
+      <div class="grid cols-3">
+        <div class="field">
+          <label>Number of agents <span class="hint">(people in the simulation)</span></label>
+          <input id="run-N" type="number" value="8000" min="100" max="32000" step="100">
+        </div>
+        <div class="field">
+          <label>Simulation length <span class="hint">(ticks — each is one day)</span></label>
+          <input id="run-T" type="number" value="250" min="50" max="500" step="10">
+        </div>
+        <div class="field">
+          <label>Random seed <span class="hint">(same seed = same result)</span></label>
+          <input id="run-seed" type="number" value="42" min="0" max="999999">
+        </div>
+      </div>
+      <div class="notice info">
+        Full scale is 32,000 agents over 500 ticks. The dashboard defaults to 8,000 × 250 for speed; runs at full scale take about 5 seconds.
+      </div>
+      <div class="btn-row">
+        <button class="btn primary" id="run-btn" onclick="runScenario()">
+          Run simulation
+        </button>
+        <button class="btn secondary" onclick="useFullScale()">Use full scale (32k × 500)</button>
+      </div>
+
+      <div id="run-progress"></div>
+      <div id="run-results"></div>
+    </section>
+
+    <!-- TRACE -->
+    <section id="view-trace" class="view">
+      <h2 class="page-title" id="trace-title">Trace a decision</h2>
+      <p class="page-sub" id="trace-desc"></p>
+
+      <div class="grid cols-2">
+        <div class="field">
+          <label>Which agent? <span class="hint">(0 to N−1)</span></label>
+          <div class="slider-row">
+            <input id="trace-agent" type="range" min="0" max="7999" value="100" oninput="updateTraceValue()">
+            <div class="value" id="trace-agent-v">100</div>
+          </div>
+        </div>
+        <div class="field">
+          <label>At which tick? <span class="hint">(moment in time)</span></label>
+          <div class="slider-row">
+            <input id="trace-tick" type="range" min="0" max="249" value="100" oninput="updateTraceValue()">
+            <div class="value" id="trace-tick-v">100</div>
+          </div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn primary" onclick="fetchTrace()">Show me the trace</button>
+        <button class="btn secondary" onclick="randomTrace()">Pick a random agent</button>
+      </div>
+
+      <div id="trace-output"></div>
+    </section>
+
+    <!-- BUILD -->
+    <section id="view-build" class="view">
+      <h2 class="page-title">Build your own scenario</h2>
+      <p class="page-sub">Combine one or more interventions into a custom experiment, then run it.</p>
+
+      <div class="grid cols-2">
+        <div class="card">
+          <h3 style="margin-top:0;">Add an intervention</h3>
+
+          <div class="field">
+            <label>Type of intervention</label>
+            <select id="b-type" onchange="updateBuilderFields()">
+              <option value="resource_scarcity">Resource scarcity — reduce available rewards</option>
+              <option value="distress_injection">Distress injection — raise baseline distress</option>
+              <option value="network_thinning">Social isolation — reduce neighbours</option>
+              <option value="wealth_redistribution">Wealth redistribution — pull wealth toward the mean</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Strength <span class="hint" id="b-strength-hint"></span></label>
+            <div class="slider-row">
+              <input id="b-mag" type="range" min="1" max="100" value="30" oninput="updateBuilderLabels()">
+              <div class="value" id="b-mag-v">0.30</div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>When does it start? <span class="hint">(tick)</span></label>
+            <div class="slider-row">
+              <input id="b-tick" type="range" min="0" max="490" value="200" oninput="updateBuilderLabels()">
+              <div class="value" id="b-tick-v">200</div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>How long does it last? <span class="hint">(ticks)</span></label>
+            <div class="slider-row">
+              <input id="b-dur" type="range" min="10" max="500" value="200" oninput="updateBuilderLabels()">
+              <div class="value" id="b-dur-v">200</div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Who does it affect? <span class="hint">(percentage of agents)</span></label>
+            <div class="slider-row">
+              <input id="b-frac" type="range" min="1" max="100" value="100" oninput="updateBuilderLabels()">
+              <div class="value" id="b-frac-v">100%</div>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn primary" onclick="addShock()">Add to scenario</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-top:0;">Your scenario</h3>
+          <div id="build-list"></div>
+          <div class="btn-row" style="margin-top:20px;">
+            <button class="btn primary" onclick="runCustomScenario()" id="build-run-btn">Run this scenario</button>
+            <button class="btn secondary" onclick="clearShocks()">Clear all</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="build-results"></div>
+    </section>
+
+    <!-- COMPARE -->
+    <section id="view-compare" class="view">
+      <h2 class="page-title">Compare scenarios</h2>
+      <p class="page-sub">Select two or more scenarios. The dashboard runs each one and shows all benchmarks side by side.</p>
+      <div id="compare-picker" class="grid cols-3"></div>
+      <div class="btn-row">
+        <button class="btn primary" onclick="runCompare()">Run comparison</button>
+        <button class="btn secondary" onclick="clearCompare()">Clear selection</button>
+      </div>
+      <div id="compare-results"></div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="view-about" class="view">
+      <h2 class="page-title">About this platform</h2>
+      <p class="page-sub">A research tool for causal, individual-level interrogation of emergent social behaviour.</p>
+
+      <div class="card" style="margin-bottom:16px;">
+        <h3 style="margin-top:0;">What it is</h3>
+        <p style="color:var(--ink-2);margin:0 0 10px;">
+          32k-XAI is a research platform that simulates 32,000 cognitive agents. Each agent has a
+          <em>transparent</em>, mathematically explicit brain — a small set of equations whose
+          parameters come from real human psychometric data.
+        </p>
+        <p style="color:var(--ink-2);margin:0 0 10px;">
+          No neural networks. No large language models. Nothing hidden. Every decision can be
+          traced back to a named parameter with a documented source.
+        </p>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <h3 style="margin-top:0;">What you can ask it</h3>
+        <ul style="margin:0;padding-left:20px;color:var(--ink-2);">
+          <li>What happens to cooperation when resources become scarce?</li>
+          <li>Does psychological distress flatten or sharpen economic inequality?</li>
+          <li>How does social isolation change trust and reciprocity?</li>
+          <li>For a specific agent at a specific tick: <em>why</em> did it make the choice it made?</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-top:0;">The science behind it</h3>
+        <p style="color:var(--ink-2);margin:0 0 10px;">
+          The platform reproduces five published human benchmarks within their standard errors:
+          ultimatum offer rate, ultimatum rejection rate, trust-game send rate, trust-game return
+          rate, and wealth Gini. All at full 32,000-agent scale.
+        </p>
+        <p style="color:var(--ink-2);margin:0;">
+          This dashboard shows you those numbers live, along with the individual decisions behind
+          them.
+        </p>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+// ---------- Navigation ----------
+function goTo(view) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('#nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + view).classList.add('active');
+  const btn = document.querySelector(`#nav button[data-view="${view}"]`);
+  if (btn) btn.classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+document.querySelectorAll('#nav button').forEach(b => {
+  b.addEventListener('click', () => goTo(b.dataset.view));
+});
+
+// ---------- State ----------
+const state = { scenarios: {}, current: null, shocks: [], compare: new Set() };
+
+const SCENARIO_TAGS = {
+  baseline: 'base', resource_crisis: 'stress', widespread_distress: 'stress',
+  compound_stress: 'compound', social_isolation: 'isolation',
+  mild_isolation: 'isolation', wealth_equalization: 'wealth',
+  strong_redistribution: 'wealth',
+};
+const SCENARIO_TAG_LABELS = {
+  base: 'Reference', stress: 'Stress', compound: 'Compound',
+  isolation: 'Isolation', wealth: 'Redistribution',
+};
+
+// ---------- Scenarios list ----------
+async function loadScenarios() {
+  try {
+    const r = await fetch('/api/scenarios');
+    state.scenarios = await r.json();
+    renderScenarioGrid();
+    renderComparePicker();
+  } catch (e) {
+    document.getElementById('scenario-grid').innerHTML =
+      `<div class="notice error">Could not load scenarios: ${e.message}</div>`;
+  }
+}
+
+function pretty(name) {
+  return name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function renderScenarioGrid() {
+  const grid = document.getElementById('scenario-grid');
+  grid.innerHTML = Object.entries(state.scenarios).map(([name, desc]) => {
+    const tag = SCENARIO_TAGS[name] || 'base';
+    const tagLabel = SCENARIO_TAG_LABELS[tag] || 'Scenario';
+    return `
+      <div class="card interactive scenario-card" onclick="openRun('${name}')">
+        <div class="sc-name">${pretty(name)}</div>
+        <div class="sc-desc">${desc}</div>
+        <span class="sc-tag ${tag}">${tagLabel}</span>
+      </div>`;
+  }).join('');
+}
+
+// ---------- Run view ----------
+function openRun(name) {
+  state.current = name;
+  document.getElementById('run-title').textContent = pretty(name);
+  document.getElementById('run-desc').textContent = state.scenarios[name];
+  document.getElementById('run-results').innerHTML = '';
+  document.getElementById('run-progress').innerHTML = '';
+  goTo('run');
+}
+
+function useFullScale() {
+  document.getElementById('run-N').value = 32000;
+  document.getElementById('run-T').value = 500;
+}
+
+async function runScenario() {
+  if (!state.current) { goTo('scenarios'); return; }
+  const N = +document.getElementById('run-N').value;
+  const T = +document.getElementById('run-T').value;
+  const seed = +document.getElementById('run-seed').value;
+  const btn = document.getElementById('run-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Running…';
+  document.getElementById('run-progress').innerHTML =
+    `<div class="notice info">Simulating ${N.toLocaleString()} agents over ${T} ticks…</div>`;
+  document.getElementById('run-results').innerHTML = '';
+  try {
+    const r = await fetch(`/api/run/${state.current}?N=${N}&T=${T}&seed=${seed}`, { method: 'POST' });
+    if (!r.ok) throw new Error(await r.text());
+    const data = await r.json();
+    renderResults('run-results', data);
+    document.getElementById('run-progress').innerHTML = '';
+  } catch (e) {
+    document.getElementById('run-progress').innerHTML =
+      `<div class="notice error">Run failed: ${e.message}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Run simulation';
+  }
+}
+
+function renderResults(containerId, data) {
+  const el = document.getElementById(containerId);
+  const nPass = data.n_pass, total = data.benchmarks.length;
+  const summary = nPass === total
+    ? `<div class="notice success"><strong>All ${total} human benchmarks matched.</strong> The simulated population behaved consistently with published human data.</div>`
+    : `<div class="notice info"><strong>${nPass} of ${total} human benchmarks matched.</strong> Some outcomes differ from human data — this is a real finding, not an error.</div>`;
+  const cards = data.benchmarks.map(b => {
+    // Position of value in bar: bar spans target ± 2·SE
+    const lo = b.target - 2 * b.se, hi = b.target + 2 * b.se;
+    const pos = Math.max(0, Math.min(100, 100 * (b.platform - lo) / (hi - lo)));
+    const seStart = 100 * ((b.target - b.se) - lo) / (hi - lo);
+    const seWidth = 100 * (2 * b.se) / (hi - lo);
+    const pass = b.pass ? 'pass' : 'fail';
+    const pill = b.pass ? 'Matched' : 'Different';
+    return `
+      <div class="bench">
+        <div class="label">${b.name} <span class="pill ${pass}">${pill}</span></div>
+        <div class="value">${b.platform.toFixed(3)}</div>
+        <div class="meta">Human target: ${b.target.toFixed(3)} ± ${b.se.toFixed(3)} · Δ ${(b.delta >= 0 ? '+' : '')}${b.delta.toFixed(4)}</div>
+        <div class="tolbar">
+          <div class="se-band" style="left:${seStart}%;width:${seWidth}%"></div>
+          <div class="target" style="left:50%"></div>
+          <div class="value-mark ${pass}" style="left:${pos}%"></div>
+        </div>
+      </div>`;
+  }).join('');
+  const json = JSON.stringify(data, null, 2);
+  const csvRows = [['benchmark','platform','target','se','delta','pass']]
+    .concat(data.benchmarks.map(b => [b.name, b.platform, b.target, b.se, b.delta, b.pass]));
+  const csv = csvRows.map(r => r.join(',')).join('\n');
+  el.innerHTML = `
+    ${summary}
+    <h3>Results</h3>
+    <div class="results-grid">${cards}</div>
+    <div class="btn-row">
+      <button class="btn secondary" onclick="downloadFile('result.json', ${JSON.stringify(JSON.stringify(json))}, 'application/json')">Download JSON</button>
+      <button class="btn secondary" onclick="downloadFile('result.csv', ${JSON.stringify(JSON.stringify(csv))}, 'text/csv')">Download CSV</button>
+      <button class="btn secondary" onclick="goTo('scenarios')">Try another scenario</button>
+      ${state.current ? `<button class="btn primary" onclick="openTraceFor('${state.current}')">Trace a decision →</button>` : ''}
+    </div>
+    <details style="margin-top:20px;">
+      <summary style="cursor:pointer;color:var(--ink-2);font-size:13px;">Show audit trail</summary>
+      <pre style="font-size:11px;background:#f6f7f9;padding:14px;border-radius:8px;overflow:auto;max-height:400px;margin-top:10px;">${escapeHtml(JSON.stringify(data.audit, null, 2))}</pre>
+    </details>
+  `;
+}
+
+function escapeHtml(s) { return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function downloadFile(name, content, type) {
+  const blob = new Blob([content], { type });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ---------- Trace view ----------
+function openTraceFor(name) {
+  state.current = name;
+  document.getElementById('trace-title').textContent = `Trace a decision · ${pretty(name)}`;
+  document.getElementById('trace-desc').textContent = state.scenarios[name];
+  document.getElementById('trace-output').innerHTML = '';
+  const N = +document.getElementById('run-N').value || 8000;
+  const T = +document.getElementById('run-T').value || 250;
+  const a = document.getElementById('trace-agent');
+  a.max = N - 1; a.value = Math.min(100, N - 1);
+  const t = document.getElementById('trace-tick');
+  t.max = T - 1; t.value = Math.floor(T / 2);
+  updateTraceValue();
+  goTo('trace');
+}
+
+function updateTraceValue() {
+  document.getElementById('trace-agent-v').textContent = document.getElementById('trace-agent').value;
+  document.getElementById('trace-tick-v').textContent = document.getElementById('trace-tick').value;
+}
+
+function randomTrace() {
+  const a = document.getElementById('trace-agent');
+  a.value = Math.floor(Math.random() * (+a.max + 1));
+  updateTraceValue();
+  fetchTrace();
+}
+
+const TRACE_GROUPS = [
+  { name: 'Decision at this tick', keys: ['a1','s2','a_off','a_send','a_acc','a_ret','interacting','is_mutual','rejected'] },
+  { name: 'Beliefs and values', keys: ['Q_mf_a0','Q_mf_a1','Q_MB_a0','Q_MB_a1','Q_net_a0','Q_net_a1','w_mb_eff','tau'] },
+  { name: 'What the agent chose', keys: ['my_off','my_send','my_rm','Q_off_chosen','Q_send_chosen','Q_acc_accept','Q_acc_reject','Q_ret_chosen'] },
+  { name: 'Why it accepted or rejected', keys: ['U_accept','inequity_neg','inequity_pos'] },
+  { name: 'Rewards received', keys: ['r_off','r_acc','r_send','r_ret','reward_total'] },
+  { name: 'Partner', keys: ['partner_id','partner_a_off','partner_a_send','partner_a_ret','partner_a_acc','partner_a1','rec_off','rec_send','rec_rm'] },
+  { name: 'Context', keys: ['distress_pre','baseline_dist','wealth_pre'] },
+];
+const KEY_LABELS = {
+  a1: 'Stage 1 choice (0=engage)', s2: 'Transition result', a_off: 'Offer chosen',
+  a_send: 'Send chosen', a_acc: 'Accept (0) or reject (1)', a_ret: 'Return chosen',
+  interacting: 'Interacted this tick', is_mutual: 'Mutual partner match', rejected: 'Rejected by partner',
+  Q_mf_a0: 'Model-free value: engage', Q_mf_a1: 'Model-free value: avoid',
+  Q_MB_a0: 'Model-based value: engage', Q_MB_a1: 'Model-based value: avoid',
+  Q_net_a0: 'Arbitrated value: engage', Q_net_a1: 'Arbitrated value: avoid',
+  w_mb_eff: 'Model-based weight (effective)', tau: 'Decision temperature',
+  my_off: 'Offer sent', my_send: 'Amount sent', my_rm: 'Return multiplier',
+  Q_off_chosen: 'Learned value of offer', Q_send_chosen: 'Learned value of send',
+  Q_acc_accept: 'Learned value of accept', Q_acc_reject: 'Learned value of reject',
+  Q_ret_chosen: 'Learned value of return',
+  U_accept: 'Fehr-Schmidt utility of accepting',
+  inequity_neg: 'Disadvantageous inequality', inequity_pos: 'Advantageous inequality',
+  r_off: 'Reward from offer', r_acc: 'Reward from accept',
+  r_send: 'Reward from sending', r_ret: 'Reward from returning',
+  reward_total: 'Total reward this tick',
+  partner_id: 'Partner ID', partner_a_off: "Partner's offer", partner_a_send: "Partner's send",
+  partner_a_ret: "Partner's return", partner_a_acc: "Partner's accept decision",
+  partner_a1: "Partner's engage decision", rec_off: 'Offer received',
+  rec_send: 'Send received', rec_rm: 'Return multiplier received',
+  distress_pre: 'Distress level at decision', baseline_dist: 'Baseline distress',
+  wealth_pre: 'Wealth before reward',
+};
+
+async function fetchTrace() {
+  const el = document.getElementById('trace-output');
+  const agent = +document.getElementById('trace-agent').value;
+  const tick = +document.getElementById('trace-tick').value;
+  const N = +document.getElementById('run-N').value || 8000;
+  const T = +document.getElementById('run-T').value || 250;
+  el.innerHTML = `<div class="notice info"><span class="spinner" style="border-color:#c5ddff;border-top-color:#0a84ff;"></span> Tracing agent ${agent} at tick ${tick}…</div>`;
+  try {
+    const r = await fetch(`/api/trace/${state.current}/${agent}?tick=${tick}&N=${N}&T=${T}&seed=42`);
+    if (!r.ok) throw new Error(await r.text());
+    const d = await r.json();
+    renderTrace(el, d);
+  } catch (e) {
+    el.innerHTML = `<div class="notice error">Trace failed: ${e.message}</div>`;
+  }
+}
+
+function renderTrace(el, d) {
+  const f = d.fields;
+  const active = d.shock_state.active.length ? d.shock_state.active.join(', ') : 'none';
+  const shockLine = d.shock_state.active.length
+    ? `<div class="notice info" style="margin-top:0;"><strong>Intervention active at this tick.</strong> ${escapeHtml(active)}.</div>`
+    : `<div class="notice info" style="margin-top:0;">No intervention active at this tick — the population is running under baseline conditions.</div>`;
+  const groups = TRACE_GROUPS.map(g => {
+    const rows = g.keys.map(k => {
+      const v = f[k];
+      const display = Number.isInteger(v) && Math.abs(v) > 100000 ? v.toFixed(0) : v.toFixed(4);
+      return `<div class="trace-row"><span class="k">${KEY_LABELS[k] || k}</span><span class="v">${display}</span></div>`;
+    }).join('');
+    return `<div class="trace-group"><h4>${g.name}</h4>${rows}</div>`;
+  }).join('');
+
+  const summary = narrativeFor(d);
+
+  el.innerHTML = `
+    ${shockLine}
+    <div class="card" style="margin-top:16px;">
+      <h3 style="margin-top:0;">Agent ${d.agent_i} at tick ${d.tick} · ${pretty(d.scenario)}</h3>
+      <p style="color:var(--ink-2);margin:0;font-size:14.5px;">${summary}</p>
+    </div>
+    <div class="card" style="margin-top:16px;">
+      <h3 style="margin-top:0;">Full decision trace</h3>
+      ${groups}
+    </div>
+  `;
+}
+
+function narrativeFor(d) {
+  const f = d.fields;
+  const engaged = f.a1 < 0.5;
+  const mutual = f.is_mutual > 0.5;
+  const inter = f.interacting > 0.5;
+  const accepted = f.a_acc < 0.5;
+  const offered = f.my_off;
+  const rejected = f.rejected > 0.5;
+
+  let s = `Agent ${d.agent_i} decided to <strong>${engaged ? 'engage with others' : 'stay out of the interaction'}</strong> at tick ${d.tick}. `;
+  if (!mutual) s += `The proposed partner did not choose this agent back, so no exchange took place. `;
+  else if (!inter) s += `Although the match was mutual, one of the two agents was not available, so no exchange took place. `;
+  else {
+    s += `A mutual partner was found and the exchange proceeded. `;
+    if (engaged) {
+      s += `The agent offered <strong>${offered.toFixed(0)} of 10</strong> points. `;
+      s += `Its partner ${accepted ? 'accepted' : 'rejected'} the offer. `;
+    }
+  }
+  if (rejected) s += `The agent's own offer was rejected by the partner. `;
+  if (f.distress_pre > 0.85) s += `Distress was elevated (${f.distress_pre.toFixed(2)}), which reduces long-horizon planning. `;
+  if (f.w_mb_eff < 0.1) s += `The model-based arbitration weight was very low (${f.w_mb_eff.toFixed(3)}), so the decision was mostly habitual. `;
+  return s;
+}
+
+// ---------- Build view ----------
+const SHOCK_META = {
+  resource_scarcity:    { label: 'Resource scarcity',   strength: '0–1 reduction in reward' },
+  distress_injection:   { label: 'Distress injection',  strength: '0–2 additional baseline distress' },
+  network_thinning:     { label: 'Social isolation',    strength: '0–1 fraction of neighbours removed' },
+  wealth_redistribution:{ label: 'Wealth redistribution', strength: '0–1 per-tick pull toward mean' },
+};
+
+function updateBuilderLabels() {
+  const type = document.getElementById('b-type').value;
+  document.getElementById('b-mag-v').textContent = (+document.getElementById('b-mag').value / 100).toFixed(2);
+  document.getElementById('b-tick-v').textContent = document.getElementById('b-tick').value;
+  document.getElementById('b-dur-v').textContent = document.getElementById('b-dur').value;
+  document.getElementById('b-frac-v').textContent = document.getElementById('b-frac').value + '%';
+  document.getElementById('b-strength-hint').textContent = SHOCK_META[type].strength;
+}
+function updateBuilderFields() { updateBuilderLabels(); }
+
+function addShock() {
+  const type = document.getElementById('b-type').value;
+  const mag = +document.getElementById('b-mag').value / 100;
+  const tick = +document.getElementById('b-tick').value;
+  const dur = +document.getElementById('b-dur').value;
+  const fracPct = +document.getElementById('b-frac').value;
+  const frac = fracPct >= 100 ? null : fracPct / 100;
+  state.shocks.push({
+    tick, duration: dur, type, magnitude: mag,
+    target_frac: frac, target_seed: 0,
+    _name: SHOCK_META[type].label,
+  });
+  renderShockList();
+}
+
+function removeShock(i) {
+  state.shocks.splice(i, 1);
+  renderShockList();
+}
+
+function clearShocks() {
+  state.shocks = [];
+  renderShockList();
+  document.getElementById('build-results').innerHTML = '';
+}
+
+function renderShockList() {
+  const el = document.getElementById('build-list');
+  if (state.shocks.length === 0) {
+    el.innerHTML = `<p style="color:var(--ink-3);font-size:13.5px;">No interventions added yet. Use the panel on the left to add one.</p>`;
+    return;
+  }
+  el.innerHTML = state.shocks.map((s, i) => `
+    <div class="shock-item">
+      <div class="icon">
+        <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6">
+          <circle cx="8" cy="8" r="5"/>
+        </svg>
+      </div>
+      <div class="info">
+        <div class="name">${escapeHtml(s._name)}</div>
+        <div class="meta">strength ${s.magnitude.toFixed(2)} · starts tick ${s.tick} · lasts ${s.duration} ticks · ${s.target_frac === null ? 'all agents' : Math.round(s.target_frac * 100) + '% of agents'}</div>
+      </div>
+      <button class="btn tertiary" onclick="removeShock(${i})">Remove</button>
+    </div>`).join('');
+}
+
+async function runCustomScenario() {
+  if (state.shocks.length === 0) {
+    document.getElementById('build-results').innerHTML =
+      `<div class="notice error">Add at least one intervention before running.</div>`;
+    return;
+  }
+  const N = 8000, T = 500, seed = 42;
+  const btn = document.getElementById('build-run-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Running…';
+  document.getElementById('build-results').innerHTML =
+    `<div class="notice info">Running custom scenario…</div>`;
+  try {
+    const cleanShocks = state.shocks.map(({_name, ...s}) => s);
+    const r = await fetch('/api/run-custom', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ shocks: cleanShocks, N, T, seed }),
+    });
+    if (!r.ok) throw new Error(await r.text());
+    const data = await r.json();
+    renderResults('build-results', data);
+  } catch (e) {
+    document.getElementById('build-results').innerHTML =
+      `<div class="notice error">Run failed: ${e.message}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Run this scenario';
+  }
+}
+
+// ---------- Compare view ----------
+function renderComparePicker() {
+  const el = document.getElementById('compare-picker');
+  el.innerHTML = Object.entries(state.scenarios).map(([name, desc]) => {
+    const checked = state.compare.has(name) ? 'checked' : '';
+    return `<label class="card" style="cursor:pointer;display:flex;gap:10px;align-items:flex-start;">
+      <input type="checkbox" ${checked} onchange="toggleCompare('${name}', this.checked)">
+      <div>
+        <div style="font-weight:600;font-size:14px;">${pretty(name)}</div>
+        <div style="color:var(--ink-3);font-size:12.5px;margin-top:4px;">${desc}</div>
+      </div>
+    </label>`;
+  }).join('');
+}
+function toggleCompare(name, on) {
+  if (on) state.compare.add(name); else state.compare.delete(name);
+}
+function clearCompare() {
+  state.compare.clear();
+  renderComparePicker();
+  document.getElementById('compare-results').innerHTML = '';
+}
+
+async function runCompare() {
+  if (state.compare.size < 2) {
+    document.getElementById('compare-results').innerHTML =
+      `<div class="notice error">Pick at least two scenarios to compare.</div>`;
+    return;
+  }
+  const el = document.getElementById('compare-results');
+  el.innerHTML = `<div class="notice info"><span class="spinner" style="border-color:#c5ddff;border-top-color:#0a84ff;"></span> Running ${state.compare.size} scenarios…</div>`;
+  const names = [...state.compare];
+  const results = {};
+  try {
+    for (const name of names) {
+      const r = await fetch(`/api/run/${name}?N=8000&T=500&seed=42`, { method: 'POST' });
+      if (!r.ok) throw new Error(await r.text());
+      results[name] = await r.json();
+    }
+    renderCompare(el, results);
+  } catch (e) {
+    el.innerHTML = `<div class="notice error">Comparison failed: ${e.message}</div>`;
+  }
+}
+
+function renderCompare(el, results) {
+  const names = Object.keys(results);
+  const benchNames = results[names[0]].benchmarks.map(b => b.name);
+  const rows = benchNames.map((bn, i) => {
+    const cells = names.map(n => {
+      const b = results[n].benchmarks[i];
+      const cls = b.pass ? 'pass' : 'fail';
+      return `<td class="num"><span class="pill ${cls}">${b.platform.toFixed(3)}</span></td>`;
+    }).join('');
+    return `<tr><td>${bn}</td>${cells}</tr>`;
+  }).join('');
+  el.innerHTML = `
+    <h3>Comparison</h3>
+    <table class="cmp">
+      <thead><tr><th>Benchmark</th>${names.map(n => `<th>${pretty(n)}</th>`).join('')}</tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <p style="color:var(--ink-3);font-size:12.5px;margin-top:10px;">
+      Green = matched the human benchmark within tolerance. Red = differed. N=8000, T=500, seed=42 for all runs.
+    </p>`;
+}
+
+// ---------- Init ----------
+loadScenarios();
+updateBuilderLabels();
+</script>
+</body>
+</html>
