@@ -63,7 +63,7 @@ SEED_COUNT    = 3      # multi-seed averaging
 _SRC = E.load_all(PARAMS, required=False)
 _N_ALL = len(_SRC["O"])
 
-def build_simulator(N, T, trace_agent_i=None, shocks=None, ws_k=6, ws_p=0.1, return_diag=False):
+def build_simulator(N, T, trace_agent_i=None, shocks=None, ws_k=6, ws_p=0.1):
     idx = np.random.default_rng(SEED).integers(0, _N_ALL, size=N)
     P = {k: jnp.asarray(v[idx]) for k, v in _SRC.items()}
 
@@ -434,8 +434,6 @@ def build_simulator(N, T, trace_agent_i=None, shocks=None, ws_k=6, ws_p=0.1, ret
         std_res  = all_res.std(axis=0)
         return mean_res, std_res
 
-    if return_diag:
-        return simulate, simulate
     return simulate_multiseed, simulate
 
 print("Building small simulator (8000 x 250) ...", flush=True)
