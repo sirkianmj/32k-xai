@@ -178,3 +178,72 @@ distress effect operates primarily through the wealth channel.
 3. Write a "Scenario" spec that combines multiple shocks into a named
    package for reproducibility.
 4. Add a shock audit log writer that produces a JSON manifest per run.
+
+## Update — dose-response calibration (11 Oct 2026, late session)
+
+The first single-shock demos in this note were produced with `P6C_PARAMS`
+unset, which caused the scenario runner to load the pre-P6d copula
+`synthetic_32k.pkl`. The corrected demos are in
+`phase4_dose_response.json`.
+
+### Wealth redistribution is inert in the decision loop
+
+At every tested magnitude, the four behavioural benchmarks (UG offer,
+UG rejection, TG send, TG return) are **identical to baseline**. Only
+Gini changes. Reason: `p6c_v5` accumulates `wealth` but never reads it
+back into `total_r`, `Q_mf`, `Q_off`, `Q_send`, `Q_acc`, or `Q_ret`.
+Wealth is a diagnostic variable, not a state variable.
+
+Consequence: a `wealth_redistribution` scenario tests "what would the
+final wealth distribution look like under intervention X?" — a
+descriptive question. It does **not** test agent behaviour under
+redistribution, because no agent's behaviour depends on wealth.
+
+If a future revision makes wealth feed back into the decision path
+(e.g., risk aversion rising with wealth, or investment opportunity
+scaling with capital), this limitation is lifted. Until then, wealth
+redistribution is documented as `[WEALTH-INERT-IN-DECISION-LOOP]`.
+
+### Wealth redistribution dose-response (tick 200, duration 200)
+
+| magnitude | Gini  | ΔGini   | % of SE |
+|:---|---:|---:|---:|
+| 0 (baseline) | 0.4637 | --- | --- |
+| 0.0005 | 0.4405 | -0.0232 | -19.4% |
+| 0.0010 | 0.4192 | -0.0445 | -37.1% |
+| 0.0020 | 0.3818 | -0.0819 | -68.2% |
+| 0.0050 | 0.3018 | -0.1619 | -135.0% |
+| 0.0100 | 0.2313 | -0.2324 | -193.6% |
+| 0.0200 | 0.1791 | -0.2846 | -237.1% |
+| 0.0500 | 0.1464 | -0.3173 | -264.5% |
+| 0.1000 | 0.1356 | -0.3282 | -273.5% |
+
+Recommended magnitudes for scenarios: 0.002 (moderate), 0.01 (strong).
+
+### Network thinning dose-response (tick 200, duration 200)
+
+| magnitude | Gini  | ΔGini  | % of SE | UG rej | TG ret |
+|:---|---:|---:|---:|---:|---:|
+| 0 (baseline) | 0.4637 | --- | --- | 0.1261 | 0.3376 |
+| 0.10 | 0.4692 | +0.0055 | +4.6% | 0.1262 | 0.3390 |
+| 0.20 | 0.4723 | +0.0086 | +7.1% | 0.1260 | 0.3392 |
+| 0.33 | 0.4918 | +0.0281 | +23.4% | 0.1296 | 0.3464 |
+| 0.50 | 0.5337 | +0.0700 | +58.3% | 0.1474 | 0.3570 |
+| 0.66 | 0.5259 | +0.0622 | +51.9% | 0.1653 | 0.3616 |
+| 0.83 | 0.5252 | +0.0614 | +51.2% | 0.1654 | 0.3617 |
+
+Network thinning has behavioural effects on **all** benchmarks, not just
+Gini. Saturation occurs around magnitude 0.5 for Gini; UG rejection and
+TG return continue to rise to ~0.66. Recommended magnitudes: 0.2 (mild),
+0.5 (strong).
+
+### Key contrast
+
+- `wealth_redistribution` = descriptive intervention, no behavioural effect.
+- `network_thinning` = causal behavioural intervention, affects all five
+  benchmarks.
+
+This is the single most important scientific distinction from the Phase 4
+work: **only interventions that touch the decision loop produce causal
+effects on behaviour.** Wealth redistribution does not, in the current
+engine.

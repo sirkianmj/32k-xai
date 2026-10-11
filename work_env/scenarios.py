@@ -54,21 +54,40 @@ SCENARIOS = {
         ],
     },
     "social_isolation": {
-        "description": ("Network thinning: affected agents can pick from "
-                        "half as many neighbours, ticks 200-400. Models "
-                        "social isolation / reduced mobility."),
+        "description": ("Network thinning 0.5: affected agents can pick "
+                        "from half as many neighbours, ticks 200-400. "
+                        "Gini +58% of SE, UG rejection +42% of SE."),
         "shocks": [
             {"tick": 200, "duration": 200, "type": "network_thinning",
              "magnitude": 0.5, "target_frac": None, "target_seed": 0},
         ],
     },
+    "mild_isolation": {
+        "description": ("Network thinning 0.2: affected agents lose 20% "
+                        "of their neighbour pool, ticks 200-400. Gini "
+                        "+7% of SE."),
+        "shocks": [
+            {"tick": 200, "duration": 200, "type": "network_thinning",
+             "magnitude": 0.2, "target_frac": None, "target_seed": 0},
+        ],
+    },
     "wealth_equalization": {
-        "description": ("Wealth redistribution 0.5 (50% pull toward mean) "
-                        "on all agents, ticks 200-400. Models a tax-and-"
-                        "transfer intervention."),
+        "description": ("Wealth redistribution 0.002 (0.2% pull toward "
+                        "mean per tick) on all agents, ticks 200-400. "
+                        "Calibrated to reduce Gini by ~68% of SE. Models "
+                        "a mild tax-and-transfer intervention."),
         "shocks": [
             {"tick": 200, "duration": 200, "type": "wealth_redistribution",
-             "magnitude": 0.5, "target_frac": None, "target_seed": 0},
+             "magnitude": 0.002, "target_frac": None, "target_seed": 0},
+        ],
+    },
+    "strong_redistribution": {
+        "description": ("Wealth redistribution 0.01 (1% pull toward mean "
+                        "per tick) on all agents, ticks 200-400. Strong "
+                        "intervention: Gini drops to 0.23."),
+        "shocks": [
+            {"tick": 200, "duration": 200, "type": "wealth_redistribution",
+             "magnitude": 0.01, "target_frac": None, "target_seed": 0},
         ],
     },
 }
