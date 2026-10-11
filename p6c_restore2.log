@@ -1,0 +1,65 @@
+===== BACKUP CURRENT (P6D-MODIFIED) COPULA =====
+'/home/kian/projects/xai_project/work_g2/synthetic_32k.pkl' -> '/home/kian/projects/xai_project/work_g2/synthetic_32k.pkl.p6d_attempt'
+
+===== RESTORE PRE-P6D =====
+'/home/kian/projects/xai_project/work_g2/synthetic_32k.pkl.pre_p6d' -> '/home/kian/projects/xai_project/work_g2/synthetic_32k.pkl'
+-rw-r--r-- 1 kian kian 6913616 Oct 11 14:26 /home/kian/projects/xai_project/work_g2/synthetic_32k.pkl
+-rw-r--r-- 1 kian kian 5634223 Oct 11 14:26 /home/kian/projects/xai_project/work_g2/synthetic_32k.pkl.p6d_attempt
+-rw-r--r-- 1 kian kian 7681182 Oct  8 09:34 /home/kian/projects/xai_project/work_g2/synthetic_32k.pkl.pre_kdefix
+-rw-r--r-- 1 kian kian 6913616 Oct 11 14:04 /home/kian/projects/xai_project/work_g2/synthetic_32k.pkl.pre_p6d
+
+===== CONFIRM CARDINALITIES RESTORED =====
+  theta_T         unique= 15696  mean=1.1183
+  u_U             unique= 15780  mean=1.1208
+  eta_vol         unique= 14611  mean=0.5356
+  omega_social    unique= 15712  mean=1.1257
+  lambda_norm     unique= 15749  mean=1.1178
+  s_spite         unique= 15962  mean=0.5648
+  tau_sens        unique= 15694  mean=1.1283
+  gamma_sal       unique= 15694  mean=1.1224
+  kappa_ctx       unique= 15997  mean=0.4975
+  m_t             unique= 15975  mean=-0.0093
+
+===== RE-VERIFY AT 32k x 500 ON PRE-P6D COPULA =====
+Building small simulator (8000 x 250) ...
+  compile wall = 4.3s
+Building 32k x 500 simulator ...
+  compile wall = 4.3s
+  run wall = 0.26s
+
+========================================================================
+FULL-SCALE VERIFICATION (32k x 500)
+========================================================================
+benchmark                platform      human       SE   |diff|  verdict
+------------------------------------------------------------------------
+UG mean offer              0.3946     0.4000   0.0500   0.0054     PASS
+UG rejection               0.1202     0.1600   0.0500   0.0398     PASS
+TG mean send               0.4832     0.5020   0.1300   0.0188     PASS
+TG mean return             0.3341     0.3720   0.1200   0.0379     PASS
+Final Gini                 0.4429     0.4000   0.1200   0.0429     PASS
+------------------------------------------------------------------------
+OVERALL: 5/5 PASS
+Saved: p6c_final.json
+
+===== NEW p6c_final.json =====
+{
+  "theta": [
+    1.788896083831787,
+    1.572543740272522,
+    1.9643938541412354,
+    2.921708345413208,
+    1.433349847793579,
+    0.4965079426765442,
+    -0.03587884455919266,
+    -0.07232300937175751,
+    2.424231767654419
+  ],
+  "platform": [
+    0.39458367228507996,
+    0.12024557590484619,
+    0.4831819236278534,
+    0.3341001272201538,
+    0.44285348057746887
+  ],
+  "n_pass": 5
+}

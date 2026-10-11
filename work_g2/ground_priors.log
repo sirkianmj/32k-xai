@@ -1,0 +1,26 @@
+[backup] /home/kian/projects/xai_project/work_g2/synthetic_32k.pkl.pre_p6d
+[load] N=32000, cols=30
+[theta_T]      DASS_Anx  proxy   range=[0.132, 2.991]
+[u_U]          DASS_Anx + inv(O)  range=[0.135, 2.995]
+[eta_vol]      Conscientiousness  range=[0.100, 0.997]
+[omega_social] Agreeableness  range=[0.101, 2.973]
+[lambda_norm]  C + A  range=[0.100, 2.999]
+[s_spite]      D + S_P - A  range=[0.100, 3.000]
+[tau_sens]     Openness  range=[0.100, 2.961]
+[gamma_sal]    Extraversion  range=[0.113, 2.993]
+[kappa_ctx]    Openness  range=[0.050, 0.938]
+[m_t]          DASS_Dep centered  range=[-2.049, 2.035]
+
+[saved] /home/kian/projects/xai_project/work_g2/synthetic_32k.pkl
+[shapes] (32000, 30)
+[check] all 10 grounded columns now have N=32000 unique values:
+  theta_T         unique=    43  range=[0.132, 2.991]
+  u_U             unique=  1326  range=[0.135, 2.995]
+  eta_vol         unique=    41  range=[0.100, 0.997]
+  omega_social    unique=    41  range=[0.101, 2.973]
+  lambda_norm     unique=   114  range=[0.100, 2.999]
+  s_spite         unique=  5329  range=[0.100, 3.000]
+  tau_sens        unique=    40  range=[0.100, 2.961]
+  gamma_sal       unique=    41  range=[0.113, 2.993]
+  kappa_ctx       unique=    40  range=[0.050, 0.938]
+  m_t             unique=    43  range=[-2.049, 2.035]
