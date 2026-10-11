@@ -1,0 +1,11 @@
+# CPU-only environment for 32k-XAI.
+# Matches the Docker image's dependency set.
+# Install with: pip install -r requirements-cpu.txt
+jax[cpu]
+numpy
+scipy
+pandas
+networkx
+tqdm
+fastapi
+uvicorn[standard]

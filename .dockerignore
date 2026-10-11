@@ -1,0 +1,40 @@
+# Git
+.git
+.gitignore
+
+# Virtual environments (huge, not needed in image)
+.venv
+.venv312
+**/__pycache__
+
+# Raw data (400 MB, not needed at runtime)
+Data_Xai32kProje
+
+# Old copula + backups (the new one is copied explicitly)
+work_g2/synthetic_32k.pkl
+work_g2/synthetic_32k.pkl.*
+work_g2/synthetic_32k_p6d.pkl.pre_*
+work_g2/synthetic_32k_sample50k.csv
+work_g2/*.npy
+
+# Local logs and diagnostics (dozens of them)
+*.log
+diag_handoff*.log
+tree_diag*.log
+recon*.log
+xai_v2_*.log
+phase*_*.log
+commit_*.log
+p6c_restore*.log
+p6d_*.log
+wealth_*_verify.log
+p6c_recalib.log
+
+# Build artifacts
+*.tar
+xai32k-image.tar
+
+# OS cruft
+.DS_Store
+Thumbs.db
+desktop.ini
