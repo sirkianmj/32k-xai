@@ -202,7 +202,7 @@ redistribution, because no agent's behaviour depends on wealth.
 If a future revision makes wealth feed back into the decision path
 (e.g., risk aversion rising with wealth, or investment opportunity
 scaling with capital), this limitation is lifted. Until then, wealth
-redistribution is documented as `[WEALTH-INERT-IN-DECISION-LOOP]`.
+redistribution is documented as `[WEALTH-INERT-IN-DECISION-LOOP-RETIRED]`.
 
 ### Wealth redistribution dose-response (tick 200, duration 200)
 

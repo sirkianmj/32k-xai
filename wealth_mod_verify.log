@@ -1,0 +1,36 @@
+Building small simulator (8000 x 250) ...
+  compile wall = 3.4s
+  [baseline] metrics = [0.39712152 0.12385976 0.48998928 0.34116325 0.41223353]
+  [wealth_redistribution mag=0.02] metrics = [0.39676243 0.12151128 0.49005482 0.3412081  0.10000122]
+
+  Delta baseline -> wealth_redistribution (mag=0.02):
+    UG offer    base=0.3971  shock=0.3968  delta=-0.000359
+    UG rej      base=0.1239  shock=0.1215  delta=-0.002348
+    TG send     base=0.4900  shock=0.4901  delta=+0.000066
+    TG ret      base=0.3412  shock=0.3412  delta=+0.000045
+    Gini        base=0.4122  shock=0.1000  delta=-0.312232
+
+  Behavioural benchmarks moved > 1e-4: True
+    (Before the wealth fix, this was always False — wealth was inert.)
+
+  Agent-level mechanism test (baseline run):
+  agents with >=5 responses: 30067
+  corr(final_wealth, rejection_rate) = -0.4089
+  bottom-quartile wealth  (n=6083): mean rejection = 0.2844
+  top-quartile wealth     (n=8000): mean rejection = 0.0743
+  gap (top - bottom)                                    = -0.2101
+  mechanism direction correct (top > bottom): False
+
+  Canonical trace hash (new engine, P6d copula):
+Building small simulator (8000 x 250) ...
+  compile wall = 2.6s
+    sha256 = 351cbeb89c963d469648c6821a53fb8a0883964b6efacc2b5d555da65a3d2184
+
+  saved: /home/kian/projects/xai_project/work_g2/wealth_mod_evidence.json
+
+============================================================
+WEALTH-MODERATION VERDICT
+============================================================
+  PASS — wealth now enters the decision loop.
+    A wealth shock at magnitude 0.02 moves the behavioural benchmarks.
+  The [WEALTH-INERT-IN-DECISION-LOOP] flag should be retired.

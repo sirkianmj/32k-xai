@@ -1,0 +1,34 @@
+{
+  "engine": "p6c_v5 with WEALTH_KAPPA=0.001 (wealth-moderated FS)",
+  "baseline_metrics": [
+    0.39712151885032654,
+    0.12385976314544678,
+    0.4899892807006836,
+    0.3411632478237152,
+    0.41223353147506714
+  ],
+  "wealth_shock_metrics": [
+    0.3967624306678772,
+    0.12151128053665161,
+    0.49005481600761414,
+    0.3412081003189087,
+    0.10000122338533401
+  ],
+  "per_benchmark_delta": {
+    "UG offer": -0.0003590881824493408,
+    "UG rej": -0.002348482608795166,
+    "TG send": 6.553530693054199e-05,
+    "TG ret": 4.4852495193481445e-05,
+    "Gini": -0.3122323155403137
+  },
+  "behavioural_benchmarks_moved": true,
+  "agent_level": {
+    "n_valid_agents": 30067,
+    "corr_wealth_rejection_rate": -0.4088709013999825,
+    "bottom_quartile_rej": 0.2843790042918761,
+    "top_quartile_rej": 0.07427644329341285,
+    "gap_top_minus_bottom": -0.21010256099846328,
+    "mechanism_direction_ok": false
+  },
+  "canonical_trace_hash_p6d_copula": "351cbeb89c963d469648c6821a53fb8a0883964b6efacc2b5d555da65a3d2184"
+}
