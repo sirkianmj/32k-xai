@@ -18,8 +18,25 @@ Adds two functions:
   dump.
 
 The `trace_agent` function in `xai_trace_v2` gained a `shocks=None`
-parameter. When `None`, it behaves identically to before, verified by
-the canonical hash `905da509bf037d50e2565b807abc6b838bc61d64c439841cede337f0f312eaea`.
+parameter. When `None`, the code path is byte-identical to the
+pre-shock version. This is verified in two separate ways:
+
+1. **Same copula, pre-shock code vs post-shock code.** Running the
+   current patched code against the OLD copula (`synthetic_32k.pkl`)
+   reproduces the canonical pre-shock hash
+   `905da509bf037d50e2565b807abc6b838bc61d64c439841cede337f0f312eaea`.
+   This confirms that the shock-tensor threading and the per-tick keff
+   mask do not alter the shocks=None trajectory.
+
+2. **Same copula, P6d baseline.** Running the current code against the
+   P6d copula (`synthetic_32k_p6d.pkl`) with `shocks=None` reproduces
+   the P6d final benchmark values
+   `[0.39593542, 0.12607908, 0.48474643, 0.33758473, 0.46371707]`
+   byte-for-byte.
+
+The hash on the P6d copula differs from the pre-shock hash because the
+copula itself changed (P6d grounded 5 priors; 4 were retired). Same code
+path, different input, different trace values. This is expected.
 
 When a scenario is passed, the shock tensors are precomputed by the
 same code path the simulator uses, so the trace's `reward_total` and
@@ -77,5 +94,6 @@ scarcity, coefficient 0.4), and the 56-field per-tick decision record.
    into any traced decision variable.
 
 3. Determinism is preserved: same scenario + same agent + same seed →
-   same trace bytes. Verified for baseline; the shock version inherits
-   the deterministic shock tensors from `build_simulator`.
+   same trace bytes. The shock tensors are precomputed deterministically
+   from the shock spec and `target_seed`; identical specs produce
+   identical trace bytes.

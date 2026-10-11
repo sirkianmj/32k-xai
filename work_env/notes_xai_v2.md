@@ -52,6 +52,12 @@ The trace patch does not perturb the calibrated simulation.
 Canonical trace: agent 100, N=32000, T=500, seed=42.
 
     sha256 = 905da509bf037d50e2565b807abc6b838bc61d64c439841cede337f0f312eaea
+    (pre-P6d copula, synthetic_32k.pkl)
+
+    On the P6d copula (synthetic_32k_p6d.pkl), the same trace produces a
+    different hash because the parameter values changed. The trace
+    schema is unchanged; only the underlying copula differs. See
+    notes_phase4_trace.md for the two-invariant verification.
 
 - Same-process (two calls in one process): byte-identical.
 - Cross-process (two fresh subprocesses): byte-identical.
