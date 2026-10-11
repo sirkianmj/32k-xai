@@ -120,7 +120,12 @@ def build_simulator(N, T, trace_agent_i=None, shocks=None):
             t0 = int(s["tick"]); dur = int(s["duration"])
             mag = float(s["magnitude"]); frac = s.get("target_frac")
             ts = int(s.get("target_seed", 0))
-            if frac is None:
+            if "target_mask" in s and s["target_mask"] is not None:
+                mask = np.asarray(s["target_mask"], dtype=bool)
+                if mask.shape != (N,):
+                    raise ValueError(
+                        f"target_mask length {mask.shape} does not match N={N}")
+            elif frac is None:
                 mask = np.ones(N, dtype=bool)
             else:
                 rng = np.random.default_rng(ts)

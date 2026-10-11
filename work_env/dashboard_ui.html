@@ -248,9 +248,9 @@ table.cmp tr:last-child td { border-bottom: 0; }
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="6" height="6" rx="1.5"/><rect x="11" y="3" width="6" height="6" rx="1.5"/><rect x="3" y="11" width="6" height="6" rx="1.5"/><rect x="11" y="11" width="6" height="6" rx="1.5"/></svg>
         Scenarios
       </button>
-      <button data-view="build">
+      <button data-view="design">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 4v12M4 10h12" stroke-linecap="round"/></svg>
-        Build a scenario
+        Design experiments
       </button>
       <button data-view="compare">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h12M4 10h8M4 14h12" stroke-linecap="round"/></svg>
@@ -396,18 +396,34 @@ table.cmp tr:last-child td { border-bottom: 0; }
       <div id="trace-output"></div>
     </section>
 
-    <!-- BUILD -->
-    <section id="view-build" class="view">
-      <h2 class="page-title">Build your own scenario</h2>
-      <p class="page-sub">Combine one or more interventions into a custom experiment, then run it.</p>
+    <!-- DESIGN -->
+    <section id="view-design" class="view">
+      <h2 class="page-title">Design an experiment</h2>
+      <p class="page-sub">Change the population's psychology, add interventions, average across random seeds. Everything you configure here is saved in the experiment record so a study is fully reproducible.</p>
 
       <div class="grid cols-2">
+
+        <!-- POPULATION -->
         <div class="card">
-          <h3 style="margin-top:0;">Add an intervention</h3>
+          <h3 style="margin-top:0;">1 · Population psychology</h3>
+          <p style="color:var(--ink-3);font-size:13px;margin:0 0 14px;">
+            Shift the mean or variance of key psychological traits across the whole population. 1.0 = no change.
+          </p>
+
+          <div id="pop-sliders"></div>
+
+          <div class="btn-row">
+            <button class="btn secondary" onclick="resetPopulation()">Reset all traits</button>
+          </div>
+        </div>
+
+        <!-- INTERVENTIONS -->
+        <div class="card">
+          <h3 style="margin-top:0;">2 · Interventions</h3>
 
           <div class="field">
-            <label>Type of intervention</label>
-            <select id="b-type" onchange="updateBuilderFields()">
+            <label>What kind of intervention?</label>
+            <select id="d-type" onchange="updateDesignLabels()">
               <option value="resource_scarcity">Resource scarcity — reduce available rewards</option>
               <option value="distress_injection">Distress injection — raise baseline distress</option>
               <option value="network_thinning">Social isolation — reduce neighbours</option>
@@ -416,53 +432,107 @@ table.cmp tr:last-child td { border-bottom: 0; }
           </div>
 
           <div class="field">
-            <label>Strength <span class="hint" id="b-strength-hint"></span></label>
+            <label>Strength <span class="hint" id="d-strength-hint"></span></label>
             <div class="slider-row">
-              <input id="b-mag" type="range" min="1" max="100" value="30" oninput="updateBuilderLabels()">
-              <div class="value" id="b-mag-v">0.30</div>
+              <input id="d-mag" type="range" min="1" max="100" value="30" oninput="updateDesignLabels()">
+              <div class="value" id="d-mag-v">0.30</div>
             </div>
           </div>
 
           <div class="field">
-            <label>When does it start? <span class="hint">(tick)</span></label>
+            <label>Start · Duration <span class="hint">(ticks)</span></label>
             <div class="slider-row">
-              <input id="b-tick" type="range" min="0" max="490" value="200" oninput="updateBuilderLabels()">
-              <div class="value" id="b-tick-v">200</div>
+              <input id="d-tick" type="range" min="0" max="490" value="200" oninput="updateDesignLabels()">
+              <input id="d-dur"  type="range" min="10" max="500" value="200" oninput="updateDesignLabels()">
+              <div class="value" id="d-window-v">200 · 200</div>
             </div>
           </div>
 
           <div class="field">
-            <label>How long does it last? <span class="hint">(ticks)</span></label>
+            <label>Who does it affect?</label>
+            <select id="d-target-mode" onchange="updateDesignLabels()">
+              <option value="everyone">Everyone</option>
+              <option value="fraction">A random percentage</option>
+              <option value="trait">A sub-group defined by a trait</option>
+            </select>
+          </div>
+
+          <div id="d-target-frac-wrap" class="field" style="display:none;">
+            <label>Percentage affected</label>
             <div class="slider-row">
-              <input id="b-dur" type="range" min="10" max="500" value="200" oninput="updateBuilderLabels()">
-              <div class="value" id="b-dur-v">200</div>
+              <input id="d-frac" type="range" min="1" max="100" value="50" oninput="updateDesignLabels()">
+              <div class="value" id="d-frac-v">50%</div>
             </div>
           </div>
 
-          <div class="field">
-            <label>Who does it affect? <span class="hint">(percentage of agents)</span></label>
-            <div class="slider-row">
-              <input id="b-frac" type="range" min="1" max="100" value="100" oninput="updateBuilderLabels()">
-              <div class="value" id="b-frac-v">100%</div>
+          <div id="d-target-trait-wrap" style="display:none;">
+            <div class="field">
+              <label>Which trait defines the sub-group?</label>
+              <select id="d-target-trait"></select>
+            </div>
+            <div class="field">
+              <label>Selection rule</label>
+              <select id="d-target-op">
+                <option value=">=">Top</option>
+                <option value="<=">Bottom</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Cutoff percentile <span class="hint">(0.7 = top 30%)</span></label>
+              <div class="slider-row">
+                <input id="d-target-q" type="range" min="1" max="99" value="70" oninput="updateDesignLabels()">
+                <div class="value" id="d-target-q-v">0.70</div>
+              </div>
             </div>
           </div>
 
           <div class="btn-row">
-            <button class="btn primary" onclick="addShock()">Add to scenario</button>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3 style="margin-top:0;">Your scenario</h3>
-          <div id="build-list"></div>
-          <div class="btn-row" style="margin-top:20px;">
-            <button class="btn primary" onclick="runCustomScenario()" id="build-run-btn">Run this scenario</button>
-            <button class="btn secondary" onclick="clearShocks()">Clear all</button>
+            <button class="btn primary" onclick="addIntervention()">Add intervention</button>
           </div>
         </div>
       </div>
 
-      <div id="build-results"></div>
+      <!-- MEASUREMENT -->
+      <div class="card" style="margin-top:16px;">
+        <h3 style="margin-top:0;">3 · Measurement</h3>
+        <div class="grid cols-3">
+          <div class="field">
+            <label>Number of agents</label>
+            <input id="d-N" type="number" value="8000" min="100" max="32000" step="100">
+          </div>
+          <div class="field">
+            <label>Simulation length (ticks)</label>
+            <input id="d-T" type="number" value="500" min="50" max="500" step="10">
+          </div>
+          <div class="field">
+            <label>Seeds to average over <span class="hint">(higher = more stable)</span></label>
+            <div class="slider-row">
+              <input id="d-seeds" type="range" min="1" max="10" value="1" oninput="updateDesignLabels()">
+              <div class="value" id="d-seeds-v">1</div>
+            </div>
+          </div>
+        </div>
+        <p style="color:var(--ink-3);font-size:13px;margin:0;">
+          Each seed is an independent random draw of the same population. Averaging across seeds produces a mean ± standard error, as in published experiments.
+        </p>
+      </div>
+
+      <!-- SUMMARY -->
+      <div class="card" style="margin-top:16px;">
+        <h3 style="margin-top:0;">4 · Your experiment</h3>
+        <div id="design-summary"></div>
+        <div class="btn-row" style="margin-top:16px;">
+          <button class="btn primary" id="design-run-btn" onclick="runDesign()">Run experiment</button>
+          <button class="btn secondary" onclick="saveDesign()">Save design (.json)</button>
+          <label class="btn secondary" style="cursor:pointer;">
+            Load design
+            <input type="file" accept=".json" style="display:none;" onchange="loadDesign(event)">
+          </label>
+          <button class="btn secondary" onclick="clearDesign()">Reset everything</button>
+        </div>
+      </div>
+
+      <div id="design-results"></div>
     </section>
 
     <!-- COMPARE -->
@@ -813,101 +883,319 @@ function narrativeFor(d) {
   return s;
 }
 
-// ---------- Build view ----------
+// ---------- Design view (experiment builder) ----------
+const DESIGN_TRAITS = ["O","C","E","A","N","S_M","S_P","S_N","D",
+                       "DASS_Dep","DASS_Anx","DASS_Str","general_distress",
+                       "m_t","omega_social","theta_T","u_U"];
+const traitLabels = {};
+let traitStats = {};
+
 const SHOCK_META = {
   resource_scarcity:    { label: 'Resource scarcity',   strength: '0–1 reduction in reward' },
-  distress_injection:   { label: 'Distress injection',  strength: '0–2 additional baseline distress' },
+  distress_injection:   { label: 'Distress injection',  strength: '0–2 added baseline distress' },
   network_thinning:     { label: 'Social isolation',    strength: '0–1 fraction of neighbours removed' },
   wealth_redistribution:{ label: 'Wealth redistribution', strength: '0–1 per-tick pull toward mean' },
 };
 
-function updateBuilderLabels() {
-  const type = document.getElementById('b-type').value;
-  document.getElementById('b-mag-v').textContent = (+document.getElementById('b-mag').value / 100).toFixed(2);
-  document.getElementById('b-tick-v').textContent = document.getElementById('b-tick').value;
-  document.getElementById('b-dur-v').textContent = document.getElementById('b-dur').value;
-  document.getElementById('b-frac-v').textContent = document.getElementById('b-frac').value + '%';
-  document.getElementById('b-strength-hint').textContent = SHOCK_META[type].strength;
-}
-function updateBuilderFields() { updateBuilderLabels(); }
+const design = {
+  population: {},   // trait -> {shift: 0.0, scale: 1.0}
+  interventions: [],
+};
 
-function addShock() {
-  const type = document.getElementById('b-type').value;
-  const mag = +document.getElementById('b-mag').value / 100;
-  const tick = +document.getElementById('b-tick').value;
-  const dur = +document.getElementById('b-dur').value;
-  const fracPct = +document.getElementById('b-frac').value;
-  const frac = fracPct >= 100 ? null : fracPct / 100;
-  state.shocks.push({
+async function loadTraits() {
+  try {
+    const r = await fetch('/api/traits');
+    const list = await r.json();
+    list.forEach(t => {
+      traitLabels[t.name] = t.label;
+      traitStats[t.name] = t;
+    });
+    renderPopulationSliders();
+    renderTargetTraitSelect();
+  } catch (e) {
+    document.getElementById('pop-sliders').innerHTML =
+      `<div class="notice error">Could not load traits: ${e.message}</div>`;
+  }
+}
+
+function renderPopulationSliders() {
+  const el = document.getElementById('pop-sliders');
+  el.innerHTML = DESIGN_TRAITS.map(name => {
+    const s = traitStats[name];
+    if (!s) return '';
+    if (!design.population[name]) design.population[name] = { shift: 0.0, scale: 1.0 };
+    return `
+      <div class="field" style="margin-bottom:14px;">
+        <label>${traitLabels[name] || name}
+          <span class="hint">(μ=${s.mean.toFixed(2)}, σ=${s.sd.toFixed(2)})</span>
+        </label>
+        <div class="slider-row">
+          <span style="font-size:11px;color:var(--ink-3);min-width:34px;">shift</span>
+          <input type="range" min="-100" max="100" value="0"
+                 oninput="setPopShift('${name}', this.value)">
+          <div class="value" id="pop-shift-${name}">0.00</div>
+        </div>
+        <div class="slider-row" style="margin-top:6px;">
+          <span style="font-size:11px;color:var(--ink-3);min-width:34px;">×sd</span>
+          <input type="range" min="10" max="300" value="100"
+                 oninput="setPopScale('${name}', this.value)">
+          <div class="value" id="pop-scale-${name}">1.00</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function setPopShift(name, v) {
+  const x = +v / 100;
+  design.population[name].shift = x;
+  document.getElementById(`pop-shift-${name}`).textContent = x.toFixed(2);
+  renderSummary();
+}
+function setPopScale(name, v) {
+  const x = +v / 100;
+  design.population[name].scale = x;
+  document.getElementById(`pop-scale-${name}`).textContent = x.toFixed(2);
+  renderSummary();
+}
+
+function resetPopulation() {
+  Object.keys(design.population).forEach(k => design.population[k] = { shift: 0, scale: 1 });
+  renderPopulationSliders();
+  renderSummary();
+}
+
+function renderTargetTraitSelect() {
+  const el = document.getElementById('d-target-trait');
+  el.innerHTML = DESIGN_TRAITS
+    .filter(n => traitStats[n])
+    .map(n => `<option value="${n}">${traitLabels[n] || n}</option>`).join('');
+}
+
+function updateDesignLabels() {
+  const type = document.getElementById('d-type').value;
+  document.getElementById('d-mag-v').textContent = (+document.getElementById('d-mag').value / 100).toFixed(2);
+  document.getElementById('d-window-v').textContent =
+    document.getElementById('d-tick').value + ' · ' + document.getElementById('d-dur').value;
+  document.getElementById('d-frac-v').textContent =
+    document.getElementById('d-frac').value + '%';
+  document.getElementById('d-target-q-v').textContent =
+    (+document.getElementById('d-target-q').value / 100).toFixed(2);
+  document.getElementById('d-seeds-v').textContent = document.getElementById('d-seeds').value;
+  document.getElementById('d-strength-hint').textContent = SHOCK_META[type].strength;
+
+  const mode = document.getElementById('d-target-mode').value;
+  document.getElementById('d-target-frac-wrap').style.display =
+    mode === 'fraction' ? '' : 'none';
+  document.getElementById('d-target-trait-wrap').style.display =
+    mode === 'trait' ? '' : 'none';
+}
+
+function addIntervention() {
+  const type = document.getElementById('d-type').value;
+  const mag = +document.getElementById('d-mag').value / 100;
+  const tick = +document.getElementById('d-tick').value;
+  const dur = +document.getElementById('d-dur').value;
+  const mode = document.getElementById('d-target-mode').value;
+  const s = {
     tick, duration: dur, type, magnitude: mag,
-    target_frac: frac, target_seed: 0,
+    target_frac: null, target_seed: 0,
     _name: SHOCK_META[type].label,
+    _target_desc: 'everyone',
+  };
+  if (mode === 'fraction') {
+    const f = +document.getElementById('d-frac').value / 100;
+    s.target_frac = f;
+    s._target_desc = Math.round(f * 100) + '% of agents (random)';
+  } else if (mode === 'trait') {
+    const trait = document.getElementById('d-target-trait').value;
+    const op = document.getElementById('d-target-op').value;
+    const q = +document.getElementById('d-target-q').value / 100;
+    s.target_where = { trait, op, quantile: q };
+    s._target_desc = `${op === '>=' ? 'top' : 'bottom'} ${Math.round((op === '>=' ? 1 - q : q) * 100)}% on ${traitLabels[trait] || trait}`;
+  }
+  design.interventions.push(s);
+  renderSummary();
+}
+
+function removeIntervention(i) {
+  design.interventions.splice(i, 1);
+  renderSummary();
+}
+
+function clearDesign() {
+  design.interventions = [];
+  resetPopulation();
+  document.getElementById('design-results').innerHTML = '';
+  renderSummary();
+}
+
+function renderSummary() {
+  const el = document.getElementById('design-summary');
+  const popOps = [];
+  Object.entries(design.population).forEach(([k, v]) => {
+    if (v.shift !== 0) popOps.push(`${traitLabels[k] || k} mean ${v.shift > 0 ? '+' : ''}${v.shift.toFixed(2)}`);
+    if (v.scale !== 1) popOps.push(`${traitLabels[k] || k} sd ×${v.scale.toFixed(2)}`);
   });
-  renderShockList();
+  const popHtml = popOps.length
+    ? `<ul style="margin:8px 0 0;padding-left:20px;color:var(--ink-2);font-size:13.5px;">${popOps.map(x => `<li>${escapeHtml(x)}</li>`).join('')}</ul>`
+    : `<p style="color:var(--ink-3);font-size:13.5px;margin:8px 0 0;">No population changes.</p>`;
+  const intHtml = design.interventions.length
+    ? design.interventions.map((s, i) => `
+        <div class="shock-item">
+          <div class="info">
+            <div class="name">${escapeHtml(s._name)}</div>
+            <div class="meta">strength ${s.magnitude.toFixed(2)} · starts tick ${s.tick} · lasts ${s.duration} ticks · affects ${escapeHtml(s._target_desc)}</div>
+          </div>
+          <button class="btn tertiary" onclick="removeIntervention(${i})">Remove</button>
+        </div>`).join('')
+    : `<p style="color:var(--ink-3);font-size:13.5px;margin:8px 0 0;">No interventions.</p>`;
+  el.innerHTML = `
+    <div style="font-size:13px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px;">Population changes</div>
+    ${popHtml}
+    <div style="font-size:13px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.04em;margin:20px 0 6px;">Interventions</div>
+    ${intHtml}
+  `;
 }
 
-function removeShock(i) {
-  state.shocks.splice(i, 1);
-  renderShockList();
+function _designPayload() {
+  const copula_ops = [];
+  Object.entries(design.population).forEach(([trait, v]) => {
+    if (v.shift !== 0) copula_ops.push({ op: 'shift_mean', trait, value: v.shift });
+    if (v.scale !== 1) copula_ops.push({ op: 'scale_sd',   trait, value: v.scale });
+  });
+  const shocks = design.interventions.map(({_name, _target_desc, ...s}) => s);
+  const N = +document.getElementById('d-N').value;
+  const T = +document.getElementById('d-T').value;
+  const S = +document.getElementById('d-seeds').value;
+  const seeds = Array.from({length: S}, (_, i) => 42 + i);
+  return { copula_ops, shocks, N, T, seeds };
 }
 
-function clearShocks() {
-  state.shocks = [];
-  renderShockList();
-  document.getElementById('build-results').innerHTML = '';
-}
-
-function renderShockList() {
-  const el = document.getElementById('build-list');
-  if (state.shocks.length === 0) {
-    el.innerHTML = `<p style="color:var(--ink-3);font-size:13.5px;">No interventions added yet. Use the panel on the left to add one.</p>`;
+async function runDesign() {
+  if (design.interventions.length === 0 && Object.values(design.population).every(v => v.shift === 0 && v.scale === 1)) {
+    document.getElementById('design-results').innerHTML =
+      `<div class="notice error">Configure at least one change (population or intervention) before running.</div>`;
     return;
   }
-  el.innerHTML = state.shocks.map((s, i) => `
-    <div class="shock-item">
-      <div class="icon">
-        <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6">
-          <circle cx="8" cy="8" r="5"/>
-        </svg>
-      </div>
-      <div class="info">
-        <div class="name">${escapeHtml(s._name)}</div>
-        <div class="meta">strength ${s.magnitude.toFixed(2)} · starts tick ${s.tick} · lasts ${s.duration} ticks · ${s.target_frac === null ? 'all agents' : Math.round(s.target_frac * 100) + '% of agents'}</div>
-      </div>
-      <button class="btn tertiary" onclick="removeShock(${i})">Remove</button>
-    </div>`).join('');
-}
-
-async function runCustomScenario() {
-  if (state.shocks.length === 0) {
-    document.getElementById('build-results').innerHTML =
-      `<div class="notice error">Add at least one intervention before running.</div>`;
-    return;
-  }
-  const N = 8000, T = 500, seed = 42;
-  const btn = document.getElementById('build-run-btn');
+  const btn = document.getElementById('design-run-btn');
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Running…';
-  document.getElementById('build-results').innerHTML =
-    `<div class="notice info">Running custom scenario…</div>`;
+  const payload = _designPayload();
+  document.getElementById('design-results').innerHTML =
+    `<div class="notice info">Running ${payload.seeds.length} seed(s) at ${payload.N.toLocaleString()} agents × ${payload.T} ticks…</div>`;
   try {
-    const cleanShocks = state.shocks.map(({_name, ...s}) => s);
-    const r = await fetch('/api/run-custom', {
+    const r = await fetch('/api/design', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ shocks: cleanShocks, N, T, seed }),
+      body: JSON.stringify(payload),
     });
     if (!r.ok) throw new Error(await r.text());
     const data = await r.json();
-    renderResults('build-results', data);
+    renderDesignResults(data);
   } catch (e) {
-    document.getElementById('build-results').innerHTML =
+    document.getElementById('design-results').innerHTML =
       `<div class="notice error">Run failed: ${e.message}</div>`;
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Run this scenario';
+    btn.textContent = 'Run experiment';
   }
 }
+
+function renderDesignResults(data) {
+  const el = document.getElementById('design-results');
+  const cards = data.benchmarks.map(b => {
+    const lo = b.target - 2 * b.se, hi = b.target + 2 * b.se;
+    const pos = Math.max(0, Math.min(100, 100 * (b.platform - lo) / (hi - lo)));
+    const seStart = 100 * ((b.target - b.se) - lo) / (hi - lo);
+    const seWidth = 100 * (2 * b.se) / (hi - lo);
+    const cls = b.pass ? 'pass' : 'fail';
+    const pill = b.pass ? 'Matched' : 'Different';
+    const seedNote = data.n_seeds > 1
+      ? `<div class="meta">Across ${data.n_seeds} seeds: SD ${b.se_over_seeds.toFixed(4)}</div>`
+      : '';
+    return `
+      <div class="bench">
+        <div class="label">${b.name} <span class="pill ${cls}">${pill}</span></div>
+        <div class="value">${b.platform.toFixed(3)}</div>
+        <div class="meta">Human target: ${b.target.toFixed(3)} ± ${b.se.toFixed(3)}</div>
+        ${seedNote}
+        <div class="tolbar">
+          <div class="se-band" style="left:${seStart}%;width:${seWidth}%"></div>
+          <div class="target" style="left:50%"></div>
+          <div class="value-mark ${cls}" style="left:${pos}%"></div>
+        </div>
+      </div>`;
+  }).join('');
+  const json = JSON.stringify(data, null, 2);
+  const csvRows = [['benchmark','platform','target','se','delta','pass','sd_over_seeds']]
+    .concat(data.benchmarks.map(b => [b.name, b.platform, b.target, b.se, b.delta, b.pass, b.se_over_seeds]));
+  const csv = csvRows.map(r => r.join(',')).join('\n');
+  el.innerHTML = `
+    <div class="notice success"><strong>Experiment complete.</strong> ${data.n_seeds} seed(s) averaged over ${data.wall_total_s.toFixed(1)}s of GPU time.</div>
+    <h3>Results</h3>
+    <div class="results-grid">${cards}</div>
+    <div class="btn-row">
+      <button class="btn secondary" onclick="downloadFile('experiment.json', ${JSON.stringify(JSON.stringify(json))}, 'application/json')">Download full record</button>
+      <button class="btn secondary" onclick="downloadFile('experiment.csv', ${JSON.stringify(JSON.stringify(csv))}, 'text/csv')">Download CSV</button>
+      <button class="btn secondary" onclick="goTo('scenarios')">Try a pre-built scenario</button>
+    </div>
+    <details style="margin-top:20px;">
+      <summary style="cursor:pointer;color:var(--ink-2);font-size:13px;">Show audit trail</summary>
+      <pre style="font-size:11px;background:#f6f7f9;padding:14px;border-radius:8px;overflow:auto;max-height:400px;margin-top:10px;">${escapeHtml(JSON.stringify(data.audit, null, 2))}</pre>
+    </details>
+  `;
+}
+
+function saveDesign() {
+  const payload = _designPayload();
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'experiment-design.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function loadDesign(event) {
+  const f = event.target.files[0];
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const p = JSON.parse(e.target.result);
+      // Reset
+      design.population = {};
+      design.interventions = [];
+      // Apply copula ops
+      (p.copula_ops || []).forEach(op => {
+        if (!design.population[op.trait]) design.population[op.trait] = { shift: 0, scale: 1 };
+        if (op.op === 'shift_mean') design.population[op.trait].shift = op.value;
+        if (op.op === 'scale_sd')   design.population[op.trait].scale = op.value;
+      });
+      // Apply shocks
+      (p.shocks || []).forEach(s => {
+        const s2 = {...s};
+        s2._name = (SHOCK_META[s.type] || {label: s.type}).label;
+        s2._target_desc = s.target_where
+          ? `${s.target_where.op === '>=' ? 'top' : 'bottom'} ${Math.round((s.target_where.op === '>=' ? 1 - s.target_where.quantile : s.target_where.quantile) * 100)}% on ${traitLabels[s.target_where.trait] || s.target_where.trait}`
+          : (s.target_frac == null ? 'everyone' : Math.round(s.target_frac * 100) + '% of agents');
+        design.interventions.push(s2);
+      });
+      document.getElementById('d-N').value = p.N || 8000;
+      document.getElementById('d-T').value = p.T || 500;
+      document.getElementById('d-seeds').value = (p.seeds || [42]).length;
+      renderPopulationSliders();
+      updateDesignLabels();
+      renderSummary();
+    } catch (err) {
+      alert('Could not load design: ' + err.message);
+    }
+  };
+  reader.readAsText(f);
+}
+
+// init this view
+loadTraits().then(() => { updateDesignLabels(); renderSummary(); });
 
 // ---------- Compare view ----------
 function renderComparePicker() {
