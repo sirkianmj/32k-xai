@@ -160,6 +160,7 @@ def _run_design(copula_ops, shocks, N, T, seeds):
         resolved_shocks.append(s2)
     tmp = Path("/tmp") / f"p6c_design_{uuid.uuid4().hex}.pkl"
     df.to_pickle(tmp)
+    prev_copula = os.environ.get("P6C_PARAMS", str(DEFAULT_COPULA))
     try:
         per_seed = []; walls = []
         cap0 = wealth0 = None
@@ -210,6 +211,7 @@ def _run_design(copula_ops, shocks, N, T, seeds):
             "subgroups": subgroups,
         }
     finally:
+        os.environ["P6C_PARAMS"] = prev_copula
         try: tmp.unlink()
         except Exception: pass
 
@@ -277,7 +279,6 @@ def _run_once_with_diag(copula_path, shocks, N, T, seed):
     theta = jnp.array([json.load(open(WORK / "p6c_results.json"))["calib"][k]
                        for k in p6c.CALIB_NAMES], jnp.float32)
     _, SIM = p6c.build_simulator(N, T, shocks=shocks, return_diag=True)
-    _ = SIM(theta, seed_val=int(seed)).block_until_ready()
     m, cap, wealth = SIM(theta, seed_val=int(seed))
     return np.asarray(m), np.asarray(cap), np.asarray(wealth)
 
