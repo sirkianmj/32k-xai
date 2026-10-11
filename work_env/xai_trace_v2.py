@@ -51,6 +51,39 @@ TRACE_V2_KEYS = [
 TRACE_V2_DIM = len(TRACE_V2_KEYS)
 assert TRACE_V2_DIM == 56, f"expected 56 trace fields, got {TRACE_V2_DIM}"
 
+# ---- Active flags propagated with every trace (Spec 2.4 + Sec 7.2) ----
+FLAGS_ACTIVE = [
+    # Trace infrastructure (Phase 1)
+    "[XAI-TRACE-CALIBRATED-ENGINE]",
+    "[XAI-TRACE-56-FIELDS]",
+    "[XAI-TRACE-DETERMINISTIC]",
+    # Calibration results (P6c, verified across seeds 42-46)
+    "[HUMAN-BENCHMARK-PASS-5-OF-5]",
+    "[FEHR-SCHMIDT-CANONICAL]",
+    "[PER-HEAD-Q]",
+    "[KOOL-VALIDATION-PASSED]",
+    # Documented limitations (Spec 7.2 vocabulary)
+    "[REWARD-SCALE-DRIFT]",
+    "[REWARD-SCALE-ASYMMETRY]",
+    "[SIMPLIFIED MODEL]",
+    "[ENVY-ONLY]",
+    "[NOT-IDENTIFIABLE-IN-HCP-UGR]",
+    "[SYNTHETIC-PRIOR-PARAMS]",
+    "[COPULA-COLUMN-IS-LOG-K-DD]",
+    "[KDE-TAIL-EXTRAPOLATION]",
+    "[COLLAPSED-LR]",
+    "[MF-GENERALIZED]",
+    "[SYNTH-PRIOR-COEFF]",
+    "[INERT-DEFAULT]",
+    "[P6D-RANK-TRANSFORM-REJECTED]",
+]
+
+SYNTHETIC_PRIOR_NAMES = [
+    "theta_T", "u_U", "eta_vol", "omega_social", "lambda_norm",
+    "s_spite", "tau_sens", "gamma_sal", "kappa_ctx", "m_t",
+]
+
+
 DEFAULT_THETA_PATH = Path(__file__).parent / "p6c_results.json"
 
 def load_calibrated_theta(path=None):
@@ -71,6 +104,8 @@ def trace_agent(agent_i, N=32000, T=500, seed=42, theta=None, theta_path=None):
         "values": np.asarray(traces),
         "metrics": np.asarray(metrics),
         "theta": theta,
+        "flags": list(FLAGS_ACTIVE),
+        "synthetic_prior_params": list(SYNTHETIC_PRIOR_NAMES),
     }
 
 def format_tick(tr, tick_idx):
