@@ -89,6 +89,7 @@ def build_simulator(N, T, trace_agent_i=None, shocks=None):
     NB = jnp.asarray(nb, jnp.int32)
     AR = jnp.arange(N)
     LOGITS_PICK = jnp.where(NB >= 0, 0.0, -1e30)
+    k_default_np = (nb >= 0).sum(axis=1).astype(np.int32)
 
     OFFER_VALS = jnp.array([2.0, 4.0, 5.0, 7.0])
     SEND_VALS  = jnp.array([0.0, 3.0, 6.0, 9.0])
@@ -113,6 +114,8 @@ def build_simulator(N, T, trace_agent_i=None, shocks=None):
     if shocks:
         resource_mod_np = np.ones((T, N), np.float32)
         baseline_mod_np = np.zeros((T, N), np.float32)
+        keff_np = np.tile(k_default_np[None, :], (T, 1)).astype(np.int32)
+        redist_np = np.zeros((T, N), np.float32)
         for s in shocks:
             t0 = int(s["tick"]); dur = int(s["duration"])
             mag = float(s["magnitude"]); frac = s.get("target_frac")
@@ -123,27 +126,42 @@ def build_simulator(N, T, trace_agent_i=None, shocks=None):
                 rng = np.random.default_rng(ts)
                 mask = rng.random(N) < float(frac)
             t1 = min(T, t0 + dur)
-            if s["type"] == "resource_scarcity":
+            stype = s["type"]
+            if stype == "resource_scarcity":
                 resource_mod_np[t0:t1, mask] *= (1.0 - mag)
-            elif s["type"] == "distress_injection":
+            elif stype == "distress_injection":
                 baseline_mod_np[t0:t1, mask] += mag
+            elif stype == "network_thinning":
+                reduce = np.maximum(np.round(mag * k_default_np[mask]).astype(np.int32), 0)
+                for t in range(t0, t1):
+                    keff_np[t, mask] = np.maximum(keff_np[t, mask] - reduce, 1)
+            elif stype == "wealth_redistribution":
+                redist_np[t0:t1, mask] += np.clip(mag, 0.0, 1.0)
             else:
-                raise ValueError(f"unknown shock type: {s['type']}")
+                raise ValueError(f"unknown shock type: {stype}")
         resource_mod_jax = jnp.asarray(resource_mod_np)
         baseline_mod_jax = jnp.asarray(baseline_mod_np)
+        keff_jax = jnp.asarray(keff_np, jnp.int32)
+        redist_jax = jnp.asarray(redist_np)
     else:
         resource_mod_jax = jnp.ones((T, N), jnp.float32)
         baseline_mod_jax = jnp.zeros((T, N), jnp.float32)
+        keff_jax = jnp.tile(jnp.asarray(k_default_np, jnp.int32)[None, :], (T, 1))
+        redist_jax = jnp.zeros((T, N), jnp.float32)
 
     def step(carry, scan_in):
-        tk, rm_t, bm_t = scan_in
+        tk, rm_t, bm_t, keff_t, redist_t = scan_in
         calib, Q_mf, Q_off, Q_send, Q_acc, Q_ret, P_hat, wealth, dist, last_a1 = carry
         TAU_B, B_OFF, B_SEND, B_ACC, B_RET, BI_OFF, BI_SEND, BI_RET, LAMB_FS = (
             calib[0], calib[1], calib[2], calib[3],
             calib[4], calib[5], calib[6], calib[7], calib[8])
         kp, kc, ka1, kd, ke, kf, kg, kh, _ = random.split(tk, 9)
 
-        k_idx = random.categorical(kp, LOGITS_PICK, axis=-1)
+        _arange_k = jnp.arange(NB.shape[1])
+        LOGITS_PICK_t = jnp.where(
+            (NB >= 0) & (_arange_k[None, :] < keff_t[:, None]),
+            0.0, -1e30)
+        k_idx = random.categorical(kp, LOGITS_PICK_t, axis=-1)
         ch = NB[AR, k_idx]; mut = (ch[ch] == AR)
         ca = random.bernoulli(kc, 0.5, shape=(N,)).astype(jnp.float32)
         cp = ca[jnp.minimum(AR, ch)]
@@ -261,7 +279,9 @@ def build_simulator(N, T, trace_agent_i=None, shocks=None):
         baseline_eff = jnp.clip(baseline + bm_t, 0.0, 5.0)
         dn = (E.DISTRESS_DECAY * dist + E.DISTRESS_PULL * baseline_eff
               + (1.0 + N_sens * E.N_DISTRESS) * rej.astype(jnp.float32) * 0.05)
-        wn = jnp.maximum(wealth + total_r, 0.0)
+        wn_raw = jnp.maximum(wealth + total_r, 0.0)
+        mean_w = jnp.mean(wn_raw)
+        wn = jnp.maximum(wn_raw + redist_t * (mean_w - wn_raw), 0.0)
 
         cap = jnp.stack([
             jnp.where(inter & isP, my_off, 0.0),
@@ -320,7 +340,7 @@ def build_simulator(N, T, trace_agent_i=None, shocks=None):
         keys = random.split(random.PRNGKey(seed_val), T)
         carry0 = (calib_vec, Q_MF0, Q_OFF0, Q_SEND0, Q_ACC0, Q_RET0,
                   P_HAT0, W0, baseline, LAST0)
-        final, _scan_out = lax.scan(step, carry0, (keys, resource_mod_jax, baseline_mod_jax))
+        final, _scan_out = lax.scan(step, carry0, (keys, resource_mod_jax, baseline_mod_jax, keff_jax, redist_jax))
         if trace_agent_i is not None:
             cap, traces = _scan_out
         else:

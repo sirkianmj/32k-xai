@@ -53,6 +53,24 @@ SCENARIOS = {
              "magnitude": 0.6, "target_frac": 0.5, "target_seed": 7},
         ],
     },
+    "social_isolation": {
+        "description": ("Network thinning: affected agents can pick from "
+                        "half as many neighbours, ticks 200-400. Models "
+                        "social isolation / reduced mobility."),
+        "shocks": [
+            {"tick": 200, "duration": 200, "type": "network_thinning",
+             "magnitude": 0.5, "target_frac": None, "target_seed": 0},
+        ],
+    },
+    "wealth_equalization": {
+        "description": ("Wealth redistribution 0.5 (50% pull toward mean) "
+                        "on all agents, ticks 200-400. Models a tax-and-"
+                        "transfer intervention."),
+        "shocks": [
+            {"tick": 200, "duration": 200, "type": "wealth_redistribution",
+             "magnitude": 0.5, "target_frac": None, "target_seed": 0},
+        ],
+    },
 }
 
 # ---- Runner ----

@@ -22,7 +22,30 @@ A shock spec is a dict:
       "target_seed":  int,   # RNG for reproducible targeting
     }
 
-## Shock types
+## Shock types (4 implemented)
+
+### network_thinning
+
+Reduces the effective number of neighbours an affected agent can pick
+from. The partner-selection logits `LOGITS_PICK` become a function of a
+per-tick, per-agent `keff` tensor. For an agent with default k=6 and
+magnitude 0.5, keff = max(6 - 3, 1) = 3 during the window. Models
+social isolation or reduced mobility: fewer potential partners, so
+mutual matching becomes less likely. Does not modify the underlying
+graph — only the logits used to draw from it.
+
+### wealth_redistribution
+
+At each tick during the window, for affected agents, wealth is partially
+pulled toward the population mean:
+
+    wn_raw   = max(wealth + total_r, 0)
+    mean_w   = mean(wn_raw)
+    wn       = max(wn_raw + mag * (mean_w - wn_raw), 0)
+
+with `mag` = magnitude, clipped to [0, 1]. At `mag=1` every affected
+agent is reset to the mean (full equalization). At `mag=0` no effect.
+Models a progressive tax-and-transfer intervention.
 
 ### resource_scarcity
 

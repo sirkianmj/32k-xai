@@ -26,7 +26,7 @@
         "LAMBDA_FS": 2.424231652732562
       },
       "shocks": [],
-      "wall_s": 4.3071348667144775,
+      "wall_s": 4.878159999847412,
       "platform": [
         0.39593541622161865,
         0.12607908248901367,
@@ -79,7 +79,7 @@
           "target_seed": 0
         }
       ],
-      "wall_s": 2.752558708190918,
+      "wall_s": 3.2779288291931152,
       "platform": [
         0.3921195864677429,
         0.14868372678756714,
@@ -132,7 +132,7 @@
           "target_seed": 3
         }
       ],
-      "wall_s": 2.6549909114837646,
+      "wall_s": 2.9438092708587646,
       "platform": [
         0.3959876298904419,
         0.12338393926620483,
@@ -193,13 +193,119 @@
           "target_seed": 7
         }
       ],
-      "wall_s": 2.721247434616089,
+      "wall_s": 3.0781166553497314,
       "platform": [
         0.39160022139549255,
         0.13980704545974731,
         0.4842087924480438,
         0.3317022919654846,
         0.4556889235973358
+      ],
+      "benchmark_names": [
+        "UG mean offer",
+        "UG rejection",
+        "TG mean send",
+        "TG mean return",
+        "Final Gini"
+      ]
+    }
+  },
+  "social_isolation": {
+    "platform": [
+      0.3992750346660614,
+      0.14738118648529053,
+      0.4920352101325989,
+      0.356984943151474,
+      0.5336833596229553
+    ],
+    "audit": {
+      "scenario_name": "social_isolation",
+      "description": "Network thinning: affected agents can pick from half as many neighbours, ticks 200-400. Models social isolation / reduced mobility.",
+      "N": 32000,
+      "T": 500,
+      "seed": 42,
+      "copula": "/home/kian/projects/xai_project/work_g2/synthetic_32k_p6d.pkl",
+      "theta": {
+        "TAU_BASE": 1.788896071378759,
+        "BETA_OFF": 1.5725436979719754,
+        "BETA_SEND": 1.9643939015369272,
+        "BETA_ACC": 2.9217083931844234,
+        "BETA_RET": 1.4333498327913152,
+        "BIAS_OFF": 0.4965079287369516,
+        "BIAS_SEND": -0.03587884623977938,
+        "BIAS_RET": -0.07232300791143675,
+        "LAMBDA_FS": 2.424231652732562
+      },
+      "shocks": [
+        {
+          "tick": 200,
+          "duration": 200,
+          "type": "network_thinning",
+          "magnitude": 0.5,
+          "target_frac": null,
+          "target_seed": 0
+        }
+      ],
+      "wall_s": 3.157338857650757,
+      "platform": [
+        0.3992750346660614,
+        0.14738118648529053,
+        0.4920352101325989,
+        0.356984943151474,
+        0.5336833596229553
+      ],
+      "benchmark_names": [
+        "UG mean offer",
+        "UG rejection",
+        "TG mean send",
+        "TG mean return",
+        "Final Gini"
+      ]
+    }
+  },
+  "wealth_equalization": {
+    "platform": [
+      0.39593541622161865,
+      0.12607908248901367,
+      0.48474642634391785,
+      0.3375847339630127,
+      0.12696564197540283
+    ],
+    "audit": {
+      "scenario_name": "wealth_equalization",
+      "description": "Wealth redistribution 0.5 (50% pull toward mean) on all agents, ticks 200-400. Models a tax-and-transfer intervention.",
+      "N": 32000,
+      "T": 500,
+      "seed": 42,
+      "copula": "/home/kian/projects/xai_project/work_g2/synthetic_32k_p6d.pkl",
+      "theta": {
+        "TAU_BASE": 1.788896071378759,
+        "BETA_OFF": 1.5725436979719754,
+        "BETA_SEND": 1.9643939015369272,
+        "BETA_ACC": 2.9217083931844234,
+        "BETA_RET": 1.4333498327913152,
+        "BIAS_OFF": 0.4965079287369516,
+        "BIAS_SEND": -0.03587884623977938,
+        "BIAS_RET": -0.07232300791143675,
+        "LAMBDA_FS": 2.424231652732562
+      },
+      "shocks": [
+        {
+          "tick": 200,
+          "duration": 200,
+          "type": "wealth_redistribution",
+          "magnitude": 0.5,
+          "target_frac": null,
+          "target_seed": 0
+        }
+      ],
+      "wall_s": 3.161431312561035,
+      "platform": [
+        0.39593541622161865,
+        0.12607908248901367,
+        0.48474642634391785,
+        0.3375847339630127,
+        0.12696564197540283
       ],
       "benchmark_names": [
         "UG mean offer",
