@@ -1,0 +1,74 @@
+===== 1. BACKUP =====
+'work_g2/synthetic_32k_p6d.pkl' -> 'work_g2/synthetic_32k_p6d.pkl.pre_mt_swap'
+
+===== 2. RANK-PRESERVING m_t SWAP =====
+  copula: (32000, 26) cols=26
+  panas : n=329  mean=-0.0000  sd=1.0000  min=-2.5874  max=2.1527
+
+Before (KDE-resampled m_t):
+  mean=-0.0093  sd=0.9904  min=-4.300  max=3.878
+  q01 = -2.2908
+  q05 = -1.6457
+  q10 = -1.2695
+  q25 = -0.6697
+  q50 = -0.0233
+  q75 = +0.6567
+  q90 = +1.2538
+  q95 = +1.6495
+  q99 = +2.3257
+
+After (PANAS direct m_t):
+  mean=-0.0000  sd=1.0000  min=-2.610  max=2.171
+  q01 = -2.3256
+  q05 = -1.5281
+  q10 = -1.2575
+  q25 = -0.7161
+  q50 = +0.0056
+  q75 = +0.6374
+  q90 = +1.2864
+  q95 = +1.7740
+  q99 = +2.1710
+
+  Spearman rank(old, new) = 0.999625  (must be 1.0)
+
+  wrote: work_g2/synthetic_32k_p6d.pkl  shape=(32000, 26)
+
+  -- post-write verification --
+  reloaded shape=(32000, 26)  m_t mean=-0.0000  sd=1.0000
+
+===== 3. VERIFY 5/5 WITH p6c_verify2 =====
+Building small simulator (8000 x 250) ...
+  compile wall = 4.1s
+Building 32k x 500 simulator ...
+  compile wall = 4.2s
+  run wall = 0.25s
+
+========================================================================
+FULL-SCALE VERIFICATION (32k x 500)
+========================================================================
+benchmark                platform      human       SE   |diff|  verdict
+------------------------------------------------------------------------
+UG mean offer              0.3946     0.4000   0.0500   0.0054     PASS
+UG rejection               0.1202     0.1600   0.0500   0.0398     PASS
+TG mean send               0.4832     0.5020   0.1300   0.0188     PASS
+TG mean return             0.3341     0.3720   0.1200   0.0379     PASS
+Final Gini                 0.4429     0.4000   0.1200   0.0429     PASS
+------------------------------------------------------------------------
+OVERALL: 5/5 PASS
+Saved: p6c_final.json
+
+===== 4. COMPARE TO COMMITTED p6c_final.json =====
+  got      = [0.394636869430542, 0.12023025751113892, 0.4831734597682953, 0.33405935764312744, 0.4429192841053009]
+  expected = [0.39458367228507996, 0.12024557590484619, 0.4831819236278534, 0.3341001272201538, 0.44285348057746887]
+  n_pass   = 5
+  byte-identical: False
+
+  deltas:
+    UG offer    got=0.3946368694  exp=0.3945836723  d=+5.320e-05
+    UG rej      got=0.1202302575  exp=0.1202455759  d=-1.532e-05
+    TG send     got=0.4831734598  exp=0.4831819236  d=-8.464e-06
+    TG ret      got=0.3340593576  exp=0.3341001272  d=-4.077e-05
+    Gini        got=0.4429192841  exp=0.4428534806  d=+6.580e-05
+
+===== 5. ROLLBACK (if needed) =====
+  cp work_g2/synthetic_32k_p6d.pkl.pre_mt_swap work_g2/synthetic_32k_p6d.pkl
