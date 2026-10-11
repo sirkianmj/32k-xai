@@ -63,7 +63,7 @@ SEED_COUNT    = 3      # multi-seed averaging
 _SRC = E.load_all(PARAMS, required=False)
 _N_ALL = len(_SRC["O"])
 
-def build_simulator(N, T, trace_agent_i=None, shocks=None):
+def build_simulator(N, T, trace_agent_i=None, shocks=None, ws_k=6, ws_p=0.1):
     idx = np.random.default_rng(SEED).integers(0, _N_ALL, size=N)
     P = {k: jnp.asarray(v[idx]) for k, v in _SRC.items()}
 
@@ -85,7 +85,7 @@ def build_simulator(N, T, trace_agent_i=None, shocks=None):
     baseline = (P["general_distress"] + 0.3*P["DASS_Dep"]
                 + 0.3*P["DASS_Anx"] + 0.3*P["DASS_Str"]) / 1.9
 
-    nb, _ = E.build_ws(n=N, k=6, p=0.1, seed=0)
+    nb, _ = E.build_ws(n=N, k=int(ws_k), p=float(ws_p), seed=0)
     NB = jnp.asarray(nb, jnp.int32)
     AR = jnp.arange(N)
     LOGITS_PICK = jnp.where(NB >= 0, 0.0, -1e30)
@@ -299,6 +299,10 @@ def build_simulator(N, T, trace_agent_i=None, shocks=None):
             jnp.where(inter & isP, rec_send, 0.0),
             jnp.where(inter & isP, my_rm * rec_send, 0.0),
             jnp.where(inter & isP, 1.0, 0.0),
+            # Phase 5 step 3: per-tick state for time-series
+            dn,                    # 10 — new distress after update
+            wn,                    # 11 — new wealth after update
+            w_eff,                 # 12 — arbitration weight used this tick
         ], axis=-1)
 
         if trace_agent_i is not None:
@@ -380,19 +384,50 @@ def build_simulator(N, T, trace_agent_i=None, shocks=None):
         gini = jnp.where(tot>0, (n+1 - 2.0*jnp.sum(cum)/tot)/n, 0.5)
 
         metrics = jnp.stack([ug_offer, ug_rej, tg_send, ret_frac, gini])
-        if trace_agent_i is not None:
-            return metrics, traces
-        return metrics
 
-    def simulate(calib_vec, seed_val=SEED):
-        return _run_with_seed(calib_vec, seed_val)
+        # Phase 5 step 3: time-series aggregates
+        # cap shape: (T, N, 13). Column 10 = distress, 11 = wealth, 12 = w_eff.
+        resp_per_tick = cap[:, :, 2].sum(axis=1)                      # (T,)
+        acc_per_tick  = cap[:, :, 1].sum(axis=1)                      # (T,)
+        coop_per_tick = jnp.where(resp_per_tick > 0,
+                                  acc_per_tick / jnp.maximum(resp_per_tick, 1.0),
+                                  jnp.nan)
+        dist_per_tick = cap[:, :, 10].mean(axis=1)                    # (T,)
+        wmb_per_tick  = cap[:, :, 12].mean(axis=1)                    # (T,)
+        wealth_per_tick = cap[:, :, 11]                               # (T, N)
+        n_agents = wealth_per_tick.shape[1]
+        ws_sorted = jnp.sort(wealth_per_tick, axis=1)
+        ii = jnp.arange(1, n_agents + 1, dtype=jnp.float32)
+        cum = jnp.cumsum(ws_sorted, axis=1)
+        tot = cum[:, -1:]
+        gini_per_tick = jnp.where(
+            tot[:, 0] > 0,
+            (2.0 * jnp.sum(ii[None, :] * ws_sorted, axis=1)) / (n_agents * tot[:, 0])
+              - (n_agents + 1.0) / n_agents,
+            0.5)
+        timeseries = jnp.stack([coop_per_tick, dist_per_tick,
+                                wmb_per_tick, gini_per_tick], axis=0)  # (4, T)
+
+        if trace_agent_i is not None:
+            return metrics, timeseries, traces
+        return metrics, timeseries
+
+    def simulate(calib_vec, seed_val=SEED, return_timeseries=False):
+        if trace_agent_i is not None:
+            m, _ts, tr = _run_with_seed(calib_vec, seed_val)
+            return m, tr
+        m, ts = _run_with_seed(calib_vec, seed_val)
+        if return_timeseries:
+            return m, ts
+        return m
 
     # Multi-seed averaged simulate (returns mean and std over SEED_COUNT seeds)
     @jax.jit
     def simulate_multiseed(calib_vec):
         seeds = jnp.array([SEED, SEED+1, SEED+2], dtype=jnp.int32)
         def one(seed_val):
-            return _run_with_seed(calib_vec, seed_val)
+            r = _run_with_seed(calib_vec, seed_val)
+            return r[0]  # metrics is always first
         # vmap over the 3 seeds
         all_res = jax.vmap(one)(seeds)   # (3, 5)
         mean_res = all_res.mean(axis=0)

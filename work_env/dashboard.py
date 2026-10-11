@@ -141,48 +141,163 @@ def _run_once(copula_path, shocks, N, T, seed):
     return plat, time.time() - t0
 
 def _run_design(copula_ops, shocks, N, T, seeds):
-    """Run the same design across a list of seeds; return mean, per-seed, and audit."""
-    # 1. Build modified copula
+    """Run across seeds; return mean, per-seed, timeseries, and subgroups (from seed 0)."""
     df = _load_copula()
     if copula_ops:
         df = _apply_copula_ops(df, copula_ops)
-    # 2. Subset to N rows (deterministic based on first seed)
     rng = np.random.default_rng(int(seeds[0]))
     idx = rng.integers(0, len(df), size=int(N))
     df = df.iloc[idx].reset_index(drop=True)
-    # 3. Resolve target_where masks into target_mask
     resolved_shocks = []
+    treated_mask = np.zeros(N, dtype=bool)
     for s in (shocks or []):
         s2 = dict(s)
         mask = _resolve_target_mask(df, s)
         if mask is not None:
             s2["target_mask"] = mask
             s2.pop("target_where", None)
+            treated_mask |= mask
         resolved_shocks.append(s2)
-    # 4. Write modified copula to a unique temp path
     tmp = Path("/tmp") / f"p6c_design_{uuid.uuid4().hex}.pkl"
     df.to_pickle(tmp)
     try:
-        # 5. Run each seed
-        per_seed = []
-        walls = []
-        for seed in seeds:
-            plat, w = _run_once(tmp, resolved_shocks, N, T, seed)
+        per_seed = []; walls = []
+        cap0 = wealth0 = None
+        for i, seed in enumerate(seeds):
+            if i == 0:
+                plat, cap, wealth = _run_once_with_diag(tmp, resolved_shocks, N, T, seed)
+                cap0 = cap; wealth0 = wealth
+            else:
+                plat, w = _run_once(tmp, resolved_shocks, N, T, seed)
             per_seed.append(plat)
-            walls.append(w)
-        per_seed_arr = np.array(per_seed)                # (S, 5)
+            walls.append(w if i > 0 else 1.0)
+        per_seed_arr = np.array(per_seed)
         mean = per_seed_arr.mean(axis=0)
         std = per_seed_arr.std(axis=0, ddof=1) if len(seeds) > 1 else np.zeros(5)
+
+        # Time series and subgroups from seed 0
+        ts_full = _timeseries_of(cap0)
+        shock_ticks = _build_shock_tick_mask(resolved_shocks, T)
+        ts_shock = _timeseries_of(cap0, shock_ticks=shock_ticks) if shock_ticks.any() else None
+
+        subgroups = None
+        if treated_mask.any() and not treated_mask.all():
+            t_full  = _compute_final_metrics(cap0[:, treated_mask, :],  wealth0[treated_mask])
+            c_full  = _compute_final_metrics(cap0[:, ~treated_mask, :], wealth0[~treated_mask])
+            if shock_ticks.any():
+                t_shock = _compute_final_metrics(cap0[shock_ticks][:, treated_mask, :],  wealth0[treated_mask])
+                c_shock = _compute_final_metrics(cap0[shock_ticks][:, ~treated_mask, :], wealth0[~treated_mask])
+            else:
+                t_shock = c_shock = None
+            effect_full  = {k: t_full[k]  - c_full[k]  for k in t_full}
+            effect_shock = ({k: t_shock[k] - c_shock[k] for k in t_shock}
+                            if t_shock is not None else None)
+            subgroups = {
+                "n_treated": int(treated_mask.sum()),
+                "n_control": int((~treated_mask).sum()),
+                "treated_full":  t_full,  "control_full":  c_full,  "effect_full":  effect_full,
+                "treated_shock": t_shock, "control_shock": c_shock, "effect_shock": effect_shock,
+            }
+
         return {
             "mean": mean.tolist(),
             "std_over_seeds": std.tolist(),
             "per_seed": per_seed_arr.tolist(),
             "n_seeds": len(seeds),
             "wall_total_s": float(sum(walls)),
+            "timeseries_full": ts_full,
+            "timeseries_shock": ts_shock,
+            "subgroups": subgroups,
         }
     finally:
         try: tmp.unlink()
         except Exception: pass
+
+
+def _compute_timeseries(cap_np):
+    """Per-tick aggregate benchmarks from a (T, N, 10) cap tensor."""
+    T = cap_np.shape[0]
+    c0 = cap_np[:,:,0]; c1 = cap_np[:,:,1]; c2 = cap_np[:,:,2]
+    c4 = cap_np[:,:,4]; c5 = cap_np[:,:,5]; c7 = cap_np[:,:,7]; c8 = cap_np[:,:,8]; c9 = cap_np[:,:,9]
+
+    m_off = c0 > 0; n_off = m_off.sum(axis=1)
+    offer_t = np.where(n_off > 0, (c0 * m_off).sum(axis=1) / np.maximum(n_off, 1) / 10.0, 0.0)
+
+    m_resp = c2 > 0; n_resp = m_resp.sum(axis=1)
+    rej_t = np.where(n_resp > 0, 1.0 - (c1 * m_resp).sum(axis=1) / np.maximum(n_resp, 1), 0.5)
+
+    m_send = c5 > 0; n_send = m_send.sum(axis=1)
+    send_t = np.where(n_send > 0, (c4 * m_send).sum(axis=1) / np.maximum(n_send, 1) / 10.0, 0.0)
+
+    m_ret = (c9 > 0) & (c7 > 0); n_ret = m_ret.sum(axis=1)
+    ret_frac_t = np.where(c7 > 0, c8 / np.maximum(c7, 1), 0.0)
+    ret_t = np.where(n_ret > 0, (ret_frac_t * m_ret).sum(axis=1) / np.maximum(n_ret, 1) / 3.0, 0.0)
+
+    return {
+        "ticks": list(range(T)),
+        "ug_offer": offer_t.tolist(),
+        "ug_rej":   rej_t.tolist(),
+        "tg_send":  send_t.tolist(),
+        "tg_ret":   ret_t.tolist(),
+    }
+
+
+def _gini(wealth):
+    w = np.asarray(wealth, dtype=np.float64)
+    if len(w) < 2: return 0.0
+    ws = np.sort(w); n = len(ws)
+    cum = np.cumsum(ws); tot = cum[-1]
+    return float((n + 1 - 2.0 * cum.sum() / tot) / n) if tot > 0 else 0.0
+
+
+def _compute_final_metrics(cap_sub, wealth_sub):
+    """5 benchmarks from caps restricted to a subgroup."""
+    if cap_sub.shape[1] == 0:
+        return {"ug_offer": 0.0, "ug_rej": 0.0, "tg_send": 0.0, "tg_ret": 0.0, "gini": 0.0}
+    c0 = cap_sub[:,:,0]; c1 = cap_sub[:,:,1]; c2 = cap_sub[:,:,2]
+    c4 = cap_sub[:,:,4]; c5 = cap_sub[:,:,5]; c7 = cap_sub[:,:,7]; c8 = cap_sub[:,:,8]; c9 = cap_sub[:,:,9]
+    om = c0.reshape(-1); omsk = om > 0
+    ug_offer = float((om * omsk).sum() / max(omsk.sum(), 1) / 10.0) if omsk.any() else 0.0
+    rm = c2.reshape(-1) > 0
+    ug_rej = float(1.0 - (c1.reshape(-1) * rm).sum() / max(rm.sum(), 1)) if rm.any() else 0.5
+    sm = c5.reshape(-1) > 0
+    tg_send = float((c4.reshape(-1) * sm).sum() / max(sm.sum(), 1) / 10.0) if sm.any() else 0.0
+    tm = c9.reshape(-1) > 0; recv = c7.reshape(-1); ret = c8.reshape(-1)
+    valid = tm & (recv > 0)
+    tg_ret = float(((ret * valid) / np.where(recv > 0, recv, 1)).sum() / max(valid.sum(), 1) / 3.0) if valid.any() else 0.0
+    return {"ug_offer": ug_offer, "ug_rej": ug_rej, "tg_send": tg_send, "tg_ret": tg_ret, "gini": _gini(wealth_sub)}
+
+
+def _run_once_with_diag(copula_path, shocks, N, T, seed):
+    os.environ["P6C_PARAMS"] = str(copula_path)
+    p6c = _load_p6c()
+    if str(p6c.PARAMS) != str(copula_path):
+        raise RuntimeError("copula override failed")
+    import jax.numpy as jnp
+    theta = jnp.array([json.load(open(WORK / "p6c_results.json"))["calib"][k]
+                       for k in p6c.CALIB_NAMES], jnp.float32)
+    _, SIM = p6c.build_simulator(N, T, shocks=shocks, return_diag=True)
+    _ = SIM(theta, seed_val=int(seed)).block_until_ready()
+    m, cap, wealth = SIM(theta, seed_val=int(seed))
+    return np.asarray(m), np.asarray(cap), np.asarray(wealth)
+
+
+def _timeseries_of(cap_np, mask=None, shock_ticks=None):
+    """Per-tick aggregate restricted to a subgroup and/or a tick mask."""
+    if mask is not None:
+        cap_np = cap_np[:, mask, :]
+    if shock_ticks is not None:
+        cap_np = cap_np[shock_ticks, :, :]
+    return _compute_timeseries(cap_np)
+
+
+def _build_shock_tick_mask(shocks, T):
+    m = np.zeros(T, dtype=bool)
+    for s in (shocks or []):
+        t0 = int(s["tick"]); t1 = min(T, t0 + int(s["duration"]))
+        if t1 > t0: m[t0:t1] = True
+    return m
+
 
 @app.get("/api/health")
 def health():
@@ -243,6 +358,11 @@ async def design(request: Request):
         "std_over_seeds": result["std_over_seeds"],
         "benchmarks": benchmarks,
         "n_pass": sum(b["pass"] for b in benchmarks),
+        "timeseries_full": result["timeseries_full"],
+        "timeseries_shock": result["timeseries_shock"],
+        "subgroups": result["subgroups"],
+        "shock_tick_ranges": [{"tick": int(s["tick"]), "duration": int(s["duration"])}
+                              for s in (shocks or [])],
         "audit": {
             "copula_ops": copula_ops, "shocks": shocks,
             "N": N, "T": T, "seeds": seeds,
