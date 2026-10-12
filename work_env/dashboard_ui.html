@@ -2273,6 +2273,39 @@ async function saveTraceJson() {
   await downloadFile(nm, content, 'application/json');
 }
 
+function seeCurrentTraceIn3D() {
+  // Jump from the trace view to the 3D view, landing on a run that
+  // matches the trace's scenario and highlighting the trace's agent.
+  // The 3D tab only exposes runs the user has actually done, so a
+  // matching run must exist in session.loadedRuns; if it does not,
+  // we say so and do nothing.
+  const scen = state.current;
+  if (!scen) { alert('No trace loaded yet. Fetch a trace first.'); return; }
+  const runs = v3dLoadedRuns();
+  const match = runs.find(r => r.kind === 'scenario' && r.scenario === scen);
+  if (!match) {
+    alert('No matching 3D run for "' + pretty(scen) + '" in this session. ' +
+          'Run it from the Scenarios tab first, then retry.');
+    return;
+  }
+  const ag = +document.getElementById('trace-agent').value || 0;
+
+  const hl = document.getElementById('s3d-hl');
+  if (hl) hl.value = ag;
+  const a3d = document.getElementById('a3d-agent');
+  if (a3d) a3d.value = ag;
+
+  goTo('view3d');
+
+  setTimeout(() => {
+    const sel = document.getElementById('v3d-scenario');
+    if (sel) sel.value = match.run_id;
+    V3D_STATE.runA = match;
+    V3D_STATE.runB = null;
+    try { load3DScenarios(); } catch (e) { console.warn('seeCurrentTraceIn3D load failed', e); }
+  }, 140);
+}
+
 function traceInit() {
   // The trace picker offers only the runs the user has actually
   // executed this session -- same source as the 3D view picker
@@ -3223,8 +3256,8 @@ const TOUR_STEPS = [
     body: "Thirteen pre-built experiments, from a calm baseline to a resource crisis. Click any one to configure N, T, and seed, then run. Fastest way to see the platform work." },
   { sel: '[data-view="design"]', title: "Design experiments",
     body: "Build your own study: shift the population's psychology, add interventions, target a subgroup, and average across seeds. This is where real research happens." },
-  { sel: '[data-view="trace"]', title: "Trace a decision (from any result)",
-    body: "After running anything, click 'Trace a single decision' to see every internal number behind one agent's choice at one moment — 56 fields, each with a plain-English definition." },
+  { sel: '[data-view="trace"]', title: "Trace",
+    body: "Trace is its own tab. Pick one of the runs you have actually completed, then choose an agent and a tick to see every internal number behind that single decision — 56 fields, each with a plain-English definition. Prev/Next interaction step through the ticks where the agent actually interacted." },
   { sel: '[data-view="view3d"]', title: "3D views",
     body: "See the actual agents of a run in three dimensions. Compare two runs side by side; when they share the same seed and N, they drew the same agents and the difference is the intervention." },
   { sel: '[data-view="library"]', title: "Library",
