@@ -729,6 +729,44 @@ def correlations(traits: str = Query("O,C,E,A,N,S_M,S_P,S_N,DASS_Dep,DASS_Anx,DA
     return {"traits": names, "matrix": m.tolist()}
 
 
+@app.get("/api/scenarios-with-meta")
+def scenarios_with_meta():
+    """Every scenario with description and a human-readable shock summary."""
+    out = []
+    for name, spec in SCENARIOS.items():
+        shocks = spec.get("shocks", [])
+        summary = []
+        for s in shocks:
+            stype = s.get("type", "?")
+            mag = s.get("magnitude", 0)
+            tick = s.get("tick", 0)
+            dur = s.get("duration", 0)
+            summary.append(f"{stype} mag={mag} t{tick}-{tick+dur}")
+        out.append({
+            "name": name,
+            "description": spec.get("description", ""),
+            "n_shocks": len(shocks),
+            "shock_summary": "; ".join(summary),
+        })
+    return out
+
+
+@app.get("/api/runs")
+def list_runs():
+    """List runs currently held in the in-memory cache, with metadata."""
+    out = []
+    for rid in _RUN_CACHE_ORDER:
+        df = _RUN_CACHE.get(rid)
+        if df is None:
+            continue
+        out.append({
+            "run_id": rid,
+            "n_agents": int(len(df)),
+            "has_wealth": "final_wealth" in df.columns,
+        })
+    return {"runs": out, "max_cache": _RUN_CACHE_MAX}
+
+
 @app.get("/api/scatter3d")
 def scatter3d(
     run_id: str = Query(...),
@@ -738,10 +776,14 @@ def scatter3d(
     color: str = Query("N"),
     max_points: int = Query(2500, ge=200, le=8000),
     highlight: int = Query(-1, ge=-1),
+    reference_run_id: str = Query(""),
 ):
     """Return 3-axis trait coordinates for agents actually used in a run.
-    The agents are the exact rows of the modified copula that the engine
-    saw, in the run's own indexing (0..N-1)."""
+
+    If reference_run_id is provided, the axes are z-scored against the
+    reference run's population — so two clouds can be compared on the
+    same coordinate system in the 3D comparison view.
+    """
     df = _get_run_df(run_id)
     if df is None:
         raise HTTPException(404, "run_id expired or unknown; run a scenario to refresh")
@@ -751,12 +793,25 @@ def scatter3d(
 
     N = len(df)
 
-    def zscore(col):
-        v = df[col].to_numpy().astype(np.float64)
-        return (v - v.mean()) / max(v.std(ddof=1), 1e-9)
+    # Which population provides the z-score stats?
+    ref_df = _get_run_df(reference_run_id) if reference_run_id else None
+    stat_df = ref_df if ref_df is not None else df
+    for name in (x, y, z, color):
+        if name not in stat_df.columns:
+            stat_df = df  # fall back to self-stats
+            break
 
-    xs_all = zscore(x); ys_all = zscore(y); zs_all = zscore(z)
-    cs_all = zscore(color)
+    def zscore(col, data=None):
+        src = data if data is not None else df
+        v = src[col].to_numpy().astype(np.float64)
+        mu, sd = v.mean(), max(v.std(ddof=1), 1e-9)
+        v2 = df[col].to_numpy().astype(np.float64)
+        return (v2 - mu) / sd
+
+    xs_all = zscore(x, stat_df)
+    ys_all = zscore(y, stat_df)
+    zs_all = zscore(z, stat_df)
+    cs_all = zscore(color, stat_df)
 
     # sample for display; force-include the highlight index
     rng = np.random.default_rng(0)
@@ -768,7 +823,15 @@ def scatter3d(
         idx = np.arange(N, dtype=int)
 
     cs = cs_all[idx]
-    cmin, cmax = float(cs.min()), float(cs.max())
+    # color scale: if comparing, use the reference's own range so both
+    # clouds share a color scale; otherwise use this run's own range
+    if ref_df is not None and color in ref_df.columns:
+        ref_v = ref_df[color].to_numpy().astype(np.float64)
+        ref_mu, ref_sd = ref_v.mean(), max(ref_v.std(ddof=1), 1e-9)
+        ref_z = (ref_v - ref_mu) / ref_sd
+        cmin, cmax = float(ref_z.min()), float(ref_z.max())
+    else:
+        cmin, cmax = float(cs.min()), float(cs.max())
     csn = (cs - cmin) / max(cmax - cmin, 1e-9)
 
     pts = list(zip(
