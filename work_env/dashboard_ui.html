@@ -719,6 +719,10 @@ table.cmp2 td.delta.ns  { color: var(--ink-3); font-weight: 400; }
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 4v12M4 10h12" stroke-linecap="round"/></svg>
         Design experiments
       </button>
+      <button data-view="trace">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><circle cx="10" cy="10" r="3"/><path d="M10 3v4M10 13v4M3 10h4M13 10h4" stroke-linecap="round"/></svg>
+        Trace
+      </button>
       <button data-view="guide">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4h6a3 3 0 013 3v9a2 2 0 00-2-2H4V4z"/><path d="M16 4h-3a3 3 0 00-3 3v9a2 2 0 012-2h4V4z" stroke-linejoin="round"/></svg>
         Guide
@@ -1006,6 +1010,11 @@ table.cmp2 td.delta.ns  { color: var(--ink-3); font-weight: 400; }
       <h2 class="page-title" id="trace-title">Trace a decision</h2>
       <p class="page-sub" id="trace-desc"></p>
 
+      <div class="field" style="max-width:420px;">
+        <label>Run <span class="hint">(only the runs you have actually done)</span></label>
+        <select id="trace-scenario" onchange="traceScenarioChanged()"></select>
+      </div>
+
       <div class="grid cols-2">
         <div class="field">
           <label>Which agent? <span class="hint">(0 to N−1)</span></label>
@@ -1024,8 +1033,11 @@ table.cmp2 td.delta.ns  { color: var(--ink-3); font-weight: 400; }
       </div>
       <div class="btn-row">
         <button class="btn primary" onclick="fetchTrace()">Show me the trace</button>
-        <button class="btn secondary" onclick="randomTrace()">Pick a random agent</button>
-        <button class="btn secondary" onclick="seeCurrentTraceIn3D()">See this agent in 3D →</button>
+        <button class="btn secondary" onclick="randomTrace()">Random agent</button>
+        <button class="btn secondary" onclick="jumpToPrevInteraction()">← Prev interaction</button>
+        <button class="btn secondary" onclick="jumpToNextInteraction()">Next interaction →</button>
+        <button class="btn secondary" onclick="saveTraceJson()">Save trace (.json)</button>
+        <button class="btn secondary" onclick="seeCurrentTraceIn3D()">See in 3D →</button>
       </div>
 
       <div id="trace-output"></div>
@@ -1428,6 +1440,9 @@ function goTo(view) {
   }
   if (view === 'guide') {
     try { guideLoad(); } catch (e) { console.warn('guide load failed', e); }
+  }
+  if (view === 'trace') {
+    try { traceInit(); } catch (e) { console.warn('trace init failed', e); }
   }
   if (view === 'view3d') {
     try { v3dPopulateRunsDropdown(); init3DView(); } catch (e) {
@@ -1960,7 +1975,7 @@ function renderResults(containerId, data) {
     <div class="card" style="margin-top:16px;background:#f8fbff;border-color:#dbe9ff;">
       <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-3);font-weight:600;margin-bottom:10px;">Explore this result</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        ${state.current ? `<button class="btn secondary" onclick="openTraceFor('${state.current}')">Trace a single decision →</button>` : ''}
+        ${state.current ? `<button class="btn primary" onclick="traceThisRun()">Trace this run's agents →</button>` : ''}
         <button class="btn secondary" onclick="goTo('crowd')">See the whole population →</button>
         <button class="btn secondary" onclick="goTo('library')">Open the library →</button>
         <button class="btn secondary" onclick="goTo('design')">Design a variant experiment →</button>
@@ -2178,16 +2193,155 @@ async function saveScenario() {
 function openTraceFor(name) {
   state.current = name;
   document.getElementById('trace-title').textContent = `Trace a decision · ${pretty(name)}`;
-  document.getElementById('trace-desc').textContent = state.scenarios[name];
+  document.getElementById('trace-desc').textContent = (state.scenarios && state.scenarios[name]) || '';
   document.getElementById('trace-output').innerHTML = '';
   const N = +document.getElementById('run-N').value || 8000;
   const T = +document.getElementById('run-T').value || 250;
   const a = document.getElementById('trace-agent');
-  a.max = N - 1; a.value = Math.min(100, N - 1);
   const t = document.getElementById('trace-tick');
-  t.max = T - 1; t.value = Math.floor(T / 2);
+  a.max = N - 1;
+  t.max = T - 1;
+  if (session.lastTrace && session.lastTrace.scenario === name) {
+    a.value = Math.min(session.lastTrace.agent_i, N - 1);
+    t.value = Math.min(session.lastTrace.tick, T - 1);
+  } else {
+    a.value = Math.min(100, N - 1);
+    t.value = Math.floor(T / 2);
+  }
   updateTraceValue();
   goTo('trace');
+}
+
+function traceThisRun() {
+  // Trace the run the user just completed. Looks up its run entry so
+  // the trace-tab picker stays in sync, then hands off to traceBindRun.
+  const last = session.lastRun || session.lastDesign;
+  if (!last) { alert('Run a scenario or design experiment first.'); return; }
+  const runs = v3dLoadedRuns();
+  const entry = runs.find(r => last.data && r.run_id === last.data.run_id)
+             || runs.find(r => r.kind === last.kind &&
+                                ((r.kind === 'scenario' && r.scenario === last.scenario) ||
+                                 (r.kind === 'design'  && last.kind === 'design')));
+  if (!entry) {
+    alert('This run is not in the trace picker yet. Open the Trace tab from the sidebar to see available runs.');
+    return;
+  }
+  const sel = document.getElementById('trace-scenario');
+  if (sel) {
+    const wanted = runs.map(r => r.run_id).join('|');
+    if (sel.dataset.ids !== wanted) {
+      sel.innerHTML = runs.map(r =>
+        `<option value="${r.run_id}">${prettyRunLabel(r)}</option>`).join('');
+      sel.dataset.ids = wanted;
+    }
+    sel.value = entry.run_id;
+  }
+  traceBindRun(entry);
+  document.getElementById('trace-output').innerHTML = '';
+  document.getElementById('trace-summary').innerHTML = '';
+  goTo('trace');
+  setTimeout(() => { try { fetchTrace(); } catch (e) { console.warn(e); } }, 60);
+}
+
+function jumpToPrevInteraction() {
+  const s = window.__traceSummary;
+  if (!s || !s.agent) {
+    alert('Click "Show me the trace" first so the interaction list is available.');
+    return;
+  }
+  const ticks = s.agent.interaction_ticks || [];
+  if (!ticks.length) {
+    alert('Agent ' + s.agent.agent_i + ' had no interactions in this run. Try "Next interaction" to pick a social agent, or "Random agent".');
+    return;
+  }
+  const cur = +document.getElementById('trace-tick').value;
+  const prev = [...ticks].reverse().find(x => x < cur);
+  const target = (prev !== undefined) ? prev : ticks[ticks.length - 1];
+  document.getElementById('trace-tick').value = target;
+  updateTraceValue();
+  fetchTrace();
+}
+
+async function saveTraceJson() {
+  if (!session.lastTrace) {
+    alert('Fetch a trace first, then save it.');
+    return;
+  }
+  const tr = session.lastTrace;
+  const content = JSON.stringify(tr, null, 2);
+  const nm = 'xai32k-trace-' + tr.scenario + '-agent' + tr.agent_i + '-tick' + tr.tick + '.json';
+  await downloadFile(nm, content, 'application/json');
+}
+
+function traceInit() {
+  // The trace picker offers only the runs the user has actually
+  // executed this session -- same source as the 3D view picker
+  // (session.loadedRuns). No default catalog of scenarios.
+  const sel = document.getElementById('trace-scenario');
+  if (!sel) return;
+  const runs = v3dLoadedRuns();
+  if (!runs.length) {
+    sel.innerHTML = '<option value="">— no runs yet —</option>';
+    const title = document.getElementById('trace-title');
+    const desc  = document.getElementById('trace-desc');
+    if (title) title.textContent = 'Trace a decision';
+    if (desc)  desc.textContent  = 'Run a scenario or a design experiment first; then its agents can be traced here.';
+    document.getElementById('trace-output').innerHTML = '';
+    document.getElementById('trace-summary').innerHTML = '';
+    return;
+  }
+  const wanted = runs.map(r => r.run_id).join('|');
+  if (sel.dataset.ids !== wanted) {
+    sel.innerHTML = runs.map(r =>
+      `<option value="${r.run_id}">${prettyRunLabel(r)}</option>`).join('');
+    sel.dataset.ids = wanted;
+  }
+  const validIds = new Set(runs.map(r => r.run_id));
+  if (!sel.value || !validIds.has(sel.value)) {
+    sel.value = runs[0].run_id;
+  }
+  traceBindRun(runs.find(r => r.run_id === sel.value));
+}
+
+function traceBindRun(entry) {
+  // Set the trace form to match a specific run. Design runs trace
+  // against the baseline copula (the trace endpoint does not take a
+  // design payload); their own N, T, and first seed are carried over
+  // so the population size matches the design.
+  if (!entry) return;
+  const scenario = entry.kind === 'design' ? 'baseline' : entry.scenario;
+  const N = entry.N || (entry.config && entry.config.N) || 8000;
+  const T = entry.T || (entry.config && entry.config.T) || 250;
+  const seed = entry.seed
+            || (entry.config && entry.config.seeds && entry.config.seeds[0])
+            || 42;
+  state.current = scenario;
+  document.getElementById('run-N').value = N;
+  document.getElementById('run-T').value = T;
+  document.getElementById('run-seed').value = seed;
+  const a = document.getElementById('trace-agent');
+  const t = document.getElementById('trace-tick');
+  a.max = N - 1;
+  t.max = T - 1;
+  if (a.value === '' || +a.value > N - 1) a.value = Math.min(100, N - 1);
+  if (t.value === '' || +t.value > T - 1) t.value = Math.floor(T / 2);
+  const title = document.getElementById('trace-title');
+  const desc  = document.getElementById('trace-desc');
+  if (title) title.textContent = 'Trace a decision · ' + pretty(scenario);
+  if (desc)  desc.textContent  = (state.scenarios && state.scenarios[scenario]) || '';
+  updateTraceValue();
+}
+
+function traceScenarioChanged() {
+  const sel = document.getElementById('trace-scenario');
+  if (!sel) return;
+  const entry = v3dLoadedRuns().find(r => r.run_id === sel.value);
+  if (!entry) return;
+  traceBindRun(entry);
+  document.getElementById('trace-output').innerHTML = '';
+  document.getElementById('trace-summary').innerHTML = '';
+  updateTraceValue();
+  fetchTrace();
 }
 
 function updateTraceValue() {
@@ -2694,6 +2848,7 @@ function renderDesignResults(data) {
       <button class="btn secondary" onclick="saveLatest('csv')">Save CSV</button>
       <button class="btn primary" onclick="reportPrint()">Print scientific report</button>
       <button class="btn secondary" onclick="reportDownload()">Download report (.html)</button>
+      <button class="btn primary" onclick="traceThisRun()">Trace this run's agents →</button>
       <button class="btn secondary" onclick="goTo('scenarios')">Try a pre-built scenario</button>
     </div>
     ${renderSubgroups(data)}
