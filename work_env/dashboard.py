@@ -815,6 +815,120 @@ def population(
     }
 
 
+PRIMARY_TRAITS_ORDER = [
+    "O", "C", "E", "A", "N",
+    "S_M", "S_P", "S_N", "D",
+    "DASS_Dep", "DASS_Anx", "DASS_Str", "general_distress",
+    "m_t", "omega_social", "theta_T",
+]
+
+
+def _cohens_d(m1, s1, n1, m2, s2, n2):
+    """Cohen's d with pooled SD. Returns None when either n is too small."""
+    if n1 < 2 or n2 < 2:
+        return None
+    sp2 = ((n1 - 1) * s1 * s1 + (n2 - 1) * s2 * s2) / max(n1 + n2 - 2, 1)
+    if sp2 <= 0:
+        return None
+    return float((m1 - m2) / (sp2 ** 0.5))
+
+
+def _mean_diff_ci(m1, s1, n1, m2, s2, n2, z=1.959964):
+    """95% CI on the mean difference (sub - rest), normal approximation."""
+    if n1 < 2 or n2 < 2:
+        return (None, None)
+    se = ((s1 * s1) / n1 + (s2 * s2) / n2) ** 0.5
+    if se <= 0:
+        return (None, None)
+    d = m1 - m2
+    return (float(d - z * se), float(d + z * se))
+
+
+@app.get("/api/subgroup-analysis")
+def subgroup_analysis(
+    filter_trait: str = Query(...),
+    filter_op: str = Query(">="),
+    filter_value: float = Query(0.5),
+):
+    """Compare a subgroup to the rest of the population, across every
+    primary trait. Subgroup = rows satisfying (filter_trait, op, value);
+    rest = the complement. This is the standard independent-samples
+    formulation, so Cohen's d is not attenuated by the subgroup being
+    a subset of the reference distribution.
+
+    Returns per-trait: subgroup mean/SD/N, rest mean/SD/N, raw mean
+    difference, Cohen's d, 95% CI on the mean difference, and a
+    two-sided p-value from a normal approximation.
+    """
+    df = _get_baseline_copula()
+    if filter_trait not in df.columns:
+        raise HTTPException(400, f"trait '{filter_trait}' not in copula")
+    col = df[filter_trait].to_numpy().astype(np.float64)
+    if   filter_op == ">=": mask = col >= filter_value
+    elif filter_op == ">":  mask = col >  filter_value
+    elif filter_op == "<=": mask = col <= filter_value
+    elif filter_op == "<":  mask = col <  filter_value
+    else:
+        raise HTTPException(400, f"unknown op '{filter_op}'")
+
+    n_sub = int(mask.sum())
+    n_rest = int((~mask).sum())
+    if n_sub < 2 or n_rest < 2:
+        raise HTTPException(400, "each side of the split needs at least 2 agents")
+
+    rows = []
+    for trait in PRIMARY_TRAITS_ORDER:
+        if trait not in df.columns:
+            continue
+        v = df[trait].to_numpy().astype(np.float64)
+        sub = v[mask]
+        rest = v[~mask]
+        m1 = float(sub.mean());  s1 = float(sub.std(ddof=1))
+        m2 = float(rest.mean()); s2 = float(rest.std(ddof=1))
+        diff = m1 - m2
+        d = _cohens_d(m1, s1, n_sub, m2, s2, n_rest)
+        lo, hi = _mean_diff_ci(m1, s1, n_sub, m2, s2, n_rest)
+        if lo is not None:
+            se = (hi - lo) / (2 * 1.959964)
+            p = None
+            if se > 0:
+                zstat = abs(diff) / se
+                # two-sided normal-approximation p-value
+                p = float(2.0 * (1.0 - 0.5 * (1.0 + _erf(zstat / (2 ** 0.5)))))
+        else:
+            p = None
+        rows.append({
+            "trait": trait,
+            "label": TRAIT_LABELS.get(trait, trait),
+            "provenance_status": (TRAIT_PROVENANCE.get(trait, {}) or {}).get("status", "UNCLASSIFIED"),
+            "sub_mean": m1, "sub_sd": s1, "sub_n": n_sub,
+            "rest_mean": m2, "rest_sd": s2, "rest_n": n_rest,
+            "mean_diff": float(diff),
+            "cohens_d": d,
+            "ci95_lo": lo, "ci95_hi": hi,
+            "p_value": p,
+        })
+
+    return {
+        "filter": {"trait": filter_trait, "op": filter_op, "value": float(filter_value)},
+        "n_subgroup": n_sub,
+        "n_rest": n_rest,
+        "n_total": n_sub + n_rest,
+        "traits": rows,
+    }
+
+
+def _erf(x):
+    """Abramowitz & Stegun 7.1.26 — max abs error ~1.5e-7. Adequate for
+    p-value reporting; not used in any decision path."""
+    sign = -1.0 if x < 0 else 1.0
+    ax = abs(x)
+    t = 1.0 / (1.0 + 0.3275911 * ax)
+    a1, a2, a3, a4, a5 = 0.254829592, -0.284496736, 1.421413741, -1.453152027, 1.061405429
+    y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * np.exp(-ax * ax)
+    return sign * y
+
+
 @app.get("/api/correlations")
 def correlations(traits: str = Query("O,C,E,A,N,S_M,S_P,S_N,DASS_Dep,DASS_Anx,DASS_Str,general_distress,m_t,omega_social,theta_T,u_U")):
     """Pearson correlation matrix for the listed copula columns."""

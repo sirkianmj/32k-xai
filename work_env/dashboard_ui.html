@@ -848,6 +848,8 @@ table.cmp2 td.delta.ns  { color: var(--ink-3); font-weight: 400; }
         </div>
       </div>
 
+      <div id="crowd-subgroup-panel" style="display:none;"></div>
+
       <div class="pop-table-wrap" id="pop-table-wrap">
         <table class="pop-table" id="pop-table">
           <thead id="pop-thead"></thead>
@@ -3330,6 +3332,7 @@ async function crowdLoad() {
     crowd.last = d;
     crowdRender(d);
     crowdRenderExtras(d);
+    crowdRenderSubgroupAnalysis();
     session.crowdState = {
       trait: crowd.trait,
       filter_trait: crowd.filter_trait,
@@ -3403,6 +3406,130 @@ function crowdRender(d) {
   document.getElementById("pg-info").textContent = `Page ${d.page} of ${d.n_pages}`;
   document.getElementById("pg-prev").disabled = d.page <= 1;
   document.getElementById("pg-next").disabled = d.page >= d.n_pages;
+}
+
+async function crowdRenderSubgroupAnalysis() {
+  const el = document.getElementById('crowd-subgroup-panel');
+  if (!el) return;
+  if (!crowd.filter_active || !crowd.filter_trait) {
+    el.style.display = 'none';
+    el.innerHTML = '';
+    return;
+  }
+  el.style.display = '';
+  el.innerHTML = '<div class="notice info" style="margin:16px 0 0;">Loading subgroup analysis…</div>';
+  try {
+    const q = new URLSearchParams({
+      filter_trait: crowd.filter_trait,
+      filter_op: crowd.filter_op,
+      filter_value: crowd.filter_value,
+    });
+    const r = await fetch('/api/subgroup-analysis?' + q.toString());
+    if (!r.ok) throw new Error(await r.text());
+    const d = await r.json();
+    crowd.lastSubgroup = d;
+    renderSubgroupAnalysis(el, d);
+  } catch (e) {
+    el.innerHTML = `<div class="notice error" style="margin:16px 0 0;">Subgroup analysis failed: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+function _dClass(d) {
+  if (d == null) return 'ns';
+  const a = Math.abs(d);
+  if (a >= 0.5) return 'pos';
+  if (a >= 0.2) return 'warn';
+  return 'ns';
+}
+function _fmtP(p) {
+  if (p == null) return '\u2014';
+  if (p < 0.001) return '< .001';
+  return p.toFixed(3);
+}
+
+function renderSubgroupAnalysis(el, d) {
+  const labelOf = k => (CROWD_TRAITS.find(([kk]) => kk === k) || [k, k])[1];
+  const f = d.filter;
+  const opTxt = {'>=': '\u2265', '>': '>', '<=': '\u2264', '<': '<'}[f.op] || f.op;
+  const filterDesc = (labelOf(f.trait)) + ' ' + opTxt + ' ' + f.value.toFixed(3);
+  const bonf = (0.05 / Math.max(1, d.traits.length)).toFixed(4);
+
+  const rows = d.traits.map(t => {
+    const dcls = _dClass(t.cohens_d);
+    const ci = (t.ci95_lo == null)
+      ? '\u2014'
+      : '[' + t.ci95_lo.toFixed(3) + ', ' + t.ci95_hi.toFixed(3) + ']';
+    const dTxt = (t.cohens_d == null)
+      ? '\u2014'
+      : ((t.cohens_d >= 0 ? '+' : '') + t.cohens_d.toFixed(2));
+    return '<tr>' +
+      '<td>' + t.label + ' <span class="prov-badge ' + t.provenance_status +
+        '" style="font-size:9px;padding:1px 6px;vertical-align:middle;">' + t.provenance_status + '</span></td>' +
+      '<td class="num">' + t.sub_mean.toFixed(3) + ' \u00b1 ' + t.sub_sd.toFixed(3) + '</td>' +
+      '<td class="num">' + t.rest_mean.toFixed(3) + ' \u00b1 ' + t.rest_sd.toFixed(3) + '</td>' +
+      '<td class="num delta ' + dcls + '">' + (t.mean_diff >= 0 ? '+' : '') + t.mean_diff.toFixed(3) + '</td>' +
+      '<td class="num delta ' + dcls + '">' + dTxt + '</td>' +
+      '<td class="num" style="font-size:12px;color:var(--ink-3);">' + ci + '</td>' +
+      '<td class="num" style="font-size:12px;color:var(--ink-3);">' + _fmtP(t.p_value) + '</td>' +
+      '</tr>';
+  }).join('');
+
+  el.innerHTML =
+    '<div class="card" style="margin-top:16px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:start;gap:12px;flex-wrap:wrap;">' +
+        '<div>' +
+          '<h3 style="margin:0 0 4px;">Subgroup vs the rest of the population</h3>' +
+          '<p style="color:var(--ink-3);font-size:13px;margin:0;">' +
+            'Subgroup = agents where <strong>' + filterDesc + '</strong>. ' +
+            'Compared against the complement of that subgroup ' +
+            '(n<sub>sub</sub> = ' + d.n_subgroup.toLocaleString() +
+            ', n<sub>rest</sub> = ' + d.n_rest.toLocaleString() + ').' +
+          '</p>' +
+        '</div>' +
+        '<button class="btn secondary" onclick="crowdExportSubgroupCsv()">Export CSV</button>' +
+      '</div>' +
+      '<table class="cmp2" style="margin-top:14px;">' +
+        '<thead><tr>' +
+          '<th>Trait</th>' +
+          '<th style="text-align:right">Subgroup (M \u00b1 SD)</th>' +
+          '<th style="text-align:right">Rest (M \u00b1 SD)</th>' +
+          '<th style="text-align:right">\u0394</th>' +
+          '<th style="text-align:right">Cohen\u2019s d</th>' +
+          '<th style="text-align:right">95% CI on \u0394</th>' +
+          '<th style="text-align:right">p</th>' +
+        '</tr></thead>' +
+        '<tbody>' + rows + '</tbody>' +
+      '</table>' +
+      '<p style="font-size:12px;color:var(--ink-3);margin-top:12px;">' +
+        '<strong>Cohen\u2019s d</strong>: effect size (small \u2248 0.2, medium \u2248 0.5, large \u2248 0.8). ' +
+        '<strong>p</strong>: two-sided normal-approximation p-value on the mean difference. ' +
+        'No multiple-comparison correction is applied; with ' + d.traits.length + ' traits shown, ' +
+        'a Bonferroni threshold of p &lt; ' + bonf + ' would be appropriate if you treat the table as a family of tests.' +
+      '</p>' +
+    '</div>';
+}
+
+function crowdExportSubgroupCsv() {
+  const d = crowd.lastSubgroup;
+  if (!d) { alert('No subgroup analysis to export.'); return; }
+  const header = ['trait','label','provenance_status',
+                  'subgroup_n','subgroup_mean','subgroup_sd',
+                  'rest_n','rest_mean','rest_sd',
+                  'mean_diff','cohens_d','ci95_lo','ci95_hi','p_value'];
+  const lines = [header.join(',')];
+  d.traits.forEach(t => {
+    lines.push([
+      t.trait, '"' + t.label.replace(/"/g, '""') + '"', t.provenance_status,
+      t.sub_n, t.sub_mean.toFixed(6), t.sub_sd.toFixed(6),
+      t.rest_n, t.rest_mean.toFixed(6), t.rest_sd.toFixed(6),
+      t.mean_diff.toFixed(6),
+      t.cohens_d == null ? '' : t.cohens_d.toFixed(6),
+      t.ci95_lo == null ? '' : t.ci95_lo.toFixed(6),
+      t.ci95_hi == null ? '' : t.ci95_hi.toFixed(6),
+      t.p_value == null ? '' : t.p_value.toExponential(4),
+    ].join(','));
+  });
+  downloadFile('subgroup-analysis.csv', lines.join('\n'), 'text/csv');
 }
 
 function crowdSort(c) {
