@@ -656,6 +656,81 @@ def correlations(traits: str = Query("O,C,E,A,N,S_M,S_P,S_N,DASS_Dep,DASS_Anx,DA
     return {"traits": names, "matrix": m.tolist()}
 
 
+@app.get("/api/scatter3d")
+def scatter3d(
+    x: str = Query("O"),
+    y: str = Query("C"),
+    z: str = Query("E"),
+    color: str = Query("N"),
+    sample: int = Query(1500, ge=200, le=8000),
+    seed: int = Query(42),
+    highlight: int = Query(-1, ge=-1),
+):
+    """Return 3-axis trait coordinates for a random sample of agents,
+    plus a color value for each point. Values are z-scored so the plot
+    is comparable across traits. Highlight is an agent index in the
+    full population (0..31999) or -1 for none."""
+    df = _get_baseline_copula()
+    for name in (x, y, z, color):
+        if name not in df.columns:
+            raise HTTPException(400, f"trait '{name}' not in copula")
+    rng = np.random.default_rng(int(seed))
+    idx = rng.choice(len(df), size=min(sample, len(df)), replace=False)
+
+    def zscore(col):
+        v = df[col].to_numpy().astype(np.float64)
+        return (v - v.mean()) / max(v.std(ddof=1), 1e-9)
+
+    xs = zscore(x)[idx]
+    ys = zscore(y)[idx]
+    zs = zscore(z)[idx]
+    cs = zscore(color)[idx]
+
+    # normalize colors to [0, 1] for a blue → red colormap
+    cmin, cmax = float(cs.min()), float(cs.max())
+    csn = (cs - cmin) / max(cmax - cmin, 1e-9)
+
+    pts = list(zip(xs.tolist(), ys.tolist(), zs.tolist(), csn.tolist(), idx.tolist()))
+
+    highlight_point = None
+    if 0 <= highlight < len(df):
+        highlight_point = {
+            "agent_i": int(highlight),
+            "x": float(zscore(x)[highlight]),
+            "y": float(zscore(y)[highlight]),
+            "z": float(zscore(z)[highlight]),
+        }
+
+    return {
+        "axes": {"x": x, "y": y, "z": z, "color": color},
+        "color_range": [cmin, cmax],
+        "points": pts,
+        "highlight": highlight_point,
+    }
+
+
+@app.get("/api/agent-profile")
+def agent_profile(agent_i: int = Query(..., ge=0, lt=32000)):
+    """Return z-scored traits for a single agent across the 16 primary
+    trait axes. Used by the 3D radial profile chart."""
+    df = _get_baseline_copula()
+    traits = ["O", "C", "E", "A", "N",
+              "S_M", "S_P", "S_N", "D",
+              "DASS_Dep", "DASS_Anx", "DASS_Str", "general_distress",
+              "m_t", "omega_social", "theta_T"]
+    labels = {"O": "Open", "C": "Consc", "E": "Extra", "A": "Agree",
+              "N": "Neuro", "S_M": "Mach", "S_P": "Psy", "S_N": "Narc",
+              "D": "Dark", "DASS_Dep": "Dep", "DASS_Anx": "Anx",
+              "DASS_Str": "Str", "general_distress": "Distr",
+              "m_t": "Mood", "omega_social": "Soc", "theta_T": "Thr"}
+    values = []
+    for t in traits:
+        v = df[t].to_numpy().astype(np.float64)
+        z = (v[agent_i] - v.mean()) / max(v.std(ddof=1), 1e-9)
+        values.append({"trait": t, "label": labels.get(t, t), "z": float(z)})
+    return {"agent_i": int(agent_i), "values": values}
+
+
 @app.get("/", response_class=HTMLResponse)
 def index():
     return (WORK / "dashboard_ui.html").read_text(encoding="utf-8")
