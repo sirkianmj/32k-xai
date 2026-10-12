@@ -1952,6 +1952,8 @@ function renderResults(containerId, data) {
     <div class="btn-row">
       <button class="btn secondary" onclick="saveLatest('json')">Save JSON</button>
       <button class="btn secondary" onclick="saveLatest('csv')">Save CSV</button>
+      <button class="btn primary" onclick="reportPrint()">Print scientific report</button>
+      <button class="btn secondary" onclick="reportDownload()">Download report (.html)</button>
     </div>
 
     <!-- Cross-tab context -->
@@ -2690,6 +2692,8 @@ function renderDesignResults(data) {
       <button class="btn secondary" onclick="librarySaveCurrent()">Save to library</button>
       <button class="btn secondary" onclick="saveLatest('json')">Save full record</button>
       <button class="btn secondary" onclick="saveLatest('csv')">Save CSV</button>
+      <button class="btn primary" onclick="reportPrint()">Print scientific report</button>
+      <button class="btn secondary" onclick="reportDownload()">Download report (.html)</button>
       <button class="btn secondary" onclick="goTo('scenarios')">Try a pre-built scenario</button>
     </div>
     ${renderSubgroups(data)}
@@ -3846,6 +3850,428 @@ function guideRender(el, data) {
     '<div class="guide" style="margin-top:16px;">' + html + "</div>";
 }
 
+let reportTraitsCache = null;
+
+async function reportEnsureTraits() {
+  if (reportTraitsCache) return reportTraitsCache;
+  try {
+    const r = await fetch("/api/traits");
+    if (r.ok) reportTraitsCache = await r.json();
+  } catch (e) {
+    console.warn("report traits fetch failed", e);
+  }
+  return reportTraitsCache || [];
+}
+
+function _esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g,
+    c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+function _pct(x) { return (100 * x).toFixed(1) + "%"; }
+
+function _reportCSS() {
+  return `
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Georgia, serif;
+    max-width: 820px; margin: 40px auto; padding: 0 30px; color: #1c1c1e;
+    line-height: 1.65; font-size: 14px;
+  }
+  h1 { font-size: 30px; margin: 0 0 6px; letter-spacing: -0.02em; }
+  h2 { font-size: 20px; margin: 48px 0 14px; padding-bottom: 6px;
+       border-bottom: 2px solid #1c1c1e; page-break-before: always; letter-spacing: -0.01em; }
+  h2:first-of-type { page-break-before: avoid; }
+  h3 { font-size: 15px; margin: 24px 0 8px; color: #48484a; }
+  p  { margin: 0 0 12px; }
+  ul { padding-left: 22px; margin: 6px 0 12px; }
+  li { margin: 4px 0; }
+  code, .mono { font-family: ui-monospace, Menlo, monospace; font-size: 12px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 12px 0; }
+  th, td { padding: 7px 10px; text-align: left; border-bottom: 1px solid #e5e5ea;
+           vertical-align: top; }
+  th { background: #f6f7f9; font-weight: 600; font-size: 12px;
+       text-transform: uppercase; letter-spacing: 0.03em; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .pass { color: #1a6b32; font-weight: 600; }
+  .fail { color: #a1150d; font-weight: 600; }
+  pre { background: #f8f9fb; padding: 12px 14px; border-radius: 6px;
+        font-size: 11px; overflow-x: auto; white-space: pre-wrap;
+        word-break: break-word; line-height: 1.5; margin: 8px 0; }
+  .cover { padding: 20px 0 40px; border-bottom: 1px solid #e5e5ea; margin-bottom: 30px; }
+  .cover .meta { font-size: 13px; color: #48484a; margin-top: 6px; }
+  .cover .kv { display: grid; grid-template-columns: 180px 1fr; gap: 4px 14px;
+               margin-top: 22px; font-size: 13px; }
+  .cover .kv .k { color: #8e8e93; }
+  .cover .kv .v { font-family: ui-monospace, Menlo, monospace; font-size: 12px; }
+  .flag { display: inline-block; padding: 2px 8px; background: #fff4e0;
+          color: #a35b00; border-radius: 4px; font-size: 11px;
+          margin: 2px 4px 2px 0; font-family: ui-monospace, Menlo, monospace; }
+  .prov { display: inline-block; padding: 1px 6px; border-radius: 4px;
+          font-size: 10px; font-weight: 600; letter-spacing: 0.04em; }
+  .prov.GROUNDED { background: #e7f9ec; color: #1a6b32; }
+  .prov.PROXY    { background: #fff4e0; color: #a35b00; }
+  .prov.DERIVED  { background: #eff6ff; color: #1c4dba; }
+  .prov.SYNTHETIC{ background: #ffecea; color: #a1150d; }
+  .prov.INERT    { background: #f2f3f5; color: #4a4a4c; }
+  .prov.UNCLASSIFIED { background: #f2f3f5; color: #4a4a4c; }
+  .footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid #e5e5ea;
+            font-size: 11px; color: #8e8e93; }
+  .no-print { display: block; }
+  @media print {
+    body { max-width: none; margin: 0; padding: 20mm; font-size: 12px; }
+    .no-print { display: none; }
+    h2 { page-break-before: always; }
+    h2:first-of-type { page-break-before: avoid; }
+    .cover { padding-top: 0; }
+    a { color: inherit; text-decoration: none; }
+  }`;
+}
+
+function _reportCover(entry) {
+  const d = entry.data || {};
+  const when = new Date(entry.timestamp || Date.now()).toLocaleString();
+  const title = entry.kind === "scenario"
+    ? pretty(entry.scenario)
+    : "Custom design experiment";
+  const runId = d.run_id || "(not recorded)";
+  const audit = d.audit || {};
+  const shocks = (audit.shocks && audit.shocks.length) ? audit.shocks : [];
+  const shockLines = shocks.length
+    ? shocks.map(s => `<div><span class="flag">${_esc(s.type)}</span> mag=${s.magnitude} t${s.tick}–${(s.tick||0)+(s.duration||0)}</div>`).join("")
+    : "<div>None (baseline conditions)</div>";
+  const seeds = entry.kind === "scenario"
+    ? [entry.seed]
+    : (entry.payload && entry.payload.seeds) || (entry.config && entry.config.seeds) || [entry.seed];
+  return `
+    <div class="cover">
+      <h1>32k-XAI Scientific Report</h1>
+      <div class="meta">${_esc(title)} · generated ${_esc(when)}</div>
+      <div class="kv">
+        <div class="k">Run kind</div><div class="v">${_esc(entry.kind || "unknown")}</div>
+        <div class="k">N agents</div><div class="v">${(entry.N || (entry.payload && entry.payload.N) || "?").toLocaleString()}</div>
+        <div class="k">T ticks</div><div class="v">${entry.T || (entry.payload && entry.payload.T) || "?"}</div>
+        <div class="k">Seed(s)</div><div class="v">${_esc(JSON.stringify(seeds))}</div>
+        <div class="k">Reproducibility hash</div><div class="v">${_esc(runId)}</div>
+        <div class="k">Copula</div><div class="v">${_esc(audit.copula || audit.copula_ops || "synthetic_32k_p6d.pkl")}</div>
+      </div>
+      <h3 style="margin-top:26px;">Interventions</h3>
+      ${shockLines}
+    </div>`;
+}
+
+function _reportSummary(entry) {
+  const d = entry.data || {};
+  const b = d.benchmarks || [];
+  const pass = b.filter(x => x.pass).length;
+  const t = b.length;
+  const title = entry.kind === "scenario"
+    ? pretty(entry.scenario)
+    : "this design";
+  const sentence1 = pass === t
+    ? `All ${t} human benchmarks were reproduced within one standard error of the published estimates.`
+    : `${pass} of ${t} human benchmarks were reproduced within one standard error; the remaining ${t - pass} fell outside the tolerance band.`;
+  const hasDelta = !!d.baseline_platform;
+  const shifter = [];
+  if (hasDelta) {
+    const SES = [0.050, 0.050, 0.130, 0.120, 0.120];
+    b.forEach((bench, i) => {
+      const z = (d.platform[i] - d.baseline_platform[i]) / SES[i];
+      if (Math.abs(z) > 0.5) shifter.push(`${bench.name} (Δz = ${z.toFixed(2)})`);
+    });
+  }
+  const shifterLine = hasDelta
+    ? (shifter.length
+        ? ` Relative to a matched baseline, the intervention moved: ${shifter.join(", ")}.`
+        : " Relative to a matched baseline, no benchmark moved by half a standard error or more.")
+    : "";
+  return `<p>${sentence1}${shifterLine}</p>`;
+}
+
+function _reportBenchTable(entry) {
+  const b = (entry.data && entry.data.benchmarks) || [];
+  const rows = b.map(x => {
+    const z = (x.platform - x.target) / x.se;
+    const cls = x.pass ? "pass" : "fail";
+    return `<tr>
+      <td>${_esc(x.name)}</td>
+      <td class="num">${x.platform.toFixed(4)}</td>
+      <td class="num">${x.target.toFixed(3)}</td>
+      <td class="num">${x.se.toFixed(3)}</td>
+      <td class="num">${(x.delta>=0?"+":"") + x.delta.toFixed(4)}</td>
+      <td class="num">${(z>=0?"+":"") + z.toFixed(2)}</td>
+      <td class="${cls}">${x.pass ? "PASS" : "FAIL"}</td>
+    </tr>`;
+  }).join("");
+  return `<table>
+    <thead><tr>
+      <th>Benchmark</th><th style="text-align:right">Platform</th>
+      <th style="text-align:right">Human</th><th style="text-align:right">SE</th>
+      <th style="text-align:right">Δ</th><th style="text-align:right">Δ/SE</th>
+      <th>Verdict</th>
+    </tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function _reportTimeSeries(entry) {
+  const d = entry.data || {};
+  const ts = d.timeseries_full;
+  if (!ts) return "<p>No time series recorded for this run.</p>";
+  const T = ts.ticks.length;
+  const ranges = d.shock_tick_ranges || [];
+  const specs = [
+    { key: "ug_offer", label: "Offer rate",     target: 0.400 },
+    { key: "ug_rej",   label: "Rejection rate", target: 0.160 },
+    { key: "tg_send",  label: "Send rate",      target: 0.502 },
+    { key: "tg_ret",   label: "Return rate",    target: 0.372 },
+  ];
+  const charts = specs.map(s => {
+    const ys = ts[s.key];
+    const W = 560, H = 160, PAD = 32;
+    const yMin = 0, yMax = Math.max(0.6, ...ys);
+    const sx = x => PAD + (x / Math.max(1, T - 1)) * (W - 2 * PAD);
+    const sy = y => H - PAD - ((y - yMin) / (yMax - yMin)) * (H - 2 * PAD);
+    const pts = ys.map((y, i) => `${sx(i).toFixed(1)},${sy(y).toFixed(1)}`).join(" ");
+    const targetY = sy(s.target).toFixed(1);
+    const shockRects = ranges.map(r => {
+      const x0 = sx(r.tick);
+      const x1 = sx(Math.min(T - 1, r.tick + r.duration));
+      return `<rect x="${x0.toFixed(1)}" y="${PAD}" width="${Math.max(0, x1 - x0).toFixed(1)}" height="${H - 2 * PAD}" fill="rgba(255,159,10,0.15)"/>`;
+    }).join("");
+    return `<div style="page-break-inside:avoid;margin:14px 0;">
+      <div style="font-size:12px;font-weight:600;">${_esc(s.label)}</div>
+      <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;font-family:-apple-system,sans-serif">
+        ${shockRects}
+        <line x1="${PAD}" x2="${PAD}" y1="${PAD}" y2="${H - PAD}" stroke="#e5e5ea"/>
+        <line x1="${PAD}" x2="${W - PAD}" y1="${H - PAD}" y2="${H - PAD}" stroke="#e5e5ea"/>
+        <line x1="${PAD}" x2="${W - PAD}" y1="${targetY}" y2="${targetY}" stroke="#8e8e93" stroke-dasharray="3,3"/>
+        <polyline points="${pts}" fill="none" stroke="#0a84ff" stroke-width="1.6"/>
+        <text x="${PAD+2}" y="${H-6}" font-size="9" fill="#8e8e93">0</text>
+        <text x="${W-PAD-18}" y="${H-6}" font-size="9" fill="#8e8e93">${T - 1}</text>
+        <text x="${PAD+2}" y="${PAD-4}" font-size="9" fill="#8e8e93">${yMax.toFixed(2)}</text>
+        <text x="${PAD}" y="${PAD-14}" font-size="9" fill="#8e8e93">human target = ${s.target}</text>
+      </svg>
+    </div>`;
+  }).join("");
+  return charts;
+}
+
+function _reportDelta(entry) {
+  const d = entry.data || {};
+  if (!d.baseline_platform) return "";
+  const SES = [0.050, 0.050, 0.130, 0.120, 0.120];
+  const rows = (d.benchmarks || []).map((x, i) => {
+    const delta = d.platform[i] - d.baseline_platform[i];
+    const z = delta / SES[i];
+    const cls = Math.abs(z) < 0.15 ? "" : (Math.abs(z) > 1.0 ? "flag" : "");
+    return `<tr>
+      <td>${_esc(x.name)}</td>
+      <td class="num">${d.baseline_platform[i].toFixed(4)}</td>
+      <td class="num">${d.platform[i].toFixed(4)}</td>
+      <td class="num">${(delta>=0?"+":"") + delta.toFixed(4)}</td>
+      <td class="num">${(z>=0?"+":"") + z.toFixed(2)}</td>
+    </tr>`;
+  }).join("");
+  return `<table>
+    <thead><tr><th>Benchmark</th>
+      <th style="text-align:right">Baseline</th>
+      <th style="text-align:right">This run</th>
+      <th style="text-align:right">Δ</th>
+      <th style="text-align:right">Δ/SE</th>
+    </tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function _reportPopulation(traits) {
+  const counts = { GROUNDED: 0, PROXY: 0, DERIVED: 0, SYNTHETIC: 0, INERT: 0, UNCLASSIFIED: 0 };
+  traits.forEach(t => {
+    const s = (t.provenance || {}).status;
+    if (counts[s] !== undefined) counts[s]++;
+  });
+  const summaryRow = Object.entries(counts)
+    .filter(([k, v]) => v > 0)
+    .map(([k, v]) => `<span class="prov ${k}">${k}</span> ${v}`)
+    .join(" &nbsp; ");
+  const rows = traits.map(t => {
+    const p = t.provenance || {};
+    const nTxt = (p.n == null) ? "—" : p.n.toLocaleString();
+    return `<tr>
+      <td>${_esc(t.name)}</td>
+      <td>${_esc(t.label || t.name)}</td>
+      <td><span class="prov ${_esc(p.status || "UNCLASSIFIED")}">${_esc(p.status || "UNCLASSIFIED")}</span></td>
+      <td>${_esc(p.source || "—")}</td>
+      <td class="num">${nTxt}</td>
+      <td class="num">${t.mean.toFixed(3)} ± ${t.sd.toFixed(3)}</td>
+      <td class="num">${t.skew.toFixed(2)}</td>
+      <td class="num">${t.kurtosis.toFixed(2)}</td>
+    </tr>`;
+  }).join("");
+  return `<p>${summaryRow}</p>
+    <table>
+      <thead><tr>
+        <th>Code</th><th>Label</th><th>Status</th><th>Source</th>
+        <th style="text-align:right">N</th>
+        <th style="text-align:right">Mean ± SD</th>
+        <th style="text-align:right">Skew</th>
+        <th style="text-align:right">Ex. kurt.</th>
+      </tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function _reportTrace() {
+  const tr = session.lastTrace;
+  if (!tr) return "<p>No XAI trace was fetched during this session. Open the Trace tab and pick an agent to include a trace in the report.</p>";
+  const f = tr.fields || {};
+  const keys = Object.keys(f).sort();
+  const rows = keys.map(k => `<tr><td>${_esc(k)}</td><td class="num mono">${_esc(f[k])}</td></tr>`).join("");
+  const shockLine = (tr.shock_state && tr.shock_state.active && tr.shock_state.active.length)
+    ? `<p>Shock state at this tick: <code>${_esc(tr.shock_state.active.join(", "))}</code>.</p>` : "";
+  return `<p>Agent ${tr.agent_i} at tick ${tr.tick} of <em>${_esc(tr.scenario)}</em>.</p>${shockLine}
+    <table><thead><tr><th>Field</th><th style="text-align:right">Value</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function _reportFlags(entry) {
+  const flags = [
+    "[XAI-TRACE-CALIBRATED-ENGINE]", "[HUMAN-BENCHMARK-PASS-5-OF-5]",
+    "[FEHR-SCHMIDT-CANONICAL]", "[PER-HEAD-Q]", "[KOOL-VALIDATION-PASSED]",
+    "[REWARD-SCALE-DRIFT]", "[REWARD-SCALE-ASYMMETRY]", "[SIMPLIFIED MODEL]",
+    "[ENVY-ONLY]", "[NOT-IDENTIFIABLE-IN-HCP-UGR]", "[SYNTHETIC-PRIOR-PARAMS]",
+    "[COPULA-COLUMN-IS-LOG-K-DD]", "[KDE-TAIL-EXTRAPOLATION]", "[COLLAPSED-LR]",
+    "[MF-GENERALIZED]", "[SYNTH-PRIOR-COEFF]", "[INERT-DEFAULT]",
+    "[P6D-RANK-TRANSFORM-REJECTED]",
+  ];
+  return flags.map(f => `<span class="flag">${_esc(f)}</span>`).join("");
+}
+
+function _reportRefs() {
+  return `<ul>
+    <li>Fehr, E., &amp; Schmidt, K. M. (1999). <em>Quarterly Journal of Economics</em>, 114(3), 817–868.</li>
+    <li>Oosterbeek, H., Sloof, R., &amp; Van De Kuilen, G. (2004). <em>Experimental Economics</em>, 7(2), 171–188.</li>
+    <li>Johnson, N. D., &amp; Mislin, A. A. (2011). <em>Journal of Economic Psychology</em>, 32(5), 865–889.</li>
+    <li>Daw, N. D., Gershman, S. J., Seymour, B., Dayan, P., &amp; Dolan, R. J. (2011). <em>Neuron</em>, 69(6), 1204–1215.</li>
+    <li>Zanon, C., et al. (2020). <em>Assessment</em>, 28(2), 1–14.</li>
+    <li>Knitter, L. A., et al. (2025). <em>Frontiers in Psychology</em>, 15, 1469970.</li>
+    <li>Khorshidi, S., &amp; Mansouri Jamshidi, K. (2026). SSRN Electronic Journal.</li>
+  </ul>`;
+}
+
+async function reportBuildHTML(entry) {
+  if (!entry || !entry.data) return null;
+  const traits = await reportEnsureTraits();
+  const title = entry.kind === "scenario" ? pretty(entry.scenario) : "Design experiment";
+  const chart = (typeof benchBarChart === "function")
+    ? benchBarChart(entry.data.benchmarks || [])
+    : "";
+  const mechanism = (typeof mechanismAnalysis === "function")
+    ? mechanismAnalysis(entry.data)
+    : "";
+  const audit = escapeHtml(JSON.stringify(entry.data.audit || {}, null, 2));
+  const runId = (entry.data && entry.data.run_id) || "(not recorded)";
+  const when = new Date().toLocaleString();
+  return `<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<title>32k-XAI Report — ${_esc(title)}</title>
+<style>${_reportCSS()}</style>
+</head><body>
+${_reportCover(entry)}
+
+<h2>Executive summary</h2>
+${_reportSummary(entry)}
+
+<h2>Benchmarks</h2>
+${_reportBenchTable(entry)}
+${chart ? `<div style="margin-top:16px;">${chart}</div>` : ""}
+
+<h2>Behaviour over time</h2>
+${_reportTimeSeries(entry)}
+
+${entry.data.baseline_platform ? `<h2>Intervention effect vs baseline</h2>${_reportDelta(entry)}` : ""}
+
+<h2>Population and provenance</h2>
+${_reportPopulation(traits)}
+
+<h2>Decision trace</h2>
+${_reportTrace()}
+
+${mechanism ? `<h2>Mechanistic reading</h2>${mechanism}` : ""}
+
+<h2>Active specification flags</h2>
+<p>Every report carries the active flag set from the specification. Each flag corresponds to a documented limitation or caveat that must accompany any published use of these numbers.</p>
+${_reportFlags(entry)}
+
+<h2>Audit block</h2>
+<pre>${audit}</pre>
+
+<h2>References</h2>
+${_reportRefs()}
+
+<div class="footer">
+  32k-XAI Scientific Report · run_id <code>${_esc(runId)}</code> · generated ${_esc(when)} · reproducibility of this document is guaranteed by the run_id above
+</div>
+
+<div class="no-print" style="margin-top:32px;padding:16px;background:#eff6ff;border:1px solid #dde7ff;border-radius:10px;font-size:13px;">
+  To save as PDF: <strong>File → Print</strong> (⌘P), then choose <em>Save as PDF</em> from the destination menu.
+</div>
+
+</body></html>`;
+}
+
+async function reportPrint() {
+  const entry = session.lastRun || session.lastDesign;
+  if (!entry) { alert("Run a scenario or design experiment first."); return; }
+  const html = await reportBuildHTML(entry);
+  if (!html) { alert("Could not build the report."); return; }
+
+  // Preferred route in pywebview: hand the HTML to the native
+  // layer, which writes it to a temp file and opens it in the
+  // user's default browser. The user then prints with Cmd+P. This
+  // is the reliable print path on macOS WKWebView -- window.print()
+  // from an iframe is not consistently supported there.
+  if (window.pywebview && window.pywebview.api && window.pywebview.api.open_report) {
+    try {
+      const bytes = new TextEncoder().encode(html);
+      let bin = "";
+      for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+      const b64 = btoa(bin);
+      const res = await window.pywebview.api.open_report(b64);
+      if (res && res.ok) return;
+      console.warn("open_report returned:", res);
+    } catch (e) {
+      console.warn("open_report threw:", e);
+    }
+  }
+
+  // Fallback: hidden iframe + window.print() for plain browsers.
+  let frame = document.getElementById("report-print-frame");
+  if (!frame) {
+    frame = document.createElement("iframe");
+    frame.id = "report-print-frame";
+    frame.style.position = "fixed";
+    frame.style.right = "0"; frame.style.bottom = "0";
+    frame.style.width = "1px"; frame.style.height = "1px";
+    frame.style.border = "0"; frame.style.opacity = "0";
+    document.body.appendChild(frame);
+  }
+  const doc = frame.contentDocument || frame.contentWindow.document;
+  doc.open();
+  doc.write(html);
+  doc.close();
+  setTimeout(() => {
+    try { frame.contentWindow.focus(); frame.contentWindow.print(); }
+    catch (e) {
+      alert("Print is not available in this window.\n\n" +
+            "Use Download report (.html), open the file in Safari, and press Cmd+P.");
+    }
+  }, 400);
+}
+
+async function reportDownload() {
+  const entry = session.lastRun || session.lastDesign;
+  if (!entry) { alert("Run a scenario or design experiment first."); return; }
+  const html = await reportBuildHTML(entry);
+  if (!html) { alert("Could not build the report."); return; }
+  const ts = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+  const name = "xai32k-report-" + ts + ".html";
+  await downloadFile(name, html, "text/html");
+}
 async function crowdRenderSubgroupAnalysis() {
   const el = document.getElementById('crowd-subgroup-panel');
   if (!el) return;

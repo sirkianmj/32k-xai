@@ -55,6 +55,23 @@ class Api:
         except Exception as e:
             return {"ok": False, "error": f"write failed: {e}"}
 
+    def open_report(self, content_b64):
+        """Save the report HTML to a temp file and open it in the
+        user's default browser, where it can be printed with Cmd+P.
+        This is the reliable print path on macOS WKWebView, where
+        window.print() from an iframe is not consistently supported.
+        """
+        import tempfile
+        try:
+            data = base64.b64decode(content_b64)
+            fd, path = tempfile.mkstemp(suffix=".html", prefix="xai32k-report-")
+            os.close(fd)
+            Path(path).write_bytes(data)
+            subprocess.Popen(["open", path])
+            return {"ok": True, "path": path}
+        except Exception as e:
+            return {"ok": False, "error": str(e)}
+
 
 API = Api()
 
