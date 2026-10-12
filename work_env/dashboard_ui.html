@@ -837,6 +837,18 @@ table.cmp2 td.delta.ns  { color: var(--ink-3); font-weight: 400; }
         <div id="crowd-2d-caption" style="font-size:12px;color:var(--ink-3);margin-top:10px;"></div>
       </div>
 
+      <div class="card" id="crowd-factor-card" style="margin-top:16px;">
+        <div>
+          <div style="font-size:15px;font-weight:600;">Factor structure</div>
+          <div style="color:var(--ink-3);font-size:13px;margin-top:2px;">
+            Confirmatory factor analyses of the two instruments the specification mandates be modelled as bifactor structures. Loading bars show each item's standardised loading on the general factor (dark) and its specific factor (light).
+          </div>
+        </div>
+        <div id="crowd-factor-body" style="margin-top:14px;">
+          <div class="notice info" style="margin:0;">Loading factor structure…</div>
+        </div>
+      </div>
+
       <div class="charts-grid" style="margin-top:16px;">
         <div id="corr-heatmap-slot"></div>
         <div id="dist-overlay-slot"></div>
@@ -3369,6 +3381,7 @@ async function crowdLoad() {
     crowdRenderExtras(d);
     crowdRenderSubgroupAnalysis();
     crowdRender2dScatter();
+    crowdRenderFactorStructure();
     session.crowdState = {
       trait: crowd.trait,
       filter_trait: crowd.filter_trait,
@@ -3576,6 +3589,123 @@ function crowdExport2dSvg() {
   downloadFile("joint-" + xLab + "-vs-" + yLab + ".svg",
                '<?xml version="1.0" encoding="UTF-8"?>\n' + src,
                "image/svg+xml");
+}
+
+let crowdFactorCache = null;
+
+async function crowdRenderFactorStructure() {
+  const el = document.getElementById("crowd-factor-body");
+  if (!el) return;
+  if (crowdFactorCache) { crowdRenderFactorBody(el, crowdFactorCache); return; }
+  try {
+    const r = await fetch("/api/factor-structure");
+    if (!r.ok) throw new Error(await r.text());
+    crowdFactorCache = await r.json();
+    crowdRenderFactorBody(el, crowdFactorCache);
+  } catch (e) {
+    el.innerHTML = '<div class="notice error" style="margin:0;">Factor structure failed: ' +
+                   _svgEsc(e.message) + '</div>';
+  }
+}
+
+function crowdRenderFactorBody(el, data) {
+  el.innerHTML = data.scales.map(s => crowdRenderOneScale(s)).join("");
+}
+
+function crowdRenderOneScale(scale) {
+  const nItems = scale.loadings.length;
+  const verdictClass = /PASS/i.test(scale.verdict) ? "pass" : "fail";
+
+  const modelRows = scale.models.map(m => {
+    const dfCell = (m.df != null) ? m.df.toString() : "—";
+    const win = m.name === scale.winner;
+    const style = win ? ' style="background:#e7f9ec;"' : '';
+    return '<tr' + style + '>' +
+      '<td>' + _svgEsc(m.name) + (win ? ' <span class="pill pass" style="font-size:10px;padding:1px 6px;">winner</span>' : '') + '</td>' +
+      '<td class="num">' + m.chi2.toLocaleString(undefined, {maximumFractionDigits: 0}) + '</td>' +
+      '<td class="num">' + dfCell + '</td>' +
+      '<td class="num">' + m.CFI.toFixed(3) + '</td>' +
+      '<td class="num">' + m.TLI.toFixed(3) + '</td>' +
+      '<td class="num">' + m.RMSEA.toFixed(4) + '</td>' +
+      '</tr>';
+  }).join("");
+
+  const modelsTable =
+    '<table class="cmp2" style="margin-top:6px;">' +
+      '<thead><tr>' +
+        '<th>Model</th>' +
+        '<th style="text-align:right">chi2</th>' +
+        '<th style="text-align:right">df</th>' +
+        '<th style="text-align:right">CFI</th>' +
+        '<th style="text-align:right">TLI</th>' +
+        '<th style="text-align:right">RMSEA</th>' +
+      '</tr></thead>' +
+      '<tbody>' + modelRows + '</tbody>' +
+    '</table>';
+
+  const rowH = 11, barAreaW = 480, labelW = 200, pad = 10;
+  const W = labelW + barAreaW + 60;
+  const H = nItems * rowH + 40;
+
+  const factorOrder = Object.keys(scale.specific_labels);
+  const grouped = {};
+  factorOrder.forEach(k => grouped[k] = []);
+  scale.loadings.forEach(L => { if (!grouped[L.specific]) grouped[L.specific] = []; grouped[L.specific].push(L); });
+
+  const maxLoad = Math.max(0.001, ...scale.loadings.map(L => Math.max(L.g, L.s)));
+  const barW = v => Math.max(0.5, (v / maxLoad) * barAreaW);
+
+  let y = pad + 14, svg = '';
+  svg += '<text x="' + (labelW - 8) + '" y="' + (pad + 6) + '" font-size="10" fill="#8e8e93" text-anchor="end">item</text>';
+  svg += '<text x="' + (labelW + 4) + '" y="' + (pad + 6) + '" font-size="10" fill="#8e8e93">general vs specific</text>';
+
+  factorOrder.forEach(factorId => {
+    const factorName = scale.specific_labels[factorId];
+    svg += '<text x="8" y="' + (y + 4) + '" font-size="11" font-weight="600" fill="#1c1c1e">' +
+           _svgEsc(factorName) + '</text>';
+    y += rowH + 4;
+    (grouped[factorId] || []).forEach(L => {
+      svg += '<text x="' + (labelW - 8) + '" y="' + (y + 5) + '" font-size="9" fill="#8e8e93" text-anchor="end">' +
+             _svgEsc(L.item) + '</text>';
+      const gW = barW(L.g);
+      svg += '<rect x="' + labelW + '" y="' + (y - 3) + '" width="' + gW.toFixed(1) +
+             '" height="4" fill="#0a84ff" opacity="0.85" rx="1"/>';
+      const sW = barW(L.s);
+      svg += '<rect x="' + labelW + '" y="' + (y + 2) + '" width="' + sW.toFixed(1) +
+             '" height="3" fill="#5e5ce6" opacity="0.7" rx="1"/>';
+      svg += '<text x="' + (labelW + barAreaW + 6) + '" y="' + (y + 3) + '" font-size="9" fill="#48484a" font-variant-numeric="tabular-nums">' +
+             L.g.toFixed(2) + ' / ' + L.s.toFixed(2) + '</text>';
+      y += rowH;
+    });
+    y += 4;
+  });
+
+  const svgHtml =
+    '<div style="max-height:520px;overflow-y:auto;border:1px solid var(--line);border-radius:10px;background:#fff;padding:8px;">' +
+      '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:auto;display:block;font-family:-apple-system,sans-serif">' +
+        svg +
+      '</svg>' +
+    '</div>';
+
+  const caveats = (scale.caveats || []).map(c => '<li>' + _svgEsc(c) + '</li>').join("");
+
+  return (
+    '<div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--line);">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">' +
+        '<div>' +
+          '<div style="font-size:14px;font-weight:600;">' + _svgEsc(scale.name) + '</div>' +
+          '<div style="color:var(--ink-3);font-size:12px;margin-top:2px;">N = ' + scale.n_subjects.toLocaleString() +
+            '  |  Delta CFI(A to C) = +' + scale.delta_cfi_A_to_C.toFixed(4) + '</div>' +
+        '</div>' +
+        '<span class="pill ' + verdictClass + '" style="font-size:11px;padding:3px 10px;">' + _svgEsc(scale.verdict) + '</span>' +
+      '</div>' +
+      modelsTable +
+      '<div style="font-size:12px;color:var(--ink-3);margin-top:14px;margin-bottom:6px;">Item loadings</div>' +
+      svgHtml +
+      '<div style="font-size:12px;color:var(--ink-2);margin-top:10px;"><strong>Caveats</strong><ul style="margin:6px 0 0;padding-left:20px;">' +
+        caveats + '</ul></div>' +
+    '</div>'
+  );
 }
 
 async function crowdRenderSubgroupAnalysis() {
