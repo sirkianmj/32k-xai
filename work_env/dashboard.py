@@ -391,6 +391,8 @@ async def design(request: Request):
         "subgroups": result["subgroups"],
         "shock_tick_ranges": [{"tick": int(s["tick"]), "duration": int(s["duration"])}
                               for s in (shocks or [])],
+        "run_id": result.get("run_id"),
+        "n_agents": result.get("n_agents"),
         "audit": {
             "copula_ops": copula_ops, "shocks": shocks,
             "N": N, "T": T, "seeds": seeds,

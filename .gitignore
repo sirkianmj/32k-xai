@@ -27,3 +27,4 @@ jax_install.log
 *.md.v2.1.bak
 pip_upgrade.log
 /score_ipip.log
+work_env/*.pre_*
