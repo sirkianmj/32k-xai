@@ -813,6 +813,30 @@ table.cmp2 td.delta.ns  { color: var(--ink-3); font-weight: 400; }
 
       <div class="prov-panel" id="crowd-prov-panel"></div>
 
+      <div class="card" id="crowd-scatter2d-card" style="margin-top:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:15px;font-weight:600;">Joint distribution</div>
+            <div style="color:var(--ink-3);font-size:13px;margin-top:2px;">
+              Where the population sits in the space of two traits. If a filter is active, the subgroup is drawn on top.
+            </div>
+          </div>
+          <button class="btn secondary" onclick="crowdExport2dSvg()">Export SVG</button>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:end;">
+          <div class="field" style="margin:0;min-width:180px;">
+            <label>X trait</label>
+            <select id="crowd-2d-x" onchange="crowdRender2dScatter()"></select>
+          </div>
+          <div class="field" style="margin:0;min-width:180px;">
+            <label>Y trait</label>
+            <select id="crowd-2d-y" onchange="crowdRender2dScatter()"></select>
+          </div>
+        </div>
+        <div id="crowd-2d-svg-wrap" style="margin-top:14px;"></div>
+        <div id="crowd-2d-caption" style="font-size:12px;color:var(--ink-3);margin-top:10px;"></div>
+      </div>
+
       <div class="charts-grid" style="margin-top:16px;">
         <div id="corr-heatmap-slot"></div>
         <div id="dist-overlay-slot"></div>
@@ -3300,6 +3324,17 @@ async function crowdInit() {
     el.classList.toggle("active", el.dataset.k === crowd.trait);
   });
   crowdRenderProvenance(crowd.trait);
+
+  // Populate the 2D scatter dropdowns exactly once.
+  const sel2x = document.getElementById("crowd-2d-x");
+  const sel2y = document.getElementById("crowd-2d-y");
+  if (sel2x && sel2y) {
+    const opts2d = CROWD_TRAITS.map(([k, l]) => `<option value="${k}">${l}</option>`).join("");
+    sel2x.innerHTML = opts2d;
+    sel2y.innerHTML = opts2d;
+    sel2x.value = "O";
+    sel2y.value = "C";
+  }
 }
 
 function crowdSelectTrait(k) {
@@ -3333,6 +3368,7 @@ async function crowdLoad() {
     crowdRender(d);
     crowdRenderExtras(d);
     crowdRenderSubgroupAnalysis();
+    crowdRender2dScatter();
     session.crowdState = {
       trait: crowd.trait,
       filter_trait: crowd.filter_trait,
@@ -3406,6 +3442,140 @@ function crowdRender(d) {
   document.getElementById("pg-info").textContent = `Page ${d.page} of ${d.n_pages}`;
   document.getElementById("pg-prev").disabled = d.page <= 1;
   document.getElementById("pg-next").disabled = d.page >= d.n_pages;
+}
+
+let crowdScatter2d = { data: null };
+
+function _svgEsc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+async function crowdRender2dScatter() {
+  const wrap = document.getElementById("crowd-2d-svg-wrap");
+  const cap  = document.getElementById("crowd-2d-caption");
+  if (!wrap) return;
+  const x = document.getElementById("crowd-2d-x").value;
+  const y = document.getElementById("crowd-2d-y").value;
+  if (!x || !y) { wrap.innerHTML = ""; if (cap) cap.textContent = ""; return; }
+  wrap.innerHTML = '<div class="notice info" style="margin:0;">Loading joint distribution…</div>';
+
+  const q = new URLSearchParams({
+    x, y,
+    filter_active: String(crowd.filter_active && !!crowd.filter_trait),
+    filter_trait: crowd.filter_trait || "",
+    filter_op: crowd.filter_op || ">=",
+    filter_value: String(crowd.filter_value || 0),
+    max_points: "3000",
+  });
+  try {
+    const r = await fetch("/api/scatter2d?" + q.toString());
+    if (!r.ok) throw new Error(await r.text());
+    const d = await r.json();
+    crowdScatter2d.data = d;
+    wrap.innerHTML = crowdRender2dSvg(d);
+    if (cap) cap.innerHTML = crowd2dCaption(d);
+  } catch (e) {
+    wrap.innerHTML = `<div class="notice error" style="margin:0;">Joint distribution failed: ${_svgEsc(e.message)}</div>`;
+    if (cap) cap.innerHTML = "";
+  }
+}
+
+function crowdRender2dSvg(d) {
+  const W = 720, H = 460, PAD_L = 60, PAD_R = 20, PAD_T = 30, PAD_B = 50;
+  const innerW = W - PAD_L - PAD_R, innerH = H - PAD_T - PAD_B;
+
+  const allX = d.points_rest.map(p => p[0]).concat(d.points_sub.map(p => p[0]));
+  const allY = d.points_rest.map(p => p[1]).concat(d.points_sub.map(p => p[1]));
+  if (!allX.length) return '<div class="notice info" style="margin:0;">No points in this view.</div>';
+
+  const xMin = Math.min(...allX), xMax = Math.max(...allX);
+  const yMin = Math.min(...allY), yMax = Math.max(...allY);
+  const padX = (xMax - xMin) * 0.03 || 0.01;
+  const padY = (yMax - yMin) * 0.03 || 0.01;
+  const xa = xMin - padX, xb = xMax + padX;
+  const ya = yMin - padY, yb = yMax + padY;
+
+  const sx = v => PAD_L + (v - xa) / (xb - xa) * innerW;
+  const sy = v => PAD_T + innerH - (v - ya) / (yb - ya) * innerH;
+
+  const restDots = d.points_rest.map(p =>
+    '<circle cx="' + sx(p[0]).toFixed(1) + '" cy="' + sy(p[1]).toFixed(1) +
+    '" r="1.5" fill="#8e8e93" opacity="0.35"/>'
+  ).join("");
+
+  const subDots = d.points_sub.map(p =>
+    '<circle cx="' + sx(p[0]).toFixed(1) + '" cy="' + sy(p[1]).toFixed(1) +
+    '" r="2.0" fill="#0a84ff" opacity="0.72"/>'
+  ).join("");
+
+  function ticks(a, b) {
+    const out = [];
+    for (let i = 0; i <= 4; i++) out.push(a + (b - a) * i / 4);
+    return out;
+  }
+  const xt = ticks(xa, xb), yt = ticks(ya, yb);
+  const gridX = xt.map(t => {
+    const px = sx(t);
+    return '<line x1="' + px.toFixed(1) + '" x2="' + px.toFixed(1) +
+           '" y1="' + PAD_T + '" y2="' + (PAD_T + innerH) + '" stroke="#f0f0f3"/>' +
+           '<text x="' + px.toFixed(1) + '" y="' + (PAD_T + innerH + 16) +
+           '" font-size="10" text-anchor="middle" fill="#8e8e93">' + t.toFixed(2) + '</text>';
+  }).join("");
+  const gridY = yt.map(t => {
+    const py = sy(t);
+    return '<line x1="' + PAD_L + '" x2="' + (PAD_L + innerW) + '" y1="' + py.toFixed(1) +
+           '" y2="' + py.toFixed(1) + '" stroke="#f0f0f3"/>' +
+           '<text x="' + (PAD_L - 6) + '" y="' + (py + 3) +
+           '" font-size="10" text-anchor="end" fill="#8e8e93">' + t.toFixed(2) + '</text>';
+  }).join("");
+
+  const axes =
+    '<line x1="' + PAD_L + '" x2="' + PAD_L + '" y1="' + PAD_T + '" y2="' + (PAD_T + innerH) +
+    '" stroke="#c7c7cc"/>' +
+    '<line x1="' + PAD_L + '" x2="' + (PAD_L + innerW) + '" y1="' + (PAD_T + innerH) +
+    '" y2="' + (PAD_T + innerH) + '" stroke="#c7c7cc"/>';
+
+  const labels =
+    '<text x="' + (PAD_L + innerW/2) + '" y="' + (H - 8) +
+    '" font-size="12" font-weight="600" text-anchor="middle" fill="#1c1c1e">' + _svgEsc(d.x_label) + '</text>' +
+    '<text x="14" y="' + (PAD_T + innerH/2) + '" font-size="12" font-weight="600" text-anchor="middle" ' +
+    'fill="#1c1c1e" transform="rotate(-90 14 ' + (PAD_T + innerH/2) + ')">' + _svgEsc(d.y_label) + '</text>';
+
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:auto;display:block;font-family:-apple-system,sans-serif">' +
+    gridX + gridY + axes + restDots + subDots + labels + '</svg>';
+}
+
+function crowd2dCaption(d) {
+  function rLine(rObj, rho, who) {
+    if (rObj == null || rObj.r == null) return "";
+    const r = rObj.r.toFixed(3);
+    const ci = (rObj.lo != null && rObj.hi != null)
+      ? "  [95% CI " + rObj.lo.toFixed(3) + ", " + rObj.hi.toFixed(3) + "]"
+      : "";
+    const rhoTxt = (rho != null) ? "  ·  ρ = " + rho.toFixed(3) : "";
+    return "<strong>" + who + "</strong>: r = " + r + ci + rhoTxt;
+  }
+  if (d.filter.active) {
+    const s = rLine(d.pearson.sub, d.spearman.sub, "Subgroup (blue)");
+    const r = rLine(d.pearson.rest, d.spearman.rest, "Population (grey)");
+    return "Pearson r and Spearman ρ computed on the full columns, not the display sample. " + s + " &nbsp; " + r;
+  }
+  return "Pearson r and Spearman ρ computed on the full columns, not the display sample. " +
+    rLine(d.pearson.rest, d.spearman.rest, "Population");
+}
+
+function crowdExport2dSvg() {
+  const d = crowdScatter2d.data;
+  if (!d) { alert("No joint distribution to export."); return; }
+  const wrap = document.getElementById("crowd-2d-svg-wrap");
+  const svg = wrap && wrap.querySelector("svg");
+  if (!svg) { alert("Nothing to export."); return; }
+  const src = new XMLSerializer().serializeToString(svg);
+  const xLab = d.x_label.replace(/[^A-Za-z0-9]+/g, "-");
+  const yLab = d.y_label.replace(/[^A-Za-z0-9]+/g, "-");
+  downloadFile("joint-" + xLab + "-vs-" + yLab + ".svg",
+               '<?xml version="1.0" encoding="UTF-8"?>\n' + src,
+               "image/svg+xml");
 }
 
 async function crowdRenderSubgroupAnalysis() {

@@ -981,6 +981,117 @@ def list_runs():
     return {"runs": out, "max_cache": _RUN_CACHE_MAX}
 
 
+def _pearson_with_ci(xa, ya):
+    """Pearson r with a 95% CI on r via Fisher's z-transform.
+    Returns (r, lo, hi). CI is None when n < 4 or a column has zero variance.
+    r is clamped to +/-0.999999 so arctanh stays finite."""
+    n = len(xa)
+    if n < 3:
+        return None, None, None
+    sx = xa.std(ddof=1); sy = ya.std(ddof=1)
+    if sx == 0 or sy == 0:
+        return 0.0, None, None
+    r = float(((xa - xa.mean()) * (ya - ya.mean())).mean() / (sx * sy))
+    r = max(min(r, 0.999999), -0.999999)
+    if n < 4:
+        return r, None, None
+    z = np.arctanh(r)
+    se = 1.0 / ((n - 3) ** 0.5)
+    return r, float(np.tanh(z - 1.959964 * se)), float(np.tanh(z + 1.959964 * se))
+
+
+def _spearman(xa, ya):
+    """Spearman rho: Pearson correlation on average-tied ranks.
+    Uses scipy.stats.rankdata which handles ties correctly; the copula
+    columns have few unique values, so correct tie handling matters."""
+    from scipy.stats import rankdata
+    n = len(xa)
+    if n < 3:
+        return None
+    rx = rankdata(xa); ry = rankdata(ya)
+    sx = rx.std(ddof=1); sy = ry.std(ddof=1)
+    if sx == 0 or sy == 0:
+        return 0.0
+    return float(((rx - rx.mean()) * (ry - ry.mean())).mean() / (sx * sy))
+
+
+@app.get("/api/scatter2d")
+def scatter2d(
+    x: str = Query(...),
+    y: str = Query(...),
+    filter_trait: str = Query(""),
+    filter_op: str = Query(">="),
+    filter_value: float = Query(0.0),
+    filter_active: bool = Query(False),
+    max_points: int = Query(3000, ge=200, le=10000),
+):
+    """Joint distribution of two traits, with the filtered subgroup
+    highlighted. Full population drives the axes; the subgroup is
+    overlaid. Pearson r (95% CI) and Spearman rho are computed on the
+    FULL columns, not on the display subsample."""
+    df = _get_baseline_copula()
+    for name in (x, y):
+        if name not in df.columns:
+            raise HTTPException(400, f"trait '{name}' not in copula")
+    xv = df[x].to_numpy().astype(np.float64)
+    yv = df[y].to_numpy().astype(np.float64)
+    N = len(df)
+
+    mask = np.zeros(N, dtype=bool)
+    filter_used = False
+    if filter_active and filter_trait and filter_trait in df.columns:
+        fc = df[filter_trait].to_numpy().astype(np.float64)
+        if   filter_op == ">=": mask = fc >= filter_value
+        elif filter_op == ">":  mask = fc >  filter_value
+        elif filter_op == "<=": mask = fc <= filter_value
+        elif filter_op == "<":  mask = fc <  filter_value
+        filter_used = True
+
+    rng = np.random.default_rng(0)
+    if N > max_points:
+        idx = rng.choice(N, size=max_points, replace=False).astype(int)
+    else:
+        idx = np.arange(N, dtype=int)
+
+    if filter_used:
+        sub_idx  = idx[mask[idx]]
+        rest_idx = idx[~mask[idx]]
+    else:
+        sub_idx  = np.array([], dtype=int)
+        rest_idx = idx
+
+    if filter_used and mask.sum() >= 3 and (~mask).sum() >= 3:
+        r_sub, lo_sub, hi_sub = _pearson_with_ci(xv[mask], yv[mask])
+        rho_sub = _spearman(xv[mask], yv[mask])
+        r_rest, lo_rest, hi_rest = _pearson_with_ci(xv[~mask], yv[~mask])
+        rho_rest = _spearman(xv[~mask], yv[~mask])
+    else:
+        r_sub = lo_sub = hi_sub = rho_sub = None
+        r_rest, lo_rest, hi_rest = _pearson_with_ci(xv, yv)
+        rho_rest = _spearman(xv, yv)
+
+    return {
+        "x": x, "y": y,
+        "x_label": TRAIT_LABELS.get(x, x),
+        "y_label": TRAIT_LABELS.get(y, y),
+        "n_total": int(N),
+        "n_sampled": int(len(idx)),
+        "n_sub":  int(mask.sum()) if filter_used else 0,
+        "n_rest": int((~mask).sum()) if filter_used else int(N),
+        "filter": {
+            "active": bool(filter_used),
+            "trait": filter_trait, "op": filter_op, "value": float(filter_value),
+        },
+        "points_sub":  list(zip(xv[sub_idx].tolist(),  yv[sub_idx].tolist(),  sub_idx.tolist())),
+        "points_rest": list(zip(xv[rest_idx].tolist(), yv[rest_idx].tolist(), rest_idx.tolist())),
+        "pearson": {
+            "sub":  {"r": r_sub,  "lo": lo_sub,  "hi": hi_sub},
+            "rest": {"r": r_rest, "lo": lo_rest, "hi": hi_rest},
+        },
+        "spearman": {"sub": rho_sub, "rest": rho_rest},
+    }
+
+
 @app.get("/api/scatter3d")
 def scatter3d(
     run_id: str = Query(...),
