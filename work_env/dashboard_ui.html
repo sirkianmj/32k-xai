@@ -1243,8 +1243,9 @@ table.cmp2 td.delta.ns  { color: var(--ink-3); font-weight: 400; }
           <h3 style="margin-top:0;">No scenario loaded</h3>
           <p style="color:var(--ink-2);margin:0 0 20px;">
             Run any scenario from the Scenarios tab, or design a custom experiment.
-            The 3D views will then be bound to that specific run — same agents,
-            same seed, same population shifts, same shocks.
+            The 3D view will then show that run — same agents, same seed,
+            same population shifts, same shocks. It shows only the runs you
+            have actually done, not a catalog of defaults.
           </p>
           <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
             <button class="btn primary" onclick="goTo('scenarios')">Open Scenarios</button>
@@ -1260,7 +1261,7 @@ table.cmp2 td.delta.ns  { color: var(--ink-3); font-weight: 400; }
           <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
             <div>
               <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-3);font-weight:600;">Load scenarios into the 3D view</div>
-              <div style="font-size:12px;color:var(--ink-3);margin-top:3px;">Pick a scenario from the left, load it, and it becomes the active cloud. Toggle Compare to overlay two clouds.</div>
+              <div style="font-size:12px;color:var(--ink-3);margin-top:3px;">The dropdown below lists only the scenarios you have run this session. Run more to see them here.</div>
             </div>
             <div style="display:flex;gap:6px;">
               <button class="btn secondary" id="v3d-mode-single" onclick="set3DMode('single')" style="padding:8px 16px;">Single</button>
@@ -1271,28 +1272,16 @@ table.cmp2 td.delta.ns  { color: var(--ink-3); font-weight: 400; }
 
         <div class="card" style="padding:14px 18px;margin-top:12px;">
           <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:end;">
-            <div class="field" style="margin:0;min-width:220px;">
-              <label id="v3d-pick-label">Scenario</label>
-              <select id="v3d-scenario" onchange="onScenarioPick()"></select>
+            <div class="field" style="margin:0;min-width:320px;">
+              <label id="v3d-pick-label">Run</label>
+              <select id="v3d-scenario" onchange="onScenarioPick()" style="min-width:320px;"></select>
             </div>
-            <div class="field" id="v3d-scenario-b-wrap" style="margin:0;min-width:220px;display:none;">
+            <div class="field" id="v3d-scenario-b-wrap" style="margin:0;min-width:320px;display:none;">
               <label>Compare with</label>
-              <select id="v3d-scenario-b" onchange="onScenarioPickB()"></select>
-            </div>
-            <div class="field" style="margin:0;">
-              <label>Agents</label>
-              <input id="v3d-N" type="number" min="500" max="32000" step="500" value="4000" style="width:100px;">
-            </div>
-            <div class="field" style="margin:0;">
-              <label>Ticks</label>
-              <input id="v3d-T" type="number" min="50" max="500" step="50" value="200" style="width:90px;">
-            </div>
-            <div class="field" style="margin:0;">
-              <label>Seed</label>
-              <input id="v3d-seed" type="number" min="0" max="999999" value="42" style="width:90px;">
+              <select id="v3d-scenario-b" onchange="onScenarioPickB()" style="min-width:320px;"></select>
             </div>
             <button class="btn primary" onclick="load3DScenarios()" style="padding:10px 20px;">Load</button>
-            <button class="btn secondary" onclick="reloadScatter()" style="padding:10px 20px;">Refresh cloud</button>
+            <button class="btn secondary" onclick="v3dPopulateRunsDropdown()" style="padding:10px 20px;">Refresh list</button>
           </div>
           <div style="font-size:12px;color:var(--ink-3);margin-top:10px;" id="v3d-status">—</div>
         </div>
@@ -1476,7 +1465,7 @@ function goTo(view) {
     try { crowdLoad(); } catch (e) { console.warn('crowd refresh failed', e); }
   }
   if (view === 'view3d') {
-    try { init3DView(); } catch (e) {
+    try { v3dPopulateRunsDropdown(); init3DView(); } catch (e) {
       console.warn('3D init failed', e);
       const el = document.getElementById('view3d-empty');
       if (el) {
@@ -3730,6 +3719,23 @@ function sessionSaveRun(scenario, N, T, seed, data) {
     scenario, N, T, seed, data,
     timestamp: Date.now(),
   };
+  // Register this run in the list of scenarios the user has actually run
+  session.loadedRuns = session.loadedRuns || [];
+  if (data && data.run_id) {
+    const entry = {
+      run_id: data.run_id,
+      scenario: scenario,
+      N: N, T: T, seed: seed,
+      n_pass: data.n_pass,
+      n_agents: data.n_agents || N,
+      ts: Date.now(),
+      kind: 'scenario',
+    };
+    // de-dupe on run_id
+    session.loadedRuns = [entry,
+      ...session.loadedRuns.filter(r => r.run_id !== entry.run_id)
+    ].slice(0, 30);
+  }
   sessionSave();
 }
 
@@ -3739,6 +3745,22 @@ function sessionSaveDesign(payload, data) {
     payload, data,
     timestamp: Date.now(),
   };
+  session.loadedRuns = session.loadedRuns || [];
+  if (data && data.run_id) {
+    const entry = {
+      run_id: data.run_id,
+      scenario: 'design',
+      N: payload.N, T: payload.T,
+      seed: (payload.seeds && payload.seeds[0]) || 42,
+      n_pass: data.n_pass,
+      n_agents: data.n_agents || payload.N,
+      ts: Date.now(),
+      kind: 'design',
+    };
+    session.loadedRuns = [entry,
+      ...session.loadedRuns.filter(r => r.run_id !== entry.run_id)
+    ].slice(0, 30);
+  }
   sessionSave();
 }
 
@@ -4507,103 +4529,80 @@ function colormap(t) {
 // ---------- 3D scatter ----------
 
 // ============================================================
-// 3D SCENARIO STATE
+// 3D SCENARIO STATE — reads only the runs the user has done
 // ============================================================
 const V3D_STATE = {
-  scenarios: [],
-  runA: null,          // { run_id, label, scenario, N, T, seed, n_agents }
-  runB: null,          // same shape, or null
-  mode: 'single',      // 'single' | 'compare'
+  runA: null,
+  runB: null,
+  mode: 'single',       // 'single' | 'compare'
 };
 
-function v3dInitDropdowns() {
+function v3dLoadedRuns() {
+  return session.loadedRuns || [];
+}
+
+function prettyRunLabel(r) {
+  if (r.kind === 'design') {
+    return `design · N=${r.N} · T=${r.T} · seed ${r.seed} · ${r.n_pass}/5`;
+  }
+  return `${pretty(r.scenario)} · N=${r.N} · T=${r.T} · seed ${r.seed} · ${r.n_pass}/5`;
+}
+
+function v3dPopulateRunsDropdown() {
   const selA = document.getElementById('v3d-scenario');
   const selB = document.getElementById('v3d-scenario-b');
-  if (!selA) return;
-
-  // Only populate once
-  if (selA.options.length === 0) {
-    selA.innerHTML = '<option value="">— pick a scenario —</option>' +
-      V3D_STATE.scenarios.map(s =>
-        `<option value="${s.name}">${pretty(s.name)} (${s.n_shocks} shock${s.n_shocks === 1 ? '' : 's'})</option>`
-      ).join('');
-    // Default: baseline
-    selA.value = 'baseline';
-    if (selB) {
-      selB.innerHTML = selA.innerHTML;
-      selB.value = 'severe_scarcity';
-    }
+  const runs = v3dLoadedRuns();
+  const opts = runs.map(r => {
+    const t = new Date(r.ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    return `<option value="${r.run_id}">${prettyRunLabel(r)} · ${t}</option>`;
+  }).join('');
+  if (selA) {
+    selA.innerHTML = runs.length
+      ? '<option value="">— pick one of your runs —</option>' + opts
+      : '<option value="">— no runs yet —</option>';
   }
-}
-
-async function fetchScenarioList() {
-  if (V3D_STATE.scenarios.length) return;
-  try {
-    const r = await fetch('/api/scenarios-with-meta');
-    V3D_STATE.scenarios = await r.json();
-    v3dInitDropdowns();
-  } catch (e) {
-    console.warn('scenarios fetch failed', e);
+  if (selB) {
+    selB.innerHTML = selA.innerHTML;
   }
-}
-
-async function loadOneScenario(name, N, T, seed) {
-  const r = await fetch(`/api/run/${name}?N=${N}&T=${T}&seed=${seed}`, { method: 'POST' });
-  if (!r.ok) {
-    const msg = await r.text();
-    throw new Error(`${name}: ${msg.slice(0, 150)}`);
-  }
-  const d = await r.json();
-  return {
-    run_id: d.run_id,
-    label: `${pretty(name)} · N=${d.N} · T=${d.T} · seed ${d.seed}`,
-    scenario: name,
-    N: d.N, T: d.T, seed: d.seed,
-    n_agents: d.n_agents,
-    n_pass: d.n_pass,
-  };
+  // Default A to first run, B to second
+  if (selA && runs.length >= 1 && !selA.value) selA.value = runs[0].run_id;
+  if (selB && runs.length >= 2 && !selB.value) selB.value = runs[1].run_id;
 }
 
 async function load3DScenarios() {
-  await fetchScenarioList();
-  const nameA = document.getElementById('v3d-scenario').value;
-  if (!nameA) { alert('Pick a scenario first.'); return; }
-  const N = +document.getElementById('v3d-N').value || 4000;
-  const T = +document.getElementById('v3d-T').value || 200;
-  const seed = +document.getElementById('v3d-seed').value || 42;
-
+  const runs = v3dLoadedRuns();
   const status = document.getElementById('v3d-status');
-  status.textContent = `Loading ${pretty(nameA)}…`;
 
-  try {
-    const a = await loadOneScenario(nameA, N, T, seed);
-    V3D_STATE.runA = a;
+  if (!runs.length) {
+    status.textContent = 'You have not run anything yet. Open Scenarios, run one, then return here.';
+    return;
+  }
 
-    if (V3D_STATE.mode === 'compare') {
-      const nameB = document.getElementById('v3d-scenario-b').value;
-      if (!nameB) { alert('Pick a second scenario to compare.'); return; }
-      status.textContent = `Loading ${pretty(nameB)}…`;
-      const b = await loadOneScenario(nameB, N, T, seed);
-      V3D_STATE.runB = b;
-      status.textContent = `A: ${a.label}  |  B: ${b.label}`;
-      await reloadCompare();
-    } else {
-      V3D_STATE.runB = null;
-      status.textContent = `Bound to: ${a.label} — ${a.n_agents} agents, ${a.n_pass}/5 PASS`;
-      // Update agent index range
-      const rangeEl = document.getElementById('a3d-range');
-      if (rangeEl) rangeEl.textContent = String(a.n_agents - 1);
-      await reloadScatter();
-      await reloadAgentProfile();
-    }
-  } catch (e) {
-    status.textContent = 'Load failed: ' + e.message;
+  const ridA = document.getElementById('v3d-scenario').value;
+  const rA = runs.find(r => r.run_id === ridA);
+  if (!rA) { status.textContent = 'Pick a run from the dropdown.'; return; }
+  V3D_STATE.runA = rA;
+
+  if (V3D_STATE.mode === 'compare') {
+    const ridB = document.getElementById('v3d-scenario-b').value;
+    const rB = runs.find(r => r.run_id === ridB);
+    if (!rB) { status.textContent = 'Pick a second run to compare.'; return; }
+    V3D_STATE.runB = rB;
+    status.textContent = `A: ${prettyRunLabel(rA)}   |   B: ${prettyRunLabel(rB)}`;
+    await reloadCompare();
+  } else {
+    V3D_STATE.runB = null;
+    status.textContent = `Bound to: ${prettyRunLabel(rA)} — ${rA.n_agents} agents`;
+    const rangeEl = document.getElementById('a3d-range');
+    if (rangeEl) rangeEl.textContent = String((rA.n_agents || rA.N) - 1);
+    const aEl = document.getElementById('a3d-agent');
+    if (aEl && +aEl.value >= (rA.n_agents || rA.N)) aEl.value = 0;
+    await reloadScatter();
+    await reloadAgentProfile();
   }
 }
 
-function onScenarioPick() {
-  // no-op; user must click Load
-}
+function onScenarioPick() {}
 function onScenarioPickB() {}
 
 function set3DMode(mode) {
@@ -4621,15 +4620,16 @@ function set3DMode(mode) {
     wrapB.style.display = '';
     viewC.style.display = '';
     viewS.style.display = 'none';
-    if (lblA) lblA.textContent = 'Scenario A';
+    if (lblA) lblA.textContent = 'Run A';
   } else {
     btnS.className = 'btn primary'; btnS.style.padding = '8px 16px';
     btnC.className = 'btn secondary'; btnC.style.padding = '8px 16px';
     wrapB.style.display = 'none';
     viewC.style.display = 'none';
     viewS.style.display = '';
-    if (lblA) lblA.textContent = 'Scenario';
+    if (lblA) lblA.textContent = 'Run';
   }
+  v3dPopulateRunsDropdown();
 }
 
 // ============================================================
@@ -4769,15 +4769,11 @@ function exportCompareSvg(which) {
 async function init3DView() {
   const empty = document.getElementById('view3d-empty');
   const live = document.getElementById('view3d-live');
-  await fetchScenarioList();
-  if (empty) empty.style.display = 'none';
-  if (live) live.style.display = '';
 
-  // Populate the axis dropdowns once
+  const runs = v3dLoadedRuns();
+
+  // Populate axis dropdowns once
   const traits = [
-    ["final_wealth", "Final wealth (outcome)"],
-    ["final_wealth_log1p", "log(1 + wealth)"],
-    ["final_wealth_rank_pct", "Wealth percentile"],
     ["O", "Openness"], ["C", "Conscientiousness"], ["E", "Extraversion"],
     ["A", "Agreeableness"], ["N", "Neuroticism"],
     ["S_M", "Machiavellianism"], ["S_P", "Psychopathy"], ["S_N", "Narcissism"],
@@ -4785,6 +4781,9 @@ async function init3DView() {
     ["DASS_Dep", "Depression"], ["DASS_Anx", "Anxiety"], ["DASS_Str", "Stress"],
     ["general_distress", "General distress"], ["m_t", "Current mood"],
     ["omega_social", "Social value"], ["theta_T", "Threat sensitivity"],
+    ["final_wealth", "Final wealth (outcome)"],
+    ["final_wealth_log1p", "log(1 + wealth)"],
+    ["final_wealth_rank_pct", "Wealth percentile"],
   ];
   for (const id of ['s3d-x', 's3d-y', 's3d-z', 's3d-c']) {
     const sel = document.getElementById(id);
@@ -4793,21 +4792,37 @@ async function init3DView() {
       sel.innerHTML = traits.map(([k, l]) => `<option value="${k}">${l}</option>`).join('');
     }
   }
-  if (!document.getElementById('s3d-x').value) document.getElementById('s3d-x').value = 'O';
-  if (!document.getElementById('s3d-y').value) document.getElementById('s3d-y').value = 'C';
-  if (!document.getElementById('s3d-z').value) document.getElementById('s3d-z').value = 'final_wealth_log1p';
-  if (!document.getElementById('s3d-c').value) document.getElementById('s3d-c').value = 'N';
+  // Default axes: real traits so the cloud is unambiguously 3D.
+  // The bug this fixes: after sel.innerHTML = ..., every <select> has
+  // auto-selected its first option ("O"), so the old guard `!sel.value`
+  // never fired and all four dropdowns were left on O — producing a 1D
+  // diagonal line when the same trait is plotted on X, Y, and Z.
+  // Fix: set the defaults unconditionally, exactly once per page load.
+  if (!window.__v3dAxesInit) {
+    document.getElementById('s3d-x').value = 'O';
+    document.getElementById('s3d-y').value = 'C';
+    document.getElementById('s3d-z').value = 'E';
+    document.getElementById('s3d-c').value = 'N';
+    window.__v3dAxesInit = true;
+  }
 
-  // If a run is already loaded (from a previous session), use it
+  if (!runs.length) {
+    if (empty) empty.style.display = '';
+    if (live) live.style.display = 'none';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+  if (live) live.style.display = '';
+
+  v3dPopulateRunsDropdown();
+
+  // If already bound, refresh the view
   if (V3D_STATE.runA) {
-    if (V3D_STATE.mode === 'compare' && V3D_STATE.runB) {
-      await reloadCompare();
-    } else {
-      await reloadScatter();
-      await reloadAgentProfile();
-    }
+    if (V3D_STATE.mode === 'compare' && V3D_STATE.runB) await reloadCompare();
+    else { await reloadScatter(); await reloadAgentProfile(); }
   } else {
-    document.getElementById('v3d-status').textContent = 'Pick a scenario and click Load.';
+    document.getElementById('v3d-status').textContent =
+      `You have ${runs.length} run${runs.length === 1 ? '' : 's'}. Pick one and click Load.`;
   }
 }
 
