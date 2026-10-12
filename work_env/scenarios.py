@@ -21,76 +21,126 @@ os.environ.setdefault("XLA_PYTHON_CLIENT_MEM_FRACTION", "0.85")
 
 # ---- Scenario definitions ----
 
-SCENARIOS = {
-    "baseline": {
-        "description": "No shocks. Calibrated reference run.",
-        "shocks": [],
-    },
-    "resource_crisis": {
-        "description": ("Resource scarcity 0.6 for all agents, "
-                        "ticks 200-350. Economic stress condition."),
-        "shocks": [
-            {"tick": 200, "duration": 150, "type": "resource_scarcity",
-             "magnitude": 0.6, "target_frac": None, "target_seed": 0},
-        ],
-    },
-    "widespread_distress": {
-        "description": ("Distress injection 0.8 on 70% of agents, "
-                        "ticks 150-350. Psychological stress condition."),
-        "shocks": [
-            {"tick": 150, "duration": 200, "type": "distress_injection",
-             "magnitude": 0.8, "target_frac": 0.7, "target_seed": 3},
-        ],
-    },
-    "compound_stress": {
-        "description": ("Resource scarcity 0.4 all agents from tick 100, "
-                        "plus distress injection 0.6 on 50% from tick 150. "
-                        "Simultaneous economic and psychological stress."),
-        "shocks": [
-            {"tick": 100, "duration": 200, "type": "resource_scarcity",
-             "magnitude": 0.4, "target_frac": None, "target_seed": 0},
-            {"tick": 150, "duration": 200, "type": "distress_injection",
-             "magnitude": 0.6, "target_frac": 0.5, "target_seed": 7},
-        ],
-    },
-    "social_isolation": {
-        "description": ("Network thinning 0.5: affected agents can pick "
-                        "from half as many neighbours, ticks 200-400. "
-                        "Gini +58% of SE, UG rejection +42% of SE."),
-        "shocks": [
-            {"tick": 200, "duration": 200, "type": "network_thinning",
-             "magnitude": 0.5, "target_frac": None, "target_seed": 0},
-        ],
-    },
-    "mild_isolation": {
-        "description": ("Network thinning 0.2: affected agents lose 20% "
-                        "of their neighbour pool, ticks 200-400. Gini "
-                        "+7% of SE."),
-        "shocks": [
-            {"tick": 200, "duration": 200, "type": "network_thinning",
-             "magnitude": 0.2, "target_frac": None, "target_seed": 0},
-        ],
-    },
-    "wealth_equalization": {
-        "description": ("Wealth redistribution 0.002 (0.2% pull toward "
-                        "mean per tick) on all agents, ticks 200-400. "
-                        "Calibrated to reduce Gini by ~68% of SE. Models "
-                        "a mild tax-and-transfer intervention."),
-        "shocks": [
-            {"tick": 200, "duration": 200, "type": "wealth_redistribution",
-             "magnitude": 0.002, "target_frac": None, "target_seed": 0},
-        ],
-    },
-    "strong_redistribution": {
-        "description": ("Wealth redistribution 0.01 (1% pull toward mean "
-                        "per tick) on all agents, ticks 200-400. Strong "
-                        "intervention: Gini drops to 0.23."),
-        "shocks": [
-            {"tick": 200, "duration": 200, "type": "wealth_redistribution",
-             "magnitude": 0.01, "target_frac": None, "target_seed": 0},
-        ],
-    },
-}
+SCENARIOS = {'baseline': {'description': 'No shocks. Calibrated reference run.', 'shocks': []},
+ 'resource_crisis': {'description': 'Resource scarcity 0.85 for all agents, ticks 50-450. At the '
+                                    'default 250-tick run, the shock covers ticks 50-250, giving '
+                                    'the population 200 ticks of scarcity. Rejection rises well '
+                                    'past the human SE band.',
+                     'shocks': [{'tick': 50,
+                                 'duration': 400,
+                                 'type': 'resource_scarcity',
+                                 'magnitude': 0.85,
+                                 'target_frac': None,
+                                 'target_seed': 0}]},
+ 'widespread_distress': {'description': 'Distress injection 1.5 on 70% of agents, ticks 50-450. '
+                                        'Modest effect by design - distress affects engagement, '
+                                        'not the fairness accept rule, so it moves the behavioural '
+                                        'aggregates only weakly.',
+                         'shocks': [{'tick': 50,
+                                     'duration': 400,
+                                     'type': 'distress_injection',
+                                     'magnitude': 1.5,
+                                     'target_frac': 0.7,
+                                     'target_seed': 3}]},
+ 'compound_stress': {'description': 'Simultaneous resource scarcity 0.6 (all agents) and distress '
+                                    'injection 1.0 (50% of agents), both starting at tick 50. '
+                                    'Compound economic and psychological stress.',
+                     'shocks': [{'tick': 50,
+                                 'duration': 400,
+                                 'type': 'resource_scarcity',
+                                 'magnitude': 0.6,
+                                 'target_frac': None,
+                                 'target_seed': 0},
+                                {'tick': 50,
+                                 'duration': 400,
+                                 'type': 'distress_injection',
+                                 'magnitude': 1.0,
+                                 'target_frac': 0.5,
+                                 'target_seed': 7}]},
+ 'social_isolation': {'description': 'Network thinning 0.75: neighbour pool cut by three quarters, '
+                                     'ticks 50-450. Rejection and inequality rise sharply.',
+                      'shocks': [{'tick': 50,
+                                  'duration': 400,
+                                  'type': 'network_thinning',
+                                  'magnitude': 0.75,
+                                  'target_frac': None,
+                                  'target_seed': 0}]},
+ 'mild_isolation': {'description': 'Network thinning 0.35: moderate neighbour reduction.',
+                    'shocks': [{'tick': 50,
+                                'duration': 400,
+                                'type': 'network_thinning',
+                                'magnitude': 0.35,
+                                'target_frac': None,
+                                'target_seed': 0}]},
+ 'wealth_equalization': {'description': 'Wealth redistribution 0.005 per tick for all agents, '
+                                        'ticks 50-450. Visible Gini reduction.',
+                         'shocks': [{'tick': 50,
+                                     'duration': 400,
+                                     'type': 'wealth_redistribution',
+                                     'magnitude': 0.005,
+                                     'target_frac': None,
+                                     'target_seed': 0}]},
+ 'strong_redistribution': {'description': 'Strong wealth redistribution 0.02 per tick, ticks '
+                                          '50-450. Near-total equalization of wealth.',
+                           'shocks': [{'tick': 50,
+                                       'duration': 400,
+                                       'type': 'wealth_redistribution',
+                                       'magnitude': 0.02,
+                                       'target_frac': None,
+                                       'target_seed': 0}]},
+ 'severe_scarcity': {'description': 'Resource scarcity 0.90 for all agents, ticks 50-450. The '
+                                    'population earns one tenth of normal. Causes a four-to-five '
+                                    'sigma rise in rejection — the benchmark goes from PASS to '
+                                    'FAIL.',
+                     'shocks': [{'tick': 50,
+                                 'duration': 400,
+                                 'type': 'resource_scarcity',
+                                 'magnitude': 0.9,
+                                 'target_frac': None,
+                                 'target_seed': 0}]},
+ 'total_isolation': {'description': 'Social isolation 0.83 for all agents, ticks 50-450. Neighbour '
+                                    'pool cut to roughly one sixth. Rejection and inequality rise '
+                                    'sharply, TG return rises.',
+                     'shocks': [{'tick': 50,
+                                 'duration': 400,
+                                 'type': 'network_thinning',
+                                 'magnitude': 0.83,
+                                 'target_frac': None,
+                                 'target_seed': 0}]},
+ 'radical_redistribution': {'description': 'Wealth redistribution 0.05 per tick for all agents, '
+                                           'ticks 50-450. Each tick pulls 5% of the gap to the '
+                                           'mean. Collapses Gini to near zero.',
+                            'shocks': [{'tick': 50,
+                                        'duration': 400,
+                                        'type': 'wealth_redistribution',
+                                        'magnitude': 0.05,
+                                        'target_frac': None,
+                                        'target_seed': 0}]},
+ 'compound_crisis': {'description': 'Simultaneous severe scarcity (0.8) and social isolation '
+                                    '(0.6), ticks 100-450. Both economic and structural stress at '
+                                    'once.',
+                     'shocks': [{'tick': 100,
+                                 'duration': 350,
+                                 'type': 'resource_scarcity',
+                                 'magnitude': 0.8,
+                                 'target_frac': None,
+                                 'target_seed': 0},
+                                {'tick': 100,
+                                 'duration': 350,
+                                 'type': 'network_thinning',
+                                 'magnitude': 0.6,
+                                 'target_frac': None,
+                                 'target_seed': 0}]},
+ 'mild_distress_check': {'description': 'Distress injection 2.0 for all agents, ticks 50-450. '
+                                        'Deliberately extreme. The benchmark movement is small '
+                                        'because distress affects engagement, not offer or accept '
+                                        'decisions. Documented as an engine property.',
+                         'shocks': [{'tick': 50,
+                                     'duration': 400,
+                                     'type': 'distress_injection',
+                                     'magnitude': 2.0,
+                                     'target_frac': None,
+                                     'target_seed': 0}]}}
 
 # ---- Runner ----
 
