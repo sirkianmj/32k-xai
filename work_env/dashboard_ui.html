@@ -849,6 +849,46 @@ table.cmp2 td.delta.ns  { color: var(--ink-3); font-weight: 400; }
         </div>
       </div>
 
+      <div class="card" id="crowd-apa-card" style="margin-top:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:15px;font-weight:600;">APA-ready paragraphs</div>
+            <div style="color:var(--ink-3);font-size:13px;margin-top:2px;">
+              Methods and results paragraphs generated from the current population and the last run. Copy directly into a manuscript draft; edit to taste.
+            </div>
+          </div>
+          <button class="btn secondary" onclick="apaRefresh()">Refresh</button>
+        </div>
+
+        <div style="margin-top:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <div style="font-size:13px;font-weight:600;">Methods</div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span id="apa-methods-status" style="font-size:12px;color:#1a6b32;font-weight:600;"></span>
+              <button class="btn secondary" style="padding:6px 12px;font-size:12px;" onclick="apaCopyMethods()">Copy</button>
+            </div>
+          </div>
+          <textarea id="apa-methods-text" readonly
+                    style="width:100%;min-height:180px;font-family:ui-monospace,Menlo,monospace;font-size:12px;line-height:1.55;padding:12px;border:1px solid var(--line);border-radius:10px;background:#f8f9fb;color:var(--ink);resize:vertical;white-space:pre-wrap;"></textarea>
+        </div>
+
+        <div style="margin-top:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <div style="font-size:13px;font-weight:600;">Results</div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span id="apa-results-status" style="font-size:12px;color:#1a6b32;font-weight:600;"></span>
+              <button class="btn secondary" style="padding:6px 12px;font-size:12px;" onclick="apaCopyResults()">Copy</button>
+            </div>
+          </div>
+          <textarea id="apa-results-text" readonly
+                    style="width:100%;min-height:160px;font-family:ui-monospace,Menlo,monospace;font-size:12px;line-height:1.55;padding:12px;border:1px solid var(--line);border-radius:10px;background:#f8f9fb;color:var(--ink);resize:vertical;white-space:pre-wrap;"></textarea>
+        </div>
+
+        <div class="btn-row" style="margin-top:14px;">
+          <button class="btn secondary" onclick="apaDownload()">Download both as .txt</button>
+        </div>
+      </div>
+
       <div class="charts-grid" style="margin-top:16px;">
         <div id="corr-heatmap-slot"></div>
         <div id="dist-overlay-slot"></div>
@@ -3382,6 +3422,7 @@ async function crowdLoad() {
     crowdRenderSubgroupAnalysis();
     crowdRender2dScatter();
     crowdRenderFactorStructure();
+    if (typeof apaRefresh === "function") apaRefresh();
     session.crowdState = {
       trait: crowd.trait,
       filter_trait: crowd.filter_trait,
@@ -3706,6 +3747,119 @@ function crowdRenderOneScale(scale) {
         caveats + '</ul></div>' +
     '</div>'
   );
+}
+
+function apaBuildMethodsText() {
+  const c = crowdProvCache || {};
+  const counts = { GROUNDED: 0, PROXY: 0, DERIVED: 0, SYNTHETIC: 0, INERT: 0 };
+  Object.values(c).forEach(t => {
+    const s = (t.provenance || {}).status;
+    if (counts[s] !== undefined) counts[s]++;
+  });
+  const nTotal = counts.GROUNDED + counts.PROXY + counts.SYNTHETIC;
+  const parts = [];
+  parts.push(
+    "Participants. The synthetic population comprised N = 32,000 simulated agents, " +
+    "each parameterised by a 26-dimensional psychological trait vector sampled from " +
+    "a vine copula estimated on real human psychometric data. Big Five traits were " +
+    "drawn from the IPIP-FFM normative sample (N = 603,000). The Dark Triad was " +
+    "modelled as a bifactor structure (general Dark Core plus three orthogonal " +
+    "specific factors) estimated from the SD3 (N = 17,740; bifactor model CFI = 0.901, " +
+    "RMSEA = 0.057, delta-CFI vs three-correlated = +0.053). Depressive, anxious, " +
+    "and stress symptomology was modelled with the DASS as a bifactor structure " +
+    "(general distress plus three specifics; N = 39,775; CFI = 0.931, RMSEA = 0.049, " +
+    "delta-CFI vs three-correlated = +0.034)."
+  );
+  parts.push(
+    "Learning and decision parameters were estimated from the Daw two-step task " +
+    "(N = 149; w_MB recovery rho = 0.841), the delay-discounting task (N = 476), " +
+    "the stop-signal task (N = 264), and the ultimatum game (N = 111). Of the " +
+    nTotal + " active trait dimensions used by the engine, " + counts.GROUNDED +
+    " were grounded directly in human data, " + counts.PROXY +
+    " were grounded via defended proxies, and " + counts.SYNTHETIC +
+    " were assigned literature-derived synthetic priors, each flagged " +
+    "[SYNTHETIC-PRIOR-PARAMS] in every decision trace."
+  );
+  parts.push(
+    "Decision-making was governed by a transparent, mechanistic architecture: " +
+    "temporal-difference learning with a two-step Bellman backup, Fehr-Schmidt " +
+    "inequality aversion, and softmax action selection. No neural networks or large " +
+    "language models were used in the decision loop. Each agent had a unique " +
+    "identifier and seed; trial-level traces are fully reproducible from the seed " +
+    "list and generator hash."
+  );
+  return parts.join("\n\n");
+}
+
+function apaBuildResultsText() {
+  const last = session.lastRun || session.lastDesign;
+  if (!last) return "(No run yet. Run a scenario or design an experiment first; then this paragraph will describe it.)";
+  const d = last.data;
+  const name = last.kind === "scenario"
+    ? pretty(last.scenario)
+    : "a custom design experiment";
+  const N = last.N, T = last.T, seed = last.seed;
+  const pass = d.n_pass;
+  const bm = d.benchmarks || [];
+  const benchLines = bm.map(b => {
+    const delta = b.platform - b.target;
+    const sign = delta >= 0 ? "+" : "";
+    return b.name + " = " + b.platform.toFixed(3) +
+      " (human target " + b.target.toFixed(3) + " +/- " + b.se.toFixed(3) +
+      ", delta = " + sign + delta.toFixed(3) + ", " +
+      (b.pass ? "PASS" : "FAIL") + ")";
+  }).join("; ");
+  const parts = [];
+  parts.push(
+    "Results. A population of N = " + N.toLocaleString() + " agents was simulated " +
+    "for T = " + T + " ticks under " + name + " (seed = " + seed + "). " +
+    pass + " of " + bm.length + " human benchmarks were reproduced within one " +
+    "standard error of the published estimates."
+  );
+  parts.push("Benchmark values: " + benchLines + ".");
+  parts.push(
+    "The run is fully reproducible: identical seed, N, shocks, and generator " +
+    "hash produce byte-identical traces. Reproducibility hash: " +
+    (d.run_id || "n/a") + "."
+  );
+  return parts.join("\n\n");
+}
+
+function apaFlash(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  setTimeout(() => { el.textContent = ""; }, 2200);
+}
+
+function apaCopyMethods() {
+  const txt = apaBuildMethodsText();
+  navigator.clipboard.writeText(txt).then(
+    () => apaFlash("apa-methods-status", "Copied."),
+    () => apaFlash("apa-methods-status", "Copy blocked; select manually.")
+  );
+}
+
+function apaCopyResults() {
+  const txt = apaBuildResultsText();
+  navigator.clipboard.writeText(txt).then(
+    () => apaFlash("apa-results-status", "Copied."),
+    () => apaFlash("apa-results-status", "Copy blocked; select manually.")
+  );
+}
+
+function apaRefresh() {
+  const m = document.getElementById("apa-methods-text");
+  const r = document.getElementById("apa-results-text");
+  if (m) m.value = apaBuildMethodsText();
+  if (r) r.value = apaBuildResultsText();
+}
+
+function apaDownload() {
+  const text =
+    "===== METHODS =====\n\n" + apaBuildMethodsText() + "\n\n" +
+    "===== RESULTS =====\n\n" + apaBuildResultsText() + "\n";
+  downloadFile("xai32k-apa.txt", text, "text/plain");
 }
 
 async function crowdRenderSubgroupAnalysis() {
