@@ -158,6 +158,11 @@ def _run_design(copula_ops, shocks, N, T, seeds):
             s2.pop("target_where", None)
             treated_mask |= mask
         resolved_shocks.append(s2)
+    # Register this exact agent matrix under a run_id so the 3D views
+    # can show the actual agents the engine will see.
+    run_id = _run_id_for(copula_ops, N, seeds[0], shocks=resolved_shocks)
+    _store_run(run_id, df)
+
     tmp = Path("/tmp") / f"p6c_design_{uuid.uuid4().hex}.pkl"
     df.to_pickle(tmp)
     prev_copula = os.environ.get("P6C_PARAMS", str(DEFAULT_COPULA))
@@ -200,6 +205,26 @@ def _run_design(copula_ops, shocks, N, T, seeds):
                 "treated_shock": t_shock, "control_shock": c_shock, "effect_shock": effect_shock,
             }
 
+        # Enrich the cached df with final per-agent outcomes from seed 0.
+        # The cap tensor in this engine has 10 columns (game-outcome
+        # indicators), not 13, so per-agent distress and w_mb are not
+        # available from it. We expose final wealth, which is what the
+        # engine actually computes per agent.
+        try:
+            import pandas as _pd
+            df_rich = df.copy()
+            if wealth0 is not None:
+                w = np.asarray(wealth0, dtype=np.float64)
+                df_rich["final_wealth"] = w
+                df_rich["final_wealth_log1p"] = np.log1p(np.maximum(w, 0.0))
+                # simple economic outcome: rank within the population
+                r = np.argsort(np.argsort(w))
+                df_rich["final_wealth_rank_pct"] = r / max(1, len(w) - 1)
+            _store_run(run_id, df_rich)
+            print(f"[run_id={run_id}] enriched df with final_wealth columns")
+        except Exception as _e:
+            print(f"[run_id={run_id}] enrichment failed: {_e}")
+
         return {
             "mean": mean.tolist(),
             "std_over_seeds": std.tolist(),
@@ -209,6 +234,8 @@ def _run_design(copula_ops, shocks, N, T, seeds):
             "timeseries_full": ts_full,
             "timeseries_shock": ts_shock,
             "subgroups": subgroups,
+            "run_id": run_id,
+            "n_agents": int(N),
         }
     finally:
         os.environ["P6C_PARAMS"] = prev_copula
@@ -405,6 +432,8 @@ def run_named(
         "baseline_platform": baseline_result["mean"] if baseline_result else None,
         "shock_tick_ranges": [{"tick": int(s["tick"]), "duration": int(s["duration"])}
                               for s in spec["shocks"]],
+        "run_id": result.get("run_id"),
+        "n_agents": result.get("n_agents"),
         "audit": {
             "copula": str(os.environ.get("P6C_PARAMS")),
             "shocks": spec["shocks"],
@@ -542,6 +571,50 @@ def trace_summary(
     return out
 
 
+
+# Run cache: keeps the exact agent matrices used in recent runs, keyed
+# by a run_id that is the hash of (copula_ops, N, seed). Lets the 3D
+# views show the ACTUAL agents of a run, not a random copula sample.
+_RUN_CACHE = {}
+_RUN_CACHE_ORDER = []
+_RUN_CACHE_MAX = 5
+
+
+def _run_id_for(copula_ops, N, seed, shocks=None):
+    """Hash of everything that determines what agents the engine sees
+    AND what happens to them. Two runs with the same copula, N, and seed
+    but different shocks MUST produce different ids, because their
+    outcomes differ."""
+    import hashlib, json as _json
+    key = _json.dumps(
+        {
+            "ops": copula_ops or [],
+            "N": int(N),
+            "seed": int(seed),
+            "shocks": shocks or [],
+        },
+        sort_keys=True, default=str,
+    )
+    return hashlib.sha256(key.encode()).hexdigest()[:16]
+
+
+def _store_run(run_id, df):
+    if run_id in _RUN_CACHE:
+        try:
+            _RUN_CACHE_ORDER.remove(run_id)
+        except ValueError:
+            pass
+    _RUN_CACHE[run_id] = df
+    _RUN_CACHE_ORDER.append(run_id)
+    while len(_RUN_CACHE_ORDER) > _RUN_CACHE_MAX:
+        old = _RUN_CACHE_ORDER.pop(0)
+        _RUN_CACHE.pop(old, None)
+
+
+def _get_run_df(run_id):
+    return _RUN_CACHE.get(run_id)
+
+
 _POP_CACHE = {}
 
 def _get_baseline_copula():
@@ -658,50 +731,64 @@ def correlations(traits: str = Query("O,C,E,A,N,S_M,S_P,S_N,DASS_Dep,DASS_Anx,DA
 
 @app.get("/api/scatter3d")
 def scatter3d(
+    run_id: str = Query(...),
     x: str = Query("O"),
     y: str = Query("C"),
     z: str = Query("E"),
     color: str = Query("N"),
-    sample: int = Query(1500, ge=200, le=8000),
-    seed: int = Query(42),
+    max_points: int = Query(2500, ge=200, le=8000),
     highlight: int = Query(-1, ge=-1),
 ):
-    """Return 3-axis trait coordinates for a random sample of agents,
-    plus a color value for each point. Values are z-scored so the plot
-    is comparable across traits. Highlight is an agent index in the
-    full population (0..31999) or -1 for none."""
-    df = _get_baseline_copula()
+    """Return 3-axis trait coordinates for agents actually used in a run.
+    The agents are the exact rows of the modified copula that the engine
+    saw, in the run's own indexing (0..N-1)."""
+    df = _get_run_df(run_id)
+    if df is None:
+        raise HTTPException(404, "run_id expired or unknown; run a scenario to refresh")
     for name in (x, y, z, color):
         if name not in df.columns:
-            raise HTTPException(400, f"trait '{name}' not in copula")
-    rng = np.random.default_rng(int(seed))
-    idx = rng.choice(len(df), size=min(sample, len(df)), replace=False)
+            raise HTTPException(400, f"trait '{name}' not in run's copula")
+
+    N = len(df)
 
     def zscore(col):
         v = df[col].to_numpy().astype(np.float64)
         return (v - v.mean()) / max(v.std(ddof=1), 1e-9)
 
-    xs = zscore(x)[idx]
-    ys = zscore(y)[idx]
-    zs = zscore(z)[idx]
-    cs = zscore(color)[idx]
+    xs_all = zscore(x); ys_all = zscore(y); zs_all = zscore(z)
+    cs_all = zscore(color)
 
-    # normalize colors to [0, 1] for a blue → red colormap
+    # sample for display; force-include the highlight index
+    rng = np.random.default_rng(0)
+    if N > max_points:
+        idx = rng.choice(N, size=max_points, replace=False).astype(int)
+        if 0 <= highlight < N and highlight not in idx:
+            idx[0] = int(highlight)
+    else:
+        idx = np.arange(N, dtype=int)
+
+    cs = cs_all[idx]
     cmin, cmax = float(cs.min()), float(cs.max())
     csn = (cs - cmin) / max(cmax - cmin, 1e-9)
 
-    pts = list(zip(xs.tolist(), ys.tolist(), zs.tolist(), csn.tolist(), idx.tolist()))
+    pts = list(zip(
+        xs_all[idx].tolist(), ys_all[idx].tolist(), zs_all[idx].tolist(),
+        csn.tolist(), idx.tolist(),
+    ))
 
     highlight_point = None
-    if 0 <= highlight < len(df):
+    if 0 <= highlight < N:
         highlight_point = {
             "agent_i": int(highlight),
-            "x": float(zscore(x)[highlight]),
-            "y": float(zscore(y)[highlight]),
-            "z": float(zscore(z)[highlight]),
+            "x": float(xs_all[highlight]),
+            "y": float(ys_all[highlight]),
+            "z": float(zs_all[highlight]),
         }
 
     return {
+        "run_id": run_id,
+        "n_agents_total": int(N),
+        "n_agents_sampled": int(len(idx)),
         "axes": {"x": x, "y": y, "z": z, "color": color},
         "color_range": [cmin, cmax],
         "points": pts,
@@ -710,10 +797,20 @@ def scatter3d(
 
 
 @app.get("/api/agent-profile")
-def agent_profile(agent_i: int = Query(..., ge=0, lt=32000)):
-    """Return z-scored traits for a single agent across the 16 primary
-    trait axes. Used by the 3D radial profile chart."""
-    df = _get_baseline_copula()
+def agent_profile(
+    run_id: str = Query(...),
+    agent_i: int = Query(..., ge=0),
+):
+    """Return z-scored traits for a single agent as used in a specific
+    run. Z-scored against the run's own population, so a shifted
+    population reads correctly. agent_i is the run-local index (0..N-1)."""
+    df = _get_run_df(run_id)
+    if df is None:
+        raise HTTPException(404, "run_id expired or unknown; run a scenario to refresh")
+    N = len(df)
+    if not (0 <= agent_i < N):
+        raise HTTPException(400, f"agent_i must be in [0, {N}) for this run")
+
     traits = ["O", "C", "E", "A", "N",
               "S_M", "S_P", "S_N", "D",
               "DASS_Dep", "DASS_Anx", "DASS_Str", "general_distress",
@@ -723,12 +820,22 @@ def agent_profile(agent_i: int = Query(..., ge=0, lt=32000)):
               "D": "Dark", "DASS_Dep": "Dep", "DASS_Anx": "Anx",
               "DASS_Str": "Str", "general_distress": "Distr",
               "m_t": "Mood", "omega_social": "Soc", "theta_T": "Thr"}
+
     values = []
     for t in traits:
+        if t not in df.columns:
+            values.append({"trait": t, "label": labels.get(t, t), "z": 0.0})
+            continue
         v = df[t].to_numpy().astype(np.float64)
         z = (v[agent_i] - v.mean()) / max(v.std(ddof=1), 1e-9)
         values.append({"trait": t, "label": labels.get(t, t), "z": float(z)})
-    return {"agent_i": int(agent_i), "values": values}
+
+    return {
+        "run_id": run_id,
+        "agent_i": int(agent_i),
+        "n_agents": int(N),
+        "values": values,
+    }
 
 
 @app.get("/", response_class=HTMLResponse)
