@@ -20,7 +20,7 @@ DEFAULT_COPULA = Path.home() / "projects/xai_project/work_g2/synthetic_32k_p6d.p
 os.environ.setdefault("P6C_PARAMS", str(DEFAULT_COPULA))
 
 from fastapi import FastAPI, HTTPException, Query, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, Response
 
 from scenarios import SCENARIOS
 from xai_trace_scenarios import trace_in_scenario, shock_state_at_tick
@@ -383,6 +383,11 @@ def run_named(
     spec = SCENARIOS[name]
     try:
         result = _run_design([], spec["shocks"], N, T, [seed])
+        # If this scenario uses any shock, also run a matched baseline
+        # (same seed, same N, same T) so the user can see the delta.
+        baseline_result = None
+        if spec["shocks"]:
+            baseline_result = _run_design([], [], N, T, [seed])
     except Exception as e:
         raise HTTPException(500, f"run failed: {e}")
     benchmarks = _benchmarks_block(result["mean"])
@@ -394,6 +399,12 @@ def run_named(
         "platform": result["mean"],
         "benchmarks": benchmarks,
         "n_pass": sum(b["pass"] for b in benchmarks),
+        "timeseries_full": result.get("timeseries_full"),
+        "timeseries_shock": result.get("timeseries_shock"),
+        "subgroups": result.get("subgroups"),
+        "baseline_platform": baseline_result["mean"] if baseline_result else None,
+        "shock_tick_ranges": [{"tick": int(s["tick"]), "duration": int(s["duration"])}
+                              for s in spec["shocks"]],
         "audit": {
             "copula": str(os.environ.get("P6C_PARAMS")),
             "shocks": spec["shocks"],
@@ -453,6 +464,197 @@ def trace(
         "shock_state": shock_state_at_tick(tr, tick),
         "fields": {k: float(row[idx[k]]) for k in tr["keys"]},
     }
+
+@app.post("/api/download/{kind}")
+async def download(kind: str, request: Request):
+    """Echo the POST body back with Content-Disposition. Safari and
+    embedded webviews refuse blob: downloads from localhost; a real
+    HTTP response always works."""
+    body = await request.body()
+    if kind == "json":
+        return Response(
+            content=body, media_type="application/json",
+            headers={"Content-Disposition": 'attachment; filename="xai32k-result.json"'},
+        )
+    if kind == "csv":
+        return Response(
+            content=body, media_type="text/csv",
+            headers={"Content-Disposition": 'attachment; filename="xai32k-result.csv"'},
+        )
+    raise HTTPException(400, "kind must be 'json' or 'csv'")
+
+
+@app.get("/api/trace-summary")
+def trace_summary(
+    scenario: str = Query(...),
+    agent_i: int = Query(-1),
+    N: int = Query(8000, ge=100, le=32000),
+    T: int = Query(250, ge=50, le=500),
+    seed: int = Query(42),
+):
+    """Return per-agent and population-level interaction counts for a
+    scenario. Interaction is rare in this engine (~6% baseline, lower
+    under stress); this endpoint lets the UI show the base rate and
+    offer to jump to a tick where an interaction actually happened."""
+    if scenario not in SCENARIOS:
+        raise HTTPException(404, f"scenario '{scenario}' not found")
+    spec = SCENARIOS[scenario]
+    shocks = spec["shocks"]
+    import importlib.util, json as _json, time as _time
+    p6c_path = WORK / "p6c_v5.py"
+    s = importlib.util.spec_from_file_location("p6c_summary", p6c_path)
+    p6c = importlib.util.module_from_spec(s)
+    sys.modules["p6c_summary"] = p6c
+    s.loader.exec_module(p6c)
+    import jax.numpy as jnp
+    theta = jnp.array([_json.load(open(WORK / "p6c_results.json"))["calib"][k]
+                       for k in p6c.CALIB_NAMES], jnp.float32)
+    _, SIM = p6c.build_simulator(N, T, shocks=shocks, return_diag=True)
+    m, cap, wealth = SIM(theta, seed_val=int(seed))
+    cap = np.asarray(cap)
+    # col 2 = interacted and is responder; col 3 = interacted and is proposer
+    inter = (cap[:, :, 2] > 0) | (cap[:, :, 3] > 0)     # (T, N)
+    n_inter = inter.sum(axis=0)                           # (N,)
+    order = np.argsort(n_inter)[::-1][:10]
+    top_agents = [{"agent_i": int(i), "n_interactions": int(n_inter[i])}
+                  for i in order]
+    out = {
+        "scenario": scenario,
+        "N": int(N), "T": int(T), "seed": int(seed),
+        "population": {
+            "mean":   float(n_inter.mean()),
+            "median": float(np.median(n_inter)),
+            "p95":    float(np.percentile(n_inter, 95)),
+            "max":    int(n_inter.max()),
+            "min":    int(n_inter.min()),
+            "n_agents_with_zero": int((n_inter == 0).sum()),
+            "top_agents": top_agents,
+        },
+    }
+    if 0 <= agent_i < int(N):
+        ticks = np.where(inter[:, agent_i])[0].tolist()
+        out["agent"] = {
+            "agent_i": int(agent_i),
+            "n_interactions": int(n_inter[agent_i]),
+            "interaction_rate": float(n_inter[agent_i] / max(1, int(T))),
+            "interaction_ticks": [int(t) for t in ticks],
+        }
+    return out
+
+
+_POP_CACHE = {}
+
+def _get_baseline_copula():
+    """Cache the baseline copula so the crowd tab is instant.
+    Uses P6C_PARAMS when set (which is how the .app bundle passes the
+    copula path). Falls back to DEFAULT_COPULA only for the dev box."""
+    if "df" not in _POP_CACHE:
+        import pandas as pd
+        path = os.environ.get("P6C_PARAMS", str(DEFAULT_COPULA))
+        df = pd.read_pickle(path)
+        _POP_CACHE["df"] = df
+    return _POP_CACHE["df"]
+
+
+@app.get("/api/population")
+def population(
+    trait: str = Query(...),
+    n_bins: int = Query(30, ge=10, le=80),
+    sort_by: str = Query("id"),
+    sort_dir: str = Query("asc"),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(50, ge=10, le=200),
+    filter_trait: str = Query(""),
+    filter_op: str = Query(">="),
+    filter_value: float = Query(0.0),
+    filter_active: bool = Query(False),
+):
+    """Return a slice of the baseline copula plus a histogram of the
+    selected trait. Sorting and filtering are done on the whole
+    population; pagination is applied at the end."""
+    df = _get_baseline_copula()
+    if trait not in df.columns:
+        raise HTTPException(400, f"trait '{trait}' not in copula")
+
+    # histogram
+    col = df[trait].to_numpy().astype(float)
+    counts, edges = np.histogram(col, bins=int(n_bins))
+    histogram = {
+        "bins": [float(e) for e in edges],
+        "counts": [int(c) for c in counts],
+        "mean": float(col.mean()),
+        "median": float(np.median(col)),
+        "sd": float(col.std(ddof=1)),
+        "min": float(col.min()),
+        "max": float(col.max()),
+        "p25": float(np.percentile(col, 25)),
+        "p75": float(np.percentile(col, 75)),
+    }
+
+    # filter
+    mask = np.ones(len(df), dtype=bool)
+    filter_count = int(len(df))
+    if filter_active and filter_trait and filter_trait in df.columns:
+        fc = df[filter_trait].to_numpy().astype(float)
+        op = filter_op
+        if op == ">=":   mask = fc >= filter_value
+        elif op == ">":  mask = fc >  filter_value
+        elif op == "<=": mask = fc <= filter_value
+        elif op == "<":  mask = fc <  filter_value
+        else:            mask = np.ones(len(df), dtype=bool)
+        filter_count = int(mask.sum())
+
+    sub = df.loc[mask].copy()
+    sub.insert(0, "id", sub.index)
+
+    # sort
+    if sort_by == "id":
+        sub = sub.sort_values("id", ascending=(sort_dir == "asc"))
+    elif sort_by in sub.columns:
+        sub = sub.sort_values(sort_by, ascending=(sort_dir == "asc"))
+    else:
+        sub = sub.sort_values("id")
+
+    # paginate
+    total = int(len(sub))
+    start = (page - 1) * page_size
+    end = start + page_size
+    page_rows = sub.iloc[start:end]
+
+    # return rows as list of dicts, only the columns we care about plus all
+    keep_cols = ["id"] + [c for c in sub.columns if c != "id"]
+    rows = page_rows[keep_cols].to_dict(orient="records")
+
+    return {
+        "trait": trait,
+        "histogram": histogram,
+        "filter": {
+            "active": bool(filter_active and filter_trait),
+            "trait": filter_trait, "op": filter_op, "value": float(filter_value),
+            "count": filter_count,
+        },
+        "total": total,
+        "page": int(page),
+        "page_size": int(page_size),
+        "n_pages": max(1, (total + page_size - 1) // page_size),
+        "columns": keep_cols,
+        "rows": rows,
+    }
+
+
+@app.get("/api/correlations")
+def correlations(traits: str = Query("O,C,E,A,N,S_M,S_P,S_N,DASS_Dep,DASS_Anx,DASS_Str,general_distress,m_t,omega_social,theta_T,u_U")):
+    """Pearson correlation matrix for the listed copula columns."""
+    df = _get_baseline_copula()
+    names = [t for t in traits.split(",") if t in df.columns]
+    if len(names) < 2:
+        raise HTTPException(400, "need at least two valid trait names")
+    sub = df[names].to_numpy().astype(float)
+    # correlation matrix with NaN-safe handling
+    m = np.corrcoef(sub, rowvar=False)
+    m = np.nan_to_num(m, nan=0.0)
+    return {"traits": names, "matrix": m.tolist()}
+
 
 @app.get("/", response_class=HTMLResponse)
 def index():

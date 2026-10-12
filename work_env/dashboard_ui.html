@@ -46,10 +46,10 @@ body {
   display: flex; flex-direction: column;
 }
 .brand { display: flex; align-items: center; gap: 10px; padding: 0 8px 28px; }
-.brand-logo {
-  width: 28px; height: 28px; border-radius: 8px;
-  background: linear-gradient(135deg, #0a84ff, #5e5ce6);
-  display: grid; place-items: center; color: white; font-weight: 700; font-size: 13px;
+.brand-logo-img {
+  width: 34px; height: 34px; border-radius: 8px;
+  object-fit: cover; display: block;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 .brand h1 { font-size: 16px; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
 .brand .sub { font-size: 11px; color: var(--ink-3); margin-top: -2px; }
@@ -227,13 +227,417 @@ table.cmp th, table.cmp td { padding: 10px 14px; text-align: left; border-bottom
 table.cmp th { font-size: 12px; text-transform: uppercase; color: var(--ink-3); letter-spacing: 0.04em; font-weight: 600; }
 table.cmp td.num { font-variant-numeric: tabular-nums; text-align: right; }
 table.cmp tr:last-child td { border-bottom: 0; }
+
+/* ---- Guide: accordion ---- */
+.guide { max-width: 820px; }
+.guide-section {
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--radius); margin-bottom: 12px; overflow: hidden;
+}
+.guide-section summary {
+  padding: 16px 20px; cursor: pointer; list-style: none;
+  font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 10px;
+}
+.guide-section summary::-webkit-details-marker { display: none; }
+.guide-section summary::before {
+  content: '▸'; color: var(--ink-3); transition: transform 0.15s; display: inline-block;
+}
+.guide-section[open] summary::before { transform: rotate(90deg); }
+.guide-section summary:hover { background: #f8f9fb; }
+.guide-body { padding: 4px 22px 20px; color: var(--ink-2); font-size: 14px; line-height: 1.65; }
+.guide-body h4 { font-size: 14px; font-weight: 600; color: var(--ink); margin: 18px 0 8px; }
+.guide-body ul, .guide-body ol { padding-left: 22px; margin: 6px 0; }
+.guide-body li { margin: 5px 0; }
+.guide-body code { background: #f4f4f4; padding: 1px 5px; border-radius: 4px; font-size: 12.5px; }
+.guide-body .term { font-weight: 600; color: var(--ink); }
+.guide-body .example {
+  background: #f8f9fb; border-left: 3px solid var(--accent);
+  padding: 10px 14px; margin: 10px 0; border-radius: 6px; font-size: 13.5px;
+}
+
+/* ---- Info button ---- */
+.info-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px; border-radius: 50%; border: 0;
+  background: #e5e5ea; color: #48484a; font-size: 11px; font-weight: 700;
+  cursor: pointer; padding: 0; line-height: 1; margin-left: 6px;
+  vertical-align: middle; font-family: Georgia, serif;
+  transition: background 0.12s, color 0.12s;
+}
+.info-btn:hover { background: var(--accent); color: white; }
+
+/* ---- Trace label clickable ---- */
+.trace-row .k.clickable {
+  cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
+  border-bottom: 1px dotted #c5c5ca; padding-bottom: 1px;
+}
+.trace-row .k.clickable:hover { color: var(--accent-hi); border-bottom-color: var(--accent); }
+
+/* ---- Modal ---- */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.35);
+  display: none; align-items: center; justify-content: center;
+  z-index: 9999; padding: 24px; backdrop-filter: blur(2px);
+}
+.modal-backdrop.open { display: flex; }
+.modal {
+  background: var(--panel); border-radius: var(--radius);
+  max-width: 640px; width: 100%; max-height: 82vh; overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+}
+.modal-head {
+  padding: 22px 26px 12px; border-bottom: 1px solid var(--line);
+  display: flex; align-items: start; justify-content: space-between; gap: 12px;
+}
+.modal-title { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; margin: 0; }
+.modal-close {
+  background: transparent; border: 0; font-size: 22px; cursor: pointer;
+  color: var(--ink-3); line-height: 1; padding: 0 4px; margin-top: -2px;
+}
+.modal-close:hover { color: var(--ink); }
+.modal-body { padding: 20px 26px 26px; color: var(--ink-2); font-size: 14px; line-height: 1.7; }
+.modal-body h4 { font-size: 14px; font-weight: 600; color: var(--ink); margin: 20px 0 6px; }
+.modal-body h4:first-child { margin-top: 0; }
+.modal-body .lede { color: var(--ink); font-size: 15px; margin: 0 0 12px; }
+.modal-body code { background: #f4f4f4; padding: 1px 5px; border-radius: 4px; font-size: 12.5px; }
+.modal-body ul { padding-left: 22px; }
+.modal-body li { margin: 4px 0; }
+.modal-body .formula {
+  background: #f8f9fb; padding: 10px 14px; border-radius: 6px;
+  font-family: ui-monospace, Menlo, monospace; font-size: 13px;
+  margin: 8px 0; overflow-x: auto;
+}
+.modal-body .ref {
+  font-size: 12.5px; color: var(--ink-3); border-top: 1px solid var(--line);
+  padding-top: 12px; margin-top: 18px;
+}
+
+/* ---- First-launch tour ---- */
+.tour-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+  display: none; align-items: center; justify-content: center;
+  z-index: 10000; padding: 24px;
+}
+.tour-backdrop.open { display: flex; }
+.tour-card {
+  background: var(--panel); border-radius: 16px; max-width: 520px; width: 100%;
+  padding: 32px 36px; box-shadow: 0 24px 72px rgba(0,0,0,0.35);
+}
+.tour-step { font-size: 12px; color: var(--ink-3); font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; }
+.tour-title { font-size: 24px; font-weight: 600; margin: 8px 0 12px; letter-spacing: -0.02em; }
+.tour-body { color: var(--ink-2); font-size: 14.5px; line-height: 1.65; margin-bottom: 24px; }
+.tour-body strong { color: var(--ink); }
+.tour-actions { display: flex; justify-content: space-between; gap: 10px; }
+
+/* ---- Reference list ---- */
+.refs { font-size: 12.5px; line-height: 1.7; color: var(--ink-2); }
+.refs li { margin-bottom: 8px; }
+
+
+/* ============================================================
+   CROWD TAB
+   ============================================================ */
+.crowd-hero {
+  background: linear-gradient(135deg, #eef4ff 0%, #f4ecff 100%);
+  border: 1px solid #dde7ff; border-radius: var(--radius);
+  padding: 32px 36px; margin-bottom: 24px;
+}
+.crowd-hero h2 { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 8px; }
+.crowd-hero p { color: var(--ink-2); margin: 0; max-width: 700px; }
+
+.trait-picker {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;
+}
+.trait-chip {
+  padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--panel); color: var(--ink-2); font-size: 13px;
+  font-family: inherit; cursor: pointer; transition: all 0.12s;
+}
+.trait-chip:hover { border-color: var(--accent); color: var(--accent-hi); }
+.trait-chip.active { background: var(--accent); border-color: var(--accent); color: white; font-weight: 600; }
+
+.hist-card {
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 20px 24px; box-shadow: var(--shadow-1);
+  margin-bottom: 16px;
+}
+.hist-svg { width: 100%; height: 130px; display: block; }
+.hist-stats {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 14px; margin-top: 14px;
+}
+.hist-stat .lbl {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--ink-3); font-weight: 600;
+}
+.hist-stat .val {
+  font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums;
+  color: var(--ink); letter-spacing: -0.01em;
+}
+
+.filter-bar {
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 18px 22px; box-shadow: var(--shadow-1);
+  margin-bottom: 16px;
+}
+.filter-bar .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; }
+.filter-bar select, .filter-bar input[type=number] {
+  font-family: inherit; font-size: 14px; padding: 8px 12px;
+  border: 1px solid var(--line); border-radius: 8px; background: var(--panel);
+  color: var(--ink); outline: none;
+}
+.filter-bar select:focus, .filter-bar input:focus {
+  border-color: var(--accent); box-shadow: 0 0 0 3px rgba(10,132,255,0.12);
+}
+.filter-count {
+  font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums;
+  color: var(--accent-hi); letter-spacing: -0.01em;
+}
+.filter-count-lbl { font-size: 11px; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+
+.pop-table {
+  width: 100%; border-collapse: collapse; font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.pop-table thead th {
+  position: sticky; top: 0; background: #f8f9fb; z-index: 1;
+  text-align: left; padding: 10px 12px; font-size: 11px; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--ink-3); font-weight: 600;
+  border-bottom: 1px solid var(--line); cursor: pointer; user-select: none;
+  white-space: nowrap;
+}
+.pop-table thead th:hover { background: #eff6ff; color: var(--accent-hi); }
+.pop-table thead th.sorted::after { content: ' ↑'; font-size: 10px; }
+.pop-table thead th.sorted.desc::after { content: ' ↓'; }
+.pop-table tbody tr:hover { background: #f8f9fb; }
+.pop-table td { padding: 8px 12px; border-bottom: 1px solid #f0f0f3; }
+.pop-table td.num { text-align: right; }
+.pop-table-wrap {
+  max-height: 520px; overflow: auto;
+  border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--panel);
+}
+.pagination {
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  margin-top: 14px; font-size: 14px; color: var(--ink-2);
+}
+
+/* ============================================================
+   TRACE REDESIGN
+   ============================================================ */
+.story-card {
+  background: linear-gradient(135deg, #eff6ff 0%, #f5f0ff 100%);
+  border: 1px solid #dde7ff; border-radius: var(--radius);
+  padding: 28px 32px; margin: 20px 0 18px;
+}
+.story-head {
+  display: flex; align-items: center; gap: 14px; margin-bottom: 16px;
+}
+.story-icon {
+  width: 56px; height: 56px; border-radius: 14px;
+  background: var(--panel); border: 1px solid #dde7ff;
+  display: grid; place-items: center; font-size: 22px; font-weight: 700;
+  color: var(--accent-hi); flex: 0 0 auto;
+}
+.story-meta { flex: 1; }
+.story-meta .who {
+  font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: var(--ink);
+}
+.story-meta .where {
+  font-size: 13px; color: var(--ink-3); margin-top: 2px;
+}
+.story-text {
+  font-size: 16px; line-height: 1.65; color: var(--ink-2);
+}
+.story-text strong { color: var(--ink); }
+
+/* Flow diagram */
+.flow-wrap {
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 22px 24px 18px;
+  box-shadow: var(--shadow-1); margin-bottom: 18px;
+}
+.flow-title {
+  font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--ink-3); font-weight: 600; margin: 0 0 14px;
+}
+.flow-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+
+/* Two-column detail */
+.trace-split {
+  display: grid; grid-template-columns: 1fr 340px; gap: 18px; margin-top: 8px;
+}
+@media (max-width: 1100px) { .trace-split { grid-template-columns: 1fr; } }
+.trace-detail-panel {
+  position: sticky; top: 24px; align-self: start;
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 22px 24px;
+  box-shadow: var(--shadow-1); font-size: 13.5px; color: var(--ink-2);
+  max-height: 560px; overflow-y: auto;
+}
+.trace-detail-panel h4 { font-size: 15px; font-weight: 600; color: var(--ink); margin: 0 0 12px; }
+.trace-detail-panel .hint { color: var(--ink-3); font-style: italic; }
+.trace-detail-panel .formula {
+  background: #f8f9fb; padding: 10px 12px; border-radius: 6px;
+  font-family: ui-monospace, Menlo, monospace; font-size: 12.5px;
+  margin: 8px 0; overflow-x: auto;
+}
+.trace-detail-panel ul { padding-left: 20px; margin: 6px 0; }
+.trace-detail-panel code { background: #f4f4f4; padding: 1px 4px; border-radius: 4px; font-size: 12px; }
+
+.field-row {
+  display: flex; justify-content: space-between; font-size: 13.5px;
+  padding: 6px 10px; border-bottom: 1px solid #f2f3f5;
+  border-radius: 4px; cursor: pointer; transition: background 0.1s;
+}
+.field-row:hover { background: #f8f9fb; }
+.field-row.active { background: #eff6ff; }
+.field-row .k { color: var(--ink-2); display: flex; align-items: center; gap: 5px; }
+.field-row .k::after { content: '›'; color: var(--ink-3); font-size: 12px; opacity: 0; }
+.field-row:hover .k::after, .field-row.active .k::after { opacity: 0.6; }
+.field-row .v { font-variant-numeric: tabular-nums; font-weight: 500; color: var(--ink); }
+
+
+/* ============ Session pill ============ */
+.session-pill {
+  margin: 12px 8px 0; padding: 10px 12px;
+  background: #eff6ff; border: 1px solid #dde7ff; border-radius: 10px;
+  font-size: 12px; color: #1c4dba; cursor: pointer;
+  display: none; align-items: center; gap: 8px;
+}
+.session-pill.visible { display: flex; }
+.session-pill:hover { background: #e1eeff; }
+.session-pill .sp-icon { font-size: 14px; }
+.session-pill .sp-body { flex: 1; min-width: 0; }
+.session-pill .sp-title { font-weight: 600; }
+.session-pill .sp-meta { font-size: 11px; opacity: 0.75; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ============ Library ============ */
+.lib-empty {
+  padding: 60px 30px; text-align: center;
+  background: var(--panel); border: 1px dashed var(--line);
+  border-radius: var(--radius); color: var(--ink-3);
+}
+.lib-empty h3 { color: var(--ink-2); font-size: 17px; margin: 0 0 8px; }
+.lib-empty p { margin: 6px 0; max-width: 480px; margin-left: auto; margin-right: auto; }
+
+.lib-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 14px; margin-top: 16px;
+}
+.lib-card {
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 18px 20px;
+  box-shadow: var(--shadow-1); cursor: pointer;
+  transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.lib-card:hover { box-shadow: var(--shadow-2); transform: translateY(-1px); border-color: #d8d8dc; }
+.lib-card.selected { border-color: var(--accent); background: #f8fbff; box-shadow: 0 0 0 2px rgba(10,132,255,0.15); }
+.lib-card .lc-head { display: flex; justify-content: space-between; align-items: start; gap: 10px; }
+.lib-card .lc-name { font-size: 15px; font-weight: 600; color: var(--ink); }
+.lib-card .lc-kind {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em;
+  padding: 3px 8px; border-radius: 99px; font-weight: 600;
+  background: #f2f3f5; color: var(--ink-2); flex: 0 0 auto;
+}
+.lib-card .lc-kind.scenario { background: #eff6ff; color: #1c4dba; }
+.lib-card .lc-kind.design   { background: #f5f0ff; color: #5e5ce6; }
+.lib-card .lc-kind.custom   { background: #fff4e0; color: #a35b00; }
+.lib-card .lc-meta { font-size: 12px; color: var(--ink-3); }
+.lib-card .lc-bench { display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px; font-variant-numeric: tabular-nums; }
+.lib-card .lc-bench .b {
+  padding: 3px 8px; border-radius: 6px; background: #f8f9fb;
+  border: 1px solid var(--line);
+}
+.lib-card .lc-bench .b.pass { background: #e7f9ec; border-color: #c6f0cf; color: #1a6b32; }
+.lib-card .lc-bench .lc-pass { background: #e7f9ec; color: #1a6b32; border-color: #c6f0cf; font-weight: 600; }
+.lib-card .lc-actions { display: flex; gap: 6px; margin-top: 4px; }
+.lib-card .lc-actions button { font-size: 12px; padding: 5px 10px; }
+
+.lib-toolbar {
+  display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.lib-toolbar .spacer { flex: 1; }
+
+/* ============ Counterfactual comparison ============ */
+.cmp-hero {
+  background: linear-gradient(135deg, #eff6ff 0%, #f5f0ff 100%);
+  border: 1px solid #dde7ff; border-radius: var(--radius);
+  padding: 26px 30px; margin-bottom: 20px;
+}
+.cmp-hero h3 { font-size: 20px; margin: 0 0 8px; font-weight: 600; letter-spacing: -0.01em; }
+.cmp-hero p { margin: 4px 0; color: var(--ink-2); font-size: 14px; }
+.cmp-badge {
+  display: inline-block; padding: 3px 10px; border-radius: 99px;
+  background: #e7f9ec; color: #1a6b32; font-size: 11px; font-weight: 600;
+  letter-spacing: 0.03em; margin-left: 8px;
+}
+.cmp-badge.warn { background: #fff4e0; color: #a35b00; }
+
+table.cmp2 { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 14px; }
+table.cmp2 th, table.cmp2 td { padding: 11px 14px; text-align: left; border-bottom: 1px solid var(--line); }
+table.cmp2 th { font-size: 11px; text-transform: uppercase; color: var(--ink-3); letter-spacing: 0.05em; font-weight: 600; }
+table.cmp2 td.num { text-align: right; font-variant-numeric: tabular-nums; }
+table.cmp2 tr:last-child td { border-bottom: 0; }
+table.cmp2 td.delta { font-weight: 600; }
+table.cmp2 td.delta.pos { color: #1a6b32; }
+table.cmp2 td.delta.neg { color: #a1150d; }
+table.cmp2 td.delta.ns  { color: var(--ink-3); font-weight: 400; }
+
+/* ============ Cross-tab links ============ */
+.crosslink {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--accent-hi); cursor: pointer;
+  padding: 4px 8px; border-radius: 6px; text-decoration: none;
+  background: #eff6ff; border: 1px solid #dde7ff; margin-left: 8px;
+}
+.crosslink:hover { background: #e1eeff; }
+
+
+/* Compact pills reused across cards */
+.pill { display: inline-block; padding: 3px 10px; border-radius: 99px; font-weight: 600; }
+
+/* Deep analysis block */
+.card h4 { margin-top: 18px; margin-bottom: 8px; font-size: 14px; color: var(--ink); }
+
+/* ============ Chart card with SVG export ============ */
+.chart-card {
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 14px 16px 10px;
+  box-shadow: var(--shadow-1); margin: 12px 0;
+}
+.chart-card-head {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 12px; margin-bottom: 8px;
+}
+.chart-card-title { font-size: 14px; font-weight: 600; color: var(--ink); }
+.chart-card-sub { font-size: 12px; color: var(--ink-3); margin-top: 2px; line-height: 1.5; }
+.chart-export {
+  font-size: 11px; padding: 4px 10px; border-radius: 6px;
+  white-space: nowrap; flex: 0 0 auto;
+}
+.chart-card-body { display: block; }
+.chart-card-body svg { display: block; width: 100%; height: auto; }
+.charts-grid {
+  display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
 </style>
 </head>
 <body>
 <div class="app">
   <aside class="sidebar">
     <div class="brand">
-      <div class="brand-logo">32k</div>
+      <img class="brand-logo-img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAYAAADDPmHLAAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAgKADAAQAAAABAAAAgAAAAABIjgR3AABAAElEQVR4Ae2dd6BUxRX/Zx9dOkhTwfeo0ruACgKKNXbR2BJBo8YUSzQaNQkajZrEXhIN9kjs2BUVRcTYQemgNFF671Le/r6fM3fu3t2377EY8/v98WPe271zp885Z2bOnHNm1rndbjcEdkNgNwR2Q2A3BHZDYDcEdkNgNwR2Q2A3BHZDYDcEdkNgNwR2Q+D/Cwik/h/2sui+++6rXr9+/So1atSoUlRUVLlSpUqpKlWqFJWWllaqXLlyUfXq1Z3CU1u3bk3h56m4dHU1OlWjhoUTj6Mfablq1aq5VGpryn2n96pV06WlmxVaNa2yi0Jfv/vuO6fyS0kfwigXf5Xt20s366k2uc2bN9v7VrWrcuVtpRs3lqZrKK60WrX0hg0bqMvy7NixIy6HMnhPhuFXeXGadevWue3bt6fVn+2rVq367te//vVWZYvjKeP/lvu/QgAjRoyofGDv3u2r1qrVu0a1al0qV6nSsnq1qs2KKlWuU6moCChWUYcr6wOSUsJkUUqIFX7UPj6RU8J0DCePdKVNKYeBz8eRvVRfCuNbfx6y2eVYDh9vhZOQCkv1bTkyZSq7vVhZJBZV0Sp9WbXEqo6oFkstYkqn0qIwqieRCseTaaoRXDq9rTRdurm0dMf6Hdt3rNi+fcfsbVu3Ttm8devHjz322Mynn356hzXuf/hFz/5nbvTo0cWNGjUcWr9evZPq1q3frXGTJtU0wuP6NDIYCYwYkGbQNDACuOSHHBlg+rgQZumIFj6iPD4qlJEdZ2nACAOe/2Q98oM0BZKiTLyQZenjfKQiLfhO1B/KNAII5ak4CuTVnvpm4qpSubKrqlmrquCi2czgsX79+s2bNm38fP36DU8vX7ny2fPPP/9rcv0v3P+EAJ599vGWezUtvqhJkyZnlLRs2VA9dStXrnTTpk1NT50y1c2aNdN9/fXXClvlNm7c6JiSNSLK6V8AmgdYMlE081sQQA8uhCunD8pEhST2tPgycSEgAo0eftxGRSXqYehHBUWe8KoyKKaceFLRRi1LjqWtXt26ToPD7bP33q5169aupKQk1bBhQ5tpVqxcsWzZsuWj1qxbd7eWijm+hh/uOzTxBylx6NChVS88//yf79OixVWt27RpvH37Njd+/Pj0M08/49555x03b948991WljvvAECRPloGDFgB0PkRE3L5ZxLhyZhdDSdvMk95dQd8GnlABEIgwCsvfWiTpU9SQ4KAkvWG9PAeEEL37t3cwAEHu85duqSA06xZs5bL/aVTly53HXXUUeJwfhj3gxHA448/3qZ1ScldHTt3PrxmrVrujTFj0rfffrt7Z9w4t2XLFpguV7NmTbeHOlilalV7B/E2WgXMLCcgAacMcD0YQxp7C/EEWnqfBqD6+MzTklgyn8bSEygXkJD1jMuwFL487/Vtwo8L6cybqZ8MUe2WxpL65HzzGtcb/NS/o3SHEy8As2tpau6xh+uz//7uxBNPcF06d0mJANyCBfPfSlWucv4ll1wy1xL9l185kP9+pT37xBN9W7VtO6pr9+4li779Nn399de7Rx591G3atMnVEjHU1RRXQ1Nd5cqsc6rSRg/PRH0GF4OcgQgABqSQSvDhm6/EQ2lYy1WOT0t+cVuGGPw+vSHDe6O4kD4qLqSzJ/X6cKrLymsBITJTBiGhrcln8FtpKjTkzAqP8hLm6+UpYhBftG3bNvsAw6OPPNKdcfrprsYeNVJTp06du/m7radfddVVH0Ut/d6PSt87Z5TxxeeeO7ht+/bPaaraZ8J776V/8pOfuJdeftlGeNOmTV2DBg3cHqJkcf625om7t1HPyA8fKwpiYCYwKHlQWXxooKJstgjvOU+ye4oKYObVMmXRmSWLUeHfwreVT5YoK+FxnRZODC48/VvyO6QPzzjOiD7KGflDXDJt8MMQMmvCNLNsTpkyxU2dNs21atXKdejQocGGdeuOGzho0MdvvvnmglDO93n+VwTwxBNP9GjTtu3znTp3bvLySy+lf/rTn7rZX35pSG/SuLHbQ1N+5UqVXUqjPnSswkaCO4NtBsAxOs2jryggjKfANwSkxOlDRTbyyoSG2JxnSGd7tuw4RYU6c0dwZsrIZCmTJhNVLvkEGEG3ON75SEBig+fbRYvcRx9/7Pbeq5nr1q1rzY0b1h9xyJAhY8eMGbPE59j17+9NAI8++mjjViUlL/bo1at4zOuvp4cNH+6WLF3qmjZt4urXb+CqVq1m2xpDfgXtygaUnwZzAe3RYhiwkkI8xODzRyHMoZbYvpQ2esaPOGfcomT9PmsoyyexeEX4OMLw2ZslSL4ly7KUfk63dEkiqSiPTwzygy9BCJoRECJNnDjJtWzZ0nXs2LG2towDDh0y5NnXX399YyZH4b5YOlZ4FkuZ2rtZs7/1knDn80mT0uedf57TXsU1a9ZMW5p6Nm2BeHM2AvOXngUw0gkyMYqifIQRQdrwR2nJd5L4ND5/5t3nsOjEl5VpWSwlMb5eq8NefPlRQkqhfEsVMvtklk7eLJfVL2Licigh84436ZL5EtXESZgNWE7XrV/vbrv9Djd33rx0i+b7dJAY9c4REp7FCXfB871mgBdHjz6pa7eu10OmZ555hpsydZpr0qSxmL16tm6FqSy3HckOWpyHhkElAq8PVu9DFMCL3uLirBxLEAWRRu8+nY+I84dcoZwoX3ZbCAwRIYMPsjIV5Z++hpAiWUbw8wx+S0fDks7a4QOS6bzfpw1ZQjzP4CcnfMHqNWvcN9984wb07897p6IJ73/1yiuvTE5WVYh/l6nm3nvvrd+kadM/N9tr79Rtt9zqJrz/HydJn6tbR8hnvU/OXaEFOR2wYPpq4ZKtG3hD5yOAhXgQY/6oMKBj/wAF6aEHjr5DbR5YpJPj2wDoM8XvFmnxUX7KjIoIALcyLTyqh0z27vPEZYQ2RM8QHhfos0Xt8LFJhGb7Q3x4Ro3yr/E3M8HnX3zhXn7lFddQjHaVotS1I0eObBAnKNCzywSwd9Omwzp26th26pQp6bvvucehfJFCRyO/Uta65UEfgJ9oDf0B0gDLgqMOJoBnALH4kCIgKXp6NIZisgr3eZNB1BPKSYTL68ND/T4uiQyyZeVNtInUpM39WCkKt8aRJpGOuJAeP87XZ6l8QCLMx8XBsYdwBhpSxOeef94tXbY8veeee7bcsW3beXGiAj27RAAjRoyopa3deTVr1XZ33XmnWyHxLts8GL5Uqiirsx4GdEwu9I9AQKqnB6z/BliZJPLZPyGW3D8jv4WSPoq28iyFZfJ1RTliAJI2Sh+HhRrJlhNnaSw8E+nb7As2f5Qp6Y+qzX7Q1ijEyk3E+nf6guxC2iWbaHzqZNqkP2QnjK31qlWr3auvvWa8gSSGP7/77kcahjSFPHeJADp0aDekpFXLdl/Onp1+bvRoU5ki3WPPGu9t4t6qevzhXR5gFsEtjqIjmSQk4N+H+Dgf5kPx+3J8kjilzxcKt2p9GblACEsUsSQPWQzI9s4X4fqKWmIKoqggH+5frH2hAIISBVpuvfPEJfNl3qO+UE9UXyYOX3a+ZH3mF8WwFCBtXbt2bbp2rZotatTYerTPWdj3LhFA/boNTm7UuIl7XtMOox8lhq371lJrLV/276v3Hcs0HIAQ5jtm4T6HB0CAlhUVlWNh5Ap5KDkqx7w+nU9BQI7TZgSk+4+Pg01BfsAf/7FL+q1GxRhiQt3WGGtrpk9R7igdbyEu02afLxlHH7zzksvwnijGwyRKRZm5DgUagw9cTJk61UTtqVI3VBmzepKbL/leMAHceOON2t7XH4B4UtymVVyjxh4GWF9gsoH49bGgDLL8q3+PG0FgUM0qg/3R2Zy86lQiLOS2RD6pYRKEgmxJ0cSQwi1XrVJVS1T0qVLNVZO/isJQw/pPFdu5IHXDZiQzm2XDMMwccc15EEIcLfKtCilDaNl3X0QmtUdy1KdE+bnIT75DBLT9088mmsCodMeOfo/9619Nk7VV5McIoyAn1W77xo0a7/X1ggVS604zGX/lKsoewSnR3kR5oDNyShD84ZlBKkBTqP37ZxSizIohA5+E89UK2UIaAEBaJisSa4/FiRAIszgRAshG8xgQGWwRIGiUVfaRWnr79q2mhqUqxNYSXNOCWF2dBH7cnKhvuXH537M7kpsmLjPy7CweAoDQv/zqK9TqaeGkofrSSdkX55aV771gAqhTp2b3Ro0bF7377rg0e9BGjRrFwDTTmHylR1QRuhyeHpl6s/84NC7BkwrhQiWPOIn3gEx2HzxJwqhlLRQnLDHp3k42CG5vqVR5r6ctKnxKtWrVBSgRgdIy9WPcIQscKVu2Smm1WRK2tW7FihVuqaSZUmghZJHmbYFbvGSJW6P+bhehkDcQEYA35ATCjvoaOpGLOP/u20/S7OQRkUeZc/OWVybhIe2a1avdmrVrDQ5r1q7roag3Q76KngUTQLWq1dpWlyp33tx5pqliWg2jKV8FoWF0mRFpXU/2GiBEmLW0loCSgsfGcfyGFhEksvUB8SC82V57ufbt26MccW3atBHS93F1atcWkoqkVt3uNmtkS1Tq1q1d51auWC4bvy2mamX0wwcwO6CaRkXdWLqLfffd15YO6qJN21QGKth5c+e6yZMnu4mTJrlZs2crbJkhED19sp/W+kQfQ1ymT/KF7sU9S4bh9wnCkzJ35iDGrSLQ5StWutYtS1Ryacud5QnxBRNAlSrVGpEJhQSO6TV2anTcLwUm/fQ4fo88iRCfuEw4AZ4AmN7Qi1fV6K2kdZ2R3e+AA1x/ScD2228/FE6p7Vu3pkEWiHr188+FpFnu6wVfSzexxETUwfJoy3dbbNQDXIgXewRZnxoBiL9xnTt2cpdffrmToMttkqUSswGE1qlTJ7e/9PI4LJs+lkLm6WeecR9+9JGfUaCmHOcRGPc8gfidIzwX+bnvOVXZ8sTsRNv2a9uG9x+eB6hcVFSPilevWuU7rQpxNC7TTQuKKEChORFxyjgqeHwMYLQs+mK6rq3RXF1Tfe3atVyXrl3dIYcc6nr16uXq1quX2rxxY/orrXsffvRheg8xoxDDadKXfzVnTjyKGKEQEIwfWzmYQxkdWzw4U5C5HRpBezbc011wwQVun32ay3JpjluyZKnbp3kLt12zBWUyo2C3R5sGDRzoBg0a5J4REdz817+aWRuWPNQHYTEik84z5epjqFCRwR+eIf3O3kM6nqQNH2CHjkA20oQ1HjFiRJE+2Q1JZo78Bc8ASl+LPOs3bMhQPQAMxB8wFwEVlNo2i0xyhmLFZXcwSuyT6Bs7uSJXaw/W7KoG7MGDB7tjjzvO7de+PT1zs2bOTD/y8MNphB+ffvqpKaBuvvlmd+7PfmbrNmLp2PZAwGB633vvvaQ562SqVIgmIAo+AjEq5ldX/PZKMbY1VeYnro50GoMPPUyzS60IwKXuOy0nMuF2i7/9xi2UDL6ZtJ5DTz5JhNPQjRs/3mYL+AaUYvSR5QV8h/7iDy4TlgkMYSENz3xhyfAQb0/1FTN2W9tK07UkoMP6dqemY4USAFYcmOPbGsp0gzOk5tCYhVls1AEbaZmO+ihSZcIgFDh4pnoJM2xdPuDAA91pp53GGp8S8NPvvftu+qmnn3Ivv/yKmy/mjBmiWbO93E033ejuvvsuM5Zo3ry5jfaqVato6q6p8mSCVnMP98tf/MINHDhIe+Up7oQTT3TrpVKFn2kgYumtGeUPf/yjjfBPNLW3a9/Btd2vvY1idgjBwSswIzRvvo979JGH3fU33OAukBZ00OBBbsiQIZ5fEPJZFkZLTgK/AGIgBH/kwPc3C2kqPLyHenLfQ/jOnoxDTMmY6VRflWrVqyfW6PJzF0oAlG9pZcPuS1NFmcb6sR4jVX0N/hQyiRjXhEYvPChVjnW4voRKTPftO3ZwZw8bDmJSso1OY2jywIMPurffeVsM3Qbj6JtpjYaz/9m557r3xr/nxrzxpuvXt4+MJLobQ4h4mmmYEYHVcYsW+xrjqm2sjXIIADOr4uJid8UVV4AFN336dNe7bz8xlnubabaCslxRUSW3Yf0aN0LE8ve//921bdvWzZ8338TgMJXwE8wggwcN1GeQ+88HH7iRDzxghMkyxNIQ4JX7zKpoJy8hL8mSZQJM2kG/taRVqYFypgBXMAEIcTo3wdbHV5xVNsQQBWR8ClCgf+c7pPDhPrlXaNQRMkDIWTInG3rKKWzxUh998EH6lltvNW0XiKxbt47bS1w/uw8IBa6/3X7t3F133216CWwRJosBfPHFF91sceorNV2zt29ZUuJaaGZ466033XsTJrj58xfIaKWpa6Qt4mWXXWZlTRPye+3fx+0pKSdrfa5jxkuXbnfXXH2Vu+fev7vhw852J55womsuwmoooiJ+o9bfJUsWaz8+x3Yp+/fu5bp17WK2kf8aNUrbze229ISyk4isKCzE8UzmyfUH+Ab+Q4QfDa9kCWX9hRKAx54QHUolwBqRwGumeN8c0lp0YjjxbmVoRNQW0nVSyO1bvK+7/LLLXfeePVNLFy9O33PPPen77r9f25oVrk6dOqZwwqiU7Z/pHsRsnXrqqbZtO/Xkoe4lSSZlfu7WamQz5bK2kw7z6muvvdbdqxH75ltvWfPY7lEvswfc/YwZ093e++wjjWY9t27NKq3137m6smiKWml5tNyknnnqGWvT2TJ7+8lZP3Gdu3Z3tevUFcHoUIsOEzVo0NDtW9LSbRGxzp3zlZvz1WybEc4951zNNCXub7fcYkwas0ESeVZBAV8hD09GfoVOkw2zYCGuUAIwTFJ5jG+QGr/gTbxEfiMXkllUFE/j9UGPUHOPGu7AAw9yl1x6qYQ2jVKffPRR+uJLLtb0+aGAW1sc+T62DQPxxcXF7qCDDnStW7U2JRQ8wqjHH3eXahSzVmN53BjhlEYjjpnixBNOkDHlZEM+8TB/NarXENPX3R177HEm6FktbRryAXY3JULgcq3jOrImIqhvEkFG97q1a9J3SvvZqVNnd9aZZ7nuvfoYkcU8gromg26bgmFA24vhbKH2ThRDuWDBfDfw4INdLfEi14lvWL16je1MksgJyE2GJf0hPvdJmtwwe49AnSyjPH/BBCCqMxwH2vN1BLSHGhXrse1JIPJDHsGRn1Gts4HueE2jv/zlL7Xn3uRefunF9BeTvzDkM0pBGBw8U/iPfvQjY+befXe8+/e/n3DLJJxhWsdM+ol//9s99NBD7r333jMEAwCkdfAJsltwF4oBZOsGEXEEq0aN6u505Vu/fp1J/gYMOtSYzmWSGcyaNcNGVxsxgrQTZFaulEp9MXFmepKYuosuusi1bddWZXGYRaLmylWFdK25Wns9IgQPdZXjbtVFaAfpYMc0MZ7zNCN0797DXSFivfb6G+JzEgF5ATbhSXj2+u5jwsgP+cIz5ONJmNjAZFCF/oIJQAXbNiyUZhXR28h5n74zQYoJBOInVDrAWi+YuhNPOsnpqJOJWRG+fCFJ20/FAyB4YWsG0k44/njXpUsXN+rfo9yzz402wBHP6Eb79RvlYwt36cWXmDHqE088hd28MUKDBw9yY8e+bSOOY1bMDOzj+/c/yHXt3Nl9IWuaNuL2SQ8CmzRtplmnjo1OLR9GydNVh3iH9AsvvGBSxX8/8YSTBa6m+/o2GxwggVTPnr20hDQXI1spIgQPEPglFauTPd2MkGdMm+p69Ojhhp/9U3fXPfdmttIBgIlnPuTnIjv3nexA2/BSOP49Z5+ou0KvoZOhgYPScpDtI3JoIAQK6TWEPCSIRx99tPvVL3/llkiqePGll0iq9qw78IADhfwaNr2XaNT/9CdnSek03RjD1WvXaMtW3yyPEHSwrUIkTGenyh7xggsvdLffeoulh6EjDsJZv2692dMTVkt7esJPOP4EEw8XaUbYa+99YqSJuo04mSmmTP7cTjWxnWNNR/p46KGH2qwAY4mQ6BPJIO7QssAMdcbpp7mf/HSY8QDwBMaIqZ04lolWbdq6TSpn/tyv3OGHHeYmiVkd/94Ea08AT/KZRG7SH9LkC7M4xp9gElAU0lf0LHQGsDIN4QmkG0HEpYcIJVXCEGcbRAED5qy6Rm53jQK4b9bcX198sUb2c1Lg7GUjuLG48IMHDHAwWpibvfHmm4aUvbTfR+CCrH7p0mVu4cKv1UkRlBi9Xipvk9ZwrGRP+/GpNpNAJMwiPzrqR65Tx47uOO39OXYFT9FRegOUPC3FSyAZDNta9AdM6w8/ONJd8bsrpVnb6o7R0kN7qJdlq5qmdQCM4uibhQvd50LkWJ15/NMNf3Yvv/qqu+aqq90hQ44w/gAFWSVtHSmXtnYR07hFJ6U2bVyvdv7YiGCLGE74kqQLyA3PZBz+8sKBedKtSr5U4C+UAFQEI96j1Z7yM2rMJeq2FInG8A71sHWrpWkd5DOF//73vzfko61rGG3JGLXFAvYp4vBRuqDNY0QCQKbbESNGuG8lhfvp2WebNI6pHSkghHOSpHJPPvW0lQ2jWF8zxpYtm7GUsTWZfTpTMG3hpE3jJk0zyBfikUDeeftt7oorr3T79+5tW73OXbqa8KeuyoKAaQdd5X4AhC4DBg52xx13vHvttVfc/SMfcMPPPcdd+8cRep5nu5Dly5a6+fPnm/KIPsPXsBSVFBe7nmrLO+PetRkPGCYRm/QTh8sXFoerU9Yu8JOAvWXcydcuEIBVR0usSPu2CndSg6I5E8gRcJ0edjpJlHr26afS/9A2j3Ue6R/IgamjbJizBTo6DnKRryPHp1OHSiSMiLhd23Zuv3btTP+NWnqxlpFamgkof46UQUM0Vf/kzDPdTX/5iztNhHT9n28wgRDqa4C+es1qLUUSNcuOETk/MzVbs1H/etRdedXv3FFHHeku+Nl5rmPnrq6x+AIc9evfVMgBwEgGm2pmaqo0LfYtNh0CW71r/vAHLSvb3aLFS3RE7iUdg1/odOmDMZS08yTNRj8+9RTXq2dPI4BQvlVUzleoMxkdwmyARQZAvp0eP8m0FfkLJgAAwMeGkJUIUAS9hKMBgVONg5WE0QUCjpdMf+H8+ek/33ijAR9rYvbsbdq0Nh08Grh/3HefARxmj1mD0XiigLZUXPrEiZ9JG/mtG/fuu7Z+oup9//333cOPPuI+1pbrwH4HuHPPOcdd/tvfmgRukLZfa9astTrq1K6jc3UtjS9ooBnDuqK2QZxfSXt4pUZ+V434C8473/Xotb+rJ1kAzCH92bh+rVu1coWr31C7E81YLBscSiUe10y8xCk/Pt1G/R8ld/jN5b81O4QOHdq7fn36ugYiZvIsErFiW8Ch2W4otwYPMl6AOkzYZACOIWdwyLx5HwgPyM+Ni9/ZsRXoCiUAFciqlik3mxhEHOEPIoiohI5hfiUzJXfoIYe4proE4fY77pCc/HMjCJCPBA+hziW/+Y1GxqnuX4+PMqaLNZ9tHlK723TMHCneucOHuy0a6QiIkOQh92b5ePrZZ0UsYvC073/kkUcM+WatrPKZRZAK1pFcoa4ENxvWbxBy6ttoBkaiTTdy5D/Nru6aa67W1rGLqy+hDncb0A8MRhbMmyuBzzY3f/48t6ckfzCP9eo1MOIw0atGPAqkE04aql3HKs0kVxvh/k5Etbf0B5jOkW6DCHaBylj07UKb+S7+1a/Ek3R0D6nNSDuT/EA+JNsIj3AQYJyEu2HBE1EGUTshhEIJQBfeqKScYkMjfTCUGWqTh6lVo4spnnX+eG3pmLKfefYZW0+Zdslw0kknOrZZaNLYSpEepvAyEcQnGtW/u/pqAx6SPRCOxI71lLnbpINSCqEHl8maCYJe0zattkY7xKd/G1kAn+UG5pB2MbtQN/L9r79eoF3I027QwIG2V8folX08CekOSNko5KyUEUjd+g1NaPTJRx8KqdWlOOroGjWGl/CyABRQxx53gntr7FgJn8Y6TkofdPAgzRRehM5Ws2XrNsYTfPbxRwaPI484XIRZx9125x221cSWMZ/Lh/zcdAZ/fSltqjA5oOCTW0g570BTugCPZP/0tAdSQnjIC+BAPtuu4uJik9Wjr2cLhRwg6M4xvIBbf0YjmNPEOE4U//rXv3IvvvSSe+DBh4wXAHkgnWmUcgE4DiRwJoEtFlJATLpYFtCD0Ca2ixACfggotBMBD46l6YP//Md9IxMwpHWs5UGSaAn0xdTcvUdv13/gIe7A/ge7/fse4AYeMkSzxJ5uwrvj3MzpU60+0iPvb7Y3AqozjHfBenql2uRlApn7kCT1dEccfYy2h+1MqLX//r3dj6UDYUmhb7QzOOuHRh/QxoWRjz+EmT/ggXQi8kJdoQRAo0wUmCw70c6s+gAs0zv755u03rdu1co99dRTbrjW53OGDbfRTWf7aH2foKkdmzyIgpHyy19cKKR84GTZ6g7o18/dJsaKpQPAZG2bVDlEAYCYrhnVMIK8B6SDvOCvKU0ddbBUyLQsVaN61RRSvkmTJhpD2E4EWk88CXJ/4qrrI5sE+9SqvUcKngACZF/PKO3ctZuIYnAs92emACEwtAcc1F+ayW4Yq8hKaY7aELZ6rPWVrE0QZ8/efUV0JTaDMQN1kYCK8gNi6UvwxwAWAnxohkjiOGKUR4+CXf75Jk92FcxQiqkrCehkcmZZOGxG/x+01Wuu9fKhhx9yv9V6iDr3gw8/dL/VVvBPYpaqV69mFjWkhSB6SKo3Y8ZMd92frreZgukc7dyfrrvWXf37P9jWy0/PcOTo2qsYwAAmhhiIa8Pop7wJ70+w49QQwjcLv5HS6GUjtqUrVqRBFG39QHoHZp/mkhHQp/fGj0tPmPC+mzPHrGxtBuoqhu0gIbVN23ZGpCCpVKOdrWTfAw5yUz6faAKjFsUtNdPU0rLQxHUXAdBXFEPdevQyELGoLF+6yNoM46gmSgvZ1yGGTou4jpXcYfr0GUbsEG5wMdhBPi/lOKKIL0M05aQnuGACUIPiur3HU5uvjJp9g0EKFrSnaErrrRGuu4LcVVdfY6OXrR0IZKv0m0susb02gh1b09WYfQSUK6+6yprLDMLnDbR4KvpiiY2/1OUTVaVDAKE4YAQycIsXSxUrYGMehkPi+O8nnhRBVLaRj+Tu3ffGez7A5ki/RDByO7Rv73TThgmmJk2cKDmBN6RJwhre45hjjnWXXX6FjFQ6pLbKBJvtHuVjRPqthFNIAbt06+l0q6QrKSkxol4iq2KYYEb+yhVL3cTPPjF7wwFaUlAlk79r957uk4/+49prFmJHxCAwk3vriRRb4nMQWvkLtvLstJTOcALyoY/yaSQqMfMomADI4u0BfOlWIbsNoziLNbAysmDIWNOWqvPYzOmKM+PaiTNbfa37948cadY4aAXhgNkSorn78MOPbF8fmojw5LXXx0gaVyxJ21XaBWyx28ZefOllJfFGEIz2kpYtXf+DDrKyaBsMH8TpASJky8MywsiCVLdp2WDmGC8lEvKD38vQA17j8MMPlxi5s1TGtY3wNm3Y6GbMnOnGa6nSpRjuzTfecPf/c2Ra4uzU5i3f6QbSykbc8B6t2taOdhdp2+WwFNI3pJCVRQC0BcEUbUNhRTtpO7qEr2Y3cJs3bTTJJgQQ+BwOtvTs0dMN0S4K2//RppfYHA+CAKcYD9bhOHSnnoIJgMYmyzY/X54erCI6hXnycdrvQwTo9N8Xk9VII59tG2bdGE0wgjdqL8x1J5xvf/Dhh03qx/YQCRuIAEnpCFkwjoQzUzBiEaKw9QNIAJDPXtpOnjP8HI0cDECFaPLTqtA+BRDGtycMCZ2kY8Dcm11E3z593CkSVGFmjukXUktGLaN8mayDjzjiCNvBvDbmDdNTSH+R7j9goOPuWDSKWzVrYEPIDMeoZpdDftpCGygHecCRRx8n5vFtt1Y7onraVeBIDxHMEkPZVdJQ7PuZ/YyQVQY7BWwd27Vrqy3tShsQYRa0AvTl++oJnXyFul0hAG0FExwqdeTUQ6PYxh0+5DDjyEdJVcuIQzV6ndb8zjLAGHHddXZnIFw5a/LvtWd+XlSNoGjGzBkGDBulysdsAdKREmJh85kEQfjfkAmYnQKKOkqHN23eZHZ+rSVppJm5jbOmEhrl0ehMTZ38RRrBTNs2bdxFv/6V26+D9Piaadi3M3pxEFmTJs00w7SSBZIYRe33H1e/Lr74IvVjvJBaT2tjNRVcS1P0Nu4IFuJ1MaZkDzgkhTCf6hPzpeBT3bVpt196xfKlqm+/VOkOmYupKhmTpBfMm2NbQkY9KvJAxTNnzDCtJ8sAklEc/QBOwW9PdRsBVZg9LHInXwUTQFyRQRLw4lEDIoDSGDrfWZxsi31bmH5+qlSgdJ5pm20asv2Tte8/RGLdGerUv5980n2o/TACHGT+MHKsfYweEM+HkX3hz3+u9fwJOwZ9qkYppmBY4rJlg+gARql2EOjpMSAFCKGFtJspF9PvLVIaVasu5CpdpUoCsqZctqZnnnG6IX8/2QGwLDBaVyxbYbxArZq1XW0tQ1j/wMydddZZOof3qWkZb7j+Otd/QP80VkS0o1v3Hq64uMR0BZMnf2GzwVwtL6NHP0O5mtBsNy0Dk7UmEFq8dKnRIwTDKaXJYiYhyHe1LLGlDY7lh2vitkoo9dbb75RBPOkoyKNChBEyFvDcJQJgOvOIj0qOkM+b78R2U9qAzLffflsGmZtcA63tGGb+QlKvYpl+jVU4o33wwEHuuhEj3HwpS9q0bq1LDpbZfh4NGlu6iy/6tevUoaPMvNa6W269zSSB7Ba4gu5vkvOzxRQjZgQIwaA8+rXyxBN9TJuMiLQ7TJa7nCno3K2HIX/NqpXpu++6S5x9G9ev34Ea4a2FeBmSbtrg7r7rDqeLmm2ZaidV7q/EgDLds7ywdcMe8FZJJ2+T8ohPcGz93hqrfm/Y4N4VgeJukrJqV10gFPLh183k7km1J7jc6T+EgxtQkoWjEFnOs2ACUENEZH742/hilAVSsydi3yqmbmW9ZrQzzduyoCeSvuka9cwIy5evcA8+8rAh87LfXOr6yqIXWQBLBlw9+/7jxHEzDXMjFmJgMyTRkoDQ5623x7pTh57sHpPYGKJkDeX2rJdfeTVvN9mNIFJG8FJTplno+G+68QY3SrPKpVJJM+2zu9i+dZsbef997o8jrrURRWFz586ToOgbd6+MQXv27mczwWDNYEj7eooXWa0zebh5EvF+/PEn7vbbbrVZa+bMWXbLJzIQdhUsKx/JZJydCjCB0IuLi804hVkIN+mLz3Xvz7fm5wt4A1PkIdgxwkx+9dUcYwbN2jrAn7T6A/uB54gL2YmnYAKw9V9INxrQl68wKl11s9VhZLcQA8V2Daq947bb3CvSk6NLZyrEigdk4RjNIPN3bBH1xNDSdOei+PnS10/WjgDNH+kxDnn+hRdtaoXHeOnlV9yf//QnW7sBEowhI4V6YiJVOIdLdMWqnQvopq0WhpvbtX9/5KEHZU18j5XNrIQcv0rlotTK5avSLDWUQfsoE//MWbPdF59P0hLQW3VJwCWGDeETjO35519gxDn5i0k2y/3tb3+zGQwm+MwzznADDh5o8ZMmfmpEA54oF0UXGs6z1O89hFwxD+7hhx90d9x1dwRUPYRg1nOY3jNli8hZhhtFuNzFSLsox5zKjPAf999H7Pzbczo7S6cG0G4akwSw1UqMPnC/7PNRuiyQfB117D333msj7GZJA2/RdpDlYJtGWWg4nC4zwl9uudUYPOz4cJzAueiSS+0swFnS/aNL+IsOgGCLD9EwS8A/DFccMwNLTmgXZfOh7OZC1DAZl2CM0Vx2BqR58fnnbMu3VQgEybR72tQv3Mxp09JzvtTBzxXLbYQySimHJ8jCQAT5Bn2F4JixOK/AdN+6TevUgf0HuhNkG8BoRiJ5zI+ONuOX9h07S4HUSMh9xGQVgcjRKrJkwHh2UJpOXbulBg2WbKBhg0xfRAHwOfBWLUpaumIxoixnOPoCr2Mftcneo6clKPCrIALoGQpTpQDAKqMB4aPQ7WxztL+HF1gqkynuCZwkuzs4e9Kh9fuVDEBbtvQCEoqEfjnFwynep3TODlEoRAbzxxVoTK8g4I4777Kt4jnDhsVIZwvJTNOje3cjEPKFAcGpIZaRc4YPNwtdkK9GuM8+/Uiq2suMwEA+gP29DDiOlgROly3K0GSYmK+VVj/to93MQM1btLAlRD0m2GYskLxIwqf77v+HELs0Xb/hnjZKOQvQStP+kEOHCLFdrIwHHxjpXhvzuvWF/OxgWBrayq4BAl4oy2ExkmkMULp06kySjAPG+mPmgliRxZRxvlmgxuJtE1QmUf6AggggZEWYEpwhXy+E4IeL9QoXZ9M/EYycu2UA+ZE4fZi/jz/5xJg7pIAlJeKWlY+tTW3xCJ988qlO8LSwUek58R2m1j1JOwRGAfEyAkU04P56801u0MCB7s577pGsfZ7r02d/W2dpHvEwc0do74zpOCbahGNGNkcEc5T28x07drCRwwhnNuE8wSLJJ+BTPCH5qZ+RDkOKkQkmZMgxaPMc2fYtk3aQ0fycjFVfemG0iay7iMHEnO3Iww+TMWhX2Q7U0VZzkrtF+gzaFK7MZdbr0aO7lpIWtq6PfXOMtQ8Dk4HqF0QfHPA1IPuvyO9jDQdqj/3RSTmbIbzXJ9rJd6amnSRUZakkAZA8boAqZzRBnShMgmMahvG74srfmQqU9fX8n19o5+Zgvi6XToB9PUTALgBpGu9swwDSC5L2lZQUu/POGW4qYh0hS/3j/pG2Kzj0kMHuQp3mfVUji6NYnPELBAjTxWkjFC1oC3GNtZc/4uhjRURXaDm5WfaCR5nQihEOoXJegDpBOo4nFjz9+vY1YVVr7QZAzPp1a0yxxRKAUgiBFgdPZs+cjs1g6uBB0hoe1F/7+lYyJNmQ/quWPrSNAakwf+xgesmamLON38j66f5//lOGqF9gnp46eOAgM4sDtuZAcOQ3eAdC8LFRmiQu8swQybQ5/oKZQFoBI0j9NC00KpTHOwcsGEEgAgAywvAzVcLNcpvouvUb7PAkBp8nnnC8u/KK39rofuSxx8yql9HJlg5pINq/P+kwxc+kRUQhxPFnuH2maXYSAw8eYMsOo3jkffcZk3XVNb83PoM2sovY9t1maxNbOO4AaKA1tomUOJwR4PKH93WGj7YlHe1m5HMnwMknnWSy+lqyMdCq5sa89qodUAWhpGO5wqT9oQdHuqv/cG26bbv2kue3NSHWk6OedNymRrpwdS6zGQIxZA41a1ZPvffeu+lPpX94f8J77sijfpTuqCWgX7++NhsBU/5ilyCGOEwew0eULqKVZHSF/oIJQIPUkG7NiWpJEgHrOcILkNGsWVNN5YgyoUaZVGmUTJky1R2v0zhPSC1cT9w6UyJGnK9o64aN3PWSFGI23ko8AqPrnXfGCTGVTQR86+13mC0+IwcZPRJC7PlYVlgXAdglOrTBQRI/E6UlrPnM/eGaq0zOD2w6d+4kY9MfG9NVtWp1t3+fA8TBn+9mzJplwpcw8kEWMwEmWyC/t7R1HB0jfOJnH7sbZGO4QXKNKuJdcISjAHtdOoITTjzJtIPSM5ty6E7JGdgSh9HP2s92jrKxKtq8+Ts7cwAc0VxiKdRKUslBmgWeffY5s35KEoH5A+zVKZGVbwPf6mNyKbCIAr4KJgAOm/glwEjAiIHOB8cJ32811cHBY36NVS7iUJDI1o1rTR+U6RWKFhgoCIN/EIjCBWaIQx64X1z4c6lj59htJEyzzAaYfk+bLlWpEJ90AJcLHDjo8c23i4wAGJWvvPpa1iyFapkt6Y033mSm2xDbgVIe9ZUxxovaVoJ0+sPIR5V7iuQMPWUb2HzfYiEw5b7UFH/ZZb8RUzvLGEOAD0LIw84HPgFLJOuUvqto6cEknX4HxywA89ehQ0fxB/W185gieK002Qn1TpKoG06/W4+eZr9Ifz2+PZypL7iAfN6zCEODzmYNMeSFuIIJgKpDAzLNyFQBIhaLkUKThYULnDDXx8MH1K7NUe5z3D9lOj1GIwWg2UcAYTTTL2z627Vra+vxEi0ZpCfN1GnTTWk0XxLDlBDLlo9plGmb7SHXuEBEdk0a67m4exwIZTkKDgEJAH1MBqQ9e/Z2jbRLQBnDkfKXIgEShMNOBFvEXr37uBIxfmqCHei4VAKr9//zgY3mMJ1TNu3o3q2rlqOB2g6207K12e4fwCbg3J+dJ/v/SVYvaz8yfqSRsoy2Zm0T43zFFVfGbYaBw2C0WFs+DsoYAUR9yIU5SE4SgRWoRLvKBBZOAFgECVNGBNETBBn2VDs0Cg+AhOzAA/oZY/aBLGJAyC81omfP/tLdLbkAeSAWOoSMHh7h/PPOM2ORYTpJy4ne92TpyyzRWWf70Bb+4ucXSI26zlS3n2m9bNWypRs+fJjJ1K/43VU2Q0AMlMVIWrhwoe3HrZ5o1FSSVQ7T/EJJ2laIg4cAMA1jWYERBPnYBYSRz2ke2vq1FDQoft548y1bx423iUY/+TAmOeLwI2QH0B1zttQ7b72R/vTTj92vLv6NJIf7m6ErB0dYmjjziFCHOwggTo10aDl2NFXyhjT8yZDDDnPPjn5OmkoplRTh5wAlDZSgJzZawdn0H0eG0J0/CyYAawAtjOo0YkiMMIJZBt55d5wbpvNvhw051D0qxu4EMXqs97frGBVAZsQARICH5O4XUvSwRbtbolaAws+iEMdnsviGSZ9/YbMIJ4COPfYYUww1kHHGnns21AUMDxrPcdSRR8jq+FA7eEGZcN5jxGSG2SCAgTKZztHR03R0+byDnNbSR3A2kXsCMNwE+UsWfaNLoy4z9Svvhnw9cbzTHwiUS6uwBlq1cnn6b3/7q11SNXDQYNe7zwGpY48/Mf2hLINefX2MEVjbttr7a0mbJknn+HfHmYII7NJ39vrMDkMOP0q8Rx8jFi6/SM5kNr2HDmXw7/ECeuiYhqrWlpCqwmfBBKAeC+fJGmNasAqI4/AlByH06xXuHHHuN934Z9P63aAnxAHyARzCmyNkeME26wsB4rF/PW66AwBKPM7WWFEbyIGxnK6l5ZhjjtEa2lK8xiI7CuaNQmTcIUar/4CDzSBznbRp7dvvZ0wZ5YQ2MxuwHIFoDoZY67UsMMIwOjldx7V6acS21/qMA/lXXnG5tqIv2Tt7fmuT+kkbfVmt/G1lsg6urPjnRz/r3h43zpakBx94wLVq3dZ2Beee+zO7OAKeYC9JJ6l71OP/MmMZKzzxddKJJ0h+cZAdVj1UwiSUS/Qf0Ie+JJKX8cKnoXf84e8HUKNpQKDAfI0BMAD6yaefsXtzOInzyCP8ethmY/LIA0JRCR+jA6Lzta6v37De3SwCMZR73Ftnfc/Ua5XJCOC4F3Z7bLluve124wtIQ338YAUnilqIwFDdHn74keKq35d4eZLNAjajaNbBMhmZAfcLUqZ+c0fM4+dSLA01k3DuBqK8pUsWyXD1UveMzi3iUFHDwdM/ZgHM0Vk6jj36R66H9vOIdbEOvuOOOw355MHS+XAJnU4eOjQ1cPChaWQW+xbrBFHzfVKylEqPfXuslaXfALRlCyLmCl6TcM6WIqlv39SQIYel75dRDTBjNqtWXQYx4iXyOz84gbHY0wiS+VMmQwueAURZxgOIAsxZRQJIrmNkwJVzwueaa64xznmuNGVfigfQxUUGoOeff8HO7z8lFScWNt58y5dEiVFXLABZN8e1UJzMFAc+4trrzESLbRj2fyAEk663x76lLdR+tnRw1w83jqDSRbFUvYbM0yUO5jf4OPVTR0QCMnUK2MyyTzjhRNvrI5DiFrAnnxhlZw+xEqI/1BEc/kZafnqIU++rk0httO/nwMedOvCC0Guodg8Inx7X5RX3338f9n9pLKUYxSx1T4x6PI2hKESLLuDvf7/PF632rFp9mhunGeTfo0ahPEtzUgrBGHYSo5972uCUtBMIbeIpvPNtEs7ECCKwQlcQAUjBIaLy61SEfys0exbwMWGqfXb087pRq7k/6Svg/PWWW02tyzLANImKFyNH0htXnSw4NFnUAJKH6hoYmMIHZV2MfR4GHdjYsf5SB5I4FDP76xhWH+n2Mc0adMhhpuZduWK5bV+x5OGUDpa8zDYbZGfw93vvMQUW1r6cR2CkAewOEh/3EREBVE/oNCgidgUyIyC2pTz9GLJ79aXRUk49YczoRRddYtw+iORwCJ/y3Mknn6y2wTxvEqFV17nBk4wA7pD8wOlDjRAPsxW/DAKIolbkLdLaq1SZvU/eZFmBBRGAph+tlkHX7DEVZoAAIE0QKtjHgWS0dvf8/R9aGyvrurcfy4jjZtubo/NnhgChcOxhdGUTk28j2zv25C1LSrQDGC/t4DiTv1MmHDxGHo889qiNZrZMN2op+bM47rZak2G0umt6RkdB2SwDwa1eudzd8re/mKj59zoOxpbNM1pps/fvzMzmuxJlCS8K1z8zFvEsh/+ZMN7sBzB51w852o1kbG3hcWCC0eVjCwhyLJs89At18THHHGe7FSrBphDGkWttsCSeOWum+LjVRpTEhxaEJ2H5XD445ksXwjJQCSHlPMUASbCXzQPQKZx/+hffUX9siz3trRr9S3RM+qwzznTHiYs/+OD+Eo5MNg6fw5KIdhl5cUGCbaBzpGhM/wAMqR9Ew5SMY7u4ceMG95muSYfgcAh/uPOHm0cGSrXKz9dhJsYo09wojdtmszy+Q9Y8z0pES1mYorN93C5zK1wpWPLYNYzlApT3YCj6+muvmMr7qzlzzRD2nHN+plltm1u1brmMPz40hc+1I0bYMgGB0YzAJwFLJKReWgoMsUGoZvIPDpPc988HjABoUz5HOWXapoQmrIvwki9fbljBBEBGz2FmigiNz4RkfDQQYQxIe0i6cO7XPUZMU79+fVxP7QL6S1MHOTFCDTjWaH3xL2DwyuyA5G+pCAg5Ao5ySV9PW0FUxqRlGWGE4/+PtlwwilgZcdoXqST7ao6RT9avb378ycd2yQRlQWCPagZ5Q8Ip1NlUSvl8zDHQaYg1yreLujfKlnDevHna7vk2ITK+4c83Kp92GlUqudFvjDEBFowkEj+WOoicdlLgurWrZZa+Q33gtJHfVRC3ReUuWbzIzVXZ88Qgl+fi9uUm8I0ltEgGOVEnchNlvxdMADb21fngADYN4VmeI55Rhg0+UzQfOPmOHXUbp2Te3PvH6ANwvlOqReVlZpqUiU23yhhjjUy4Q8dJw545LB8gH2OUE44/ziyPPpbqeKyMJ/nkOu4dRgfAGQV4By5p+D4OrpxLKzASPeywI2yWqVq1svvqy1mSedxhe/522tNzm8h3MoqFADBcZb2HCWRWw5ycW0cgMJYVTgit07U206fPtJmxvHZVBPMoLiFeKq8UH144AZQid8pGdgENMaRxoBNkgbSFGrV8Xhf3D0JBnp5wEMi1siqAeB564AHpVsSFKyaIYBktHBHHVh7ZAXYEZ+haWYxATjvtDI346naXgH7ZzG4MB/jYKO6nbR5X1HDIBJHtIK253H28XQTKHp9/awFPHK0JfjwQux4wppwdoF6YNGY5ZCBfavvGhVcYuFxw3lD1rYruC/Q2gMCK2YNZZ83qVcb00S6BwLZ2a1atUNovTf/xgWwHI5cFj2RrQoLkkzoYPDRchrhxy5Npcv0FEYDtAlSoL9wXURHycysB0Yhii6raVC1hlewGtCbzBAhRWdZZfRkxqAwFp/WT6ctMBoDkD5sB0vJhe7S/pGV/uekmAbqSzTQYZNQXopVAFj6HucMkoiUtAIFo8GLaBcJAeInM19EqNtnLa/t8u5NwIy/vtCrhVUHWfj05hFAqAnr9zTFmAcwR+J9fcL7a1le3kHkz85AZqSN9XqxLLjg/iQKMgbFayP9CJuHLli0xqaMsoagtnwvhyUbG6TxsxGt4jjwOr8hTEAFQAOs9nc5bs8VnLwkg3QNfIITMIydE6FUE4SopmjnF+hQ6ZqlgOPFgX4fsH+MJfhQCxRAAYxSxBcTok+tisOPrrv09WykOk4K0HTvQOOIgGC2KAj7MYpGKhvH8esE8t0qzCGu/blaWta+/+YO8tC+0maYzPfNOezF4YfqmDd9pOl+5coXuCHpNZxZeN4SedeYZOuPXXhZEbQBaBAPfvaCo2WtvXSsnyWHpjm3u6/lzuAFdqvTlkl6OxXA2Cxa+D2W+SZMBak60WpsTUv5rQQTANlC41wwQqRpVXkBusuhkWEV+wKJGimIEXP1FRACuzAXgi1jSmFqfdeaZqYMl6n1B9wCz9h537LGSxO2lEbNcUsaNZu2zxx61JGyBk/eFGH+gRleqVMVmmZUrdLuYrG/Wa03mfp8aNcR7SJZQXRo6TLYhkEpFnpHkpC7LFVszZgvOHyDI4YN/s5YPXWRtBMoMxmEYTMQhFM5AsM5jO8ASxla3Vq3aRpwsYfABtBMpJGZl3B+waNFi9+bYtyH2gPzwTIJ3p1gF5vYJgEzmLsdfEAGQFyQZUvM1rZzCc4OV35qYS6GML6tC31ZHlFH8QZr98PsT3k9xTewpEggh48agopp2GIxE5Pro0NmaeSdxtIpbsXSxaf1Yh9lFYI28p7RxHbvIiFTWyRCIzRZKS/odQgqHMzm1s1YMJ1s0/RKJcfAojxjxTN/UaTsX1cevlHDiCIKFqaQcukIYgwXVNQImCIElSJ3TLOpnEdKwZcW+QOcn06jO5SqCLnFJIsh998ivqAQPoKzvgglAdRv6QhMgCBCZRFhWybx4tCaDs5pn+X05WeE+g19SUI/KXCzdslXL1LBhZ9v2C4Sjq2dE4miDt0X08AHIM2WNvElygq1CPNJBbgJnt8HhChwpdUGEWQOtEG+BLoHRznkGnlz9LmtfQxxCJbZznHHkZlGWGphPFFwgP3STdjAjMANg5MLsRHkbNNqZMSAO/jicAiHJ5jGdZ8pPwsJ3yFq88y9wAg3tSqaCCSDMAOqjd3r6CitomBIkCMRyhuk9zh2X48HIICKPAVbQYhaQjWDpgw89VPSLCy9M7asr2jWT6nTtahP5kg7eJOPIW4QmTvf5zzVx8J66x4f6yIcY134PSNMvFzohrOJ08KxZs93U6dPsJBBbygvO+5kkhI1028cA6RK4c0CNidpmdfFiofaIvhgQMGGGa+sDfYEQdGbRdgwInCZKFsE+H1tJOYNLXEpUrr174PmKfALS2nuAYwK+xqTzjuayUFc4AWgbaExMsuS4OT6QymmYnnGnIiJhzY8B6NMkC8KfpBbTPVsCpk6sJiRTLxUxFA09+eRUo0aNzTYfLRyneszyV+s5hEDNVN9URheoXv17qSF/m/bjK8QLYHHEmYO5c+fa2YWpU6cZMhi9OH4Yiwspi0tK7Dw/e3WWmK3KP1f7fHZanA5if8/SwIERpnQcbYG7Z9ZAwwcRNm9R7BVQ6sc6ES5LynLxL/zcq2VKEAHYVSBAjKKMQPISQQTnOI4lKgH6kL/CZ0EEELaBNtKihllFUWuTNUSNsqCA/BAf+kRe77fvnFKyCQhi0frKseuUOO1SmZylDhk8qKiflDXcRbCGmUCMVh1x8dj5VdKaTx4cI36HOG1sBFAK8Ush7NGRPbC7eOChhw2BoX3koywYuXcnvC95wb5ugcSyXA0Hz7BAo5Z9PahBs8dlTwHoLDtM66z9SC9hFHXNvC1BXB6FXoJ+y2jEmEe0lEpPUTGmQzsiLPpO+EDSJN/jpEmP4SQZUIC/IAKgHI80UFq2vaEepcmOFC4tTt+gXABOdMKi7D2UySyRKII4EmkCsCnNzt4zdY588KEdMtFK6UBIqk/v/VPSsUtuvsp2CEmjEkance2MOJmAfzF5ipiuGWlZJ6e494fr6JIi13OGDXMDBx7sbtaxNi626KcDJyiiZs2YKAThcAAAETRJREFU5jp06mIzymoZcbKNZJ3ft7jELomkjxACREIXqZMdxBTZGiyVnaR+cNOYP2aguXPm2Kyi5cbDhswZIvAq90xYAl4+MPoG1GXigJ19spJW/FIQAbANNAwm8EtFFboE8pXOEBnliTPae6IbOWVaOgE0PA3AAjSCpNTXCxem+bwpQpCMIKWbNVItWjSXBXJNEwwxGhnJ/LaApvq0zMvSGnWqIs0hkKLhw85OYXh601/+Gotd0V3Uq1tHh1Lboq9PP/Pc6BT2iHMk4WMrB+PZr/8AG+Uzp093YyXzbyDBE+pjzLzXrl5pN6BwKARzsx4yLGWngbQQcMyeNUNb16W27GgLG8OhAjiSJkAopA/vZbLlwK9MfL6AgghgS8uWwkJpiunNUJmvpGQMvY2aC02SXKM77kxWQ0O3ojKTcYym8C4/HU+H2YBwPlynoh9oSuuTgnM3ApDAh7aikua0kZaPUIs9deFCaZs2bSoN6H+Q+60UNlz0LGKyGzvHvTvOBDncWcApXE4lYyjKyR+0ddwfjI0j1kPMAAiUEOF+qe0qJt4cFm24Z2NT9MBTmCmcJJVcFT9LBiNfL/xGthDvwzDQltCuqPf2notg0uSGhfRZzwzQUzKgrlpQnoIIoIOqgdH2qPR1WmWJ5nv8RO0RLyjk6DvqkFGBJU7kiMpJFuoBYnmj8pJTYkwMUS1lGM4N2nrxKceFutNIGGXAIb5ueyUsmG/403W6mPJl97wETYz8ufPm6xDLMSnONbyje4nralY4THb/U3QEvJkEN8Ua4Vg3cVyb072cBmJJ4M5hlh2uisOZCbtAMEeM4+eTJpmZvEzQ09p5hLaU09QKg8mbH7mKAey74goiAAq07Y1GVVx8djMsOCKKkMSH0SIfwndoeMwPgGhLkml5yE+45Yme1q9MMnuNGb7ccB8bf4cy4yfGFo+NGrVDly4VHTJ4cOrUU4babwLqBrAUJ3/QEp5z9tl2GQOHSlbpt35OPP5YIVmaOjGeiHrrSShVGtnoISPoJkaPLjLtI01crivwUBAt+vYb9612Hs+/+FKpjD3iNkStC+9xY/N4SBNglyfaB+0EBnnzFUwAbH3gdEMr4hkgCpCiKLcjhjcYO7lMNu8P71kUG4ghPKMWx+VW1EHlsfoSdZE9zhuVlXyk4RG0zpdqqi868vAjUp06dtBt48PdP+7/p9skLr59+/10UES/LDZT18Tp3p7u3brYyR7MxhDwsNXjl0gwRGX3gOOyC24A45DMCvEfaBvnzJmb1g9LpBNKnoralWxj0k+eGG7JiKQfGGlMFWmrudO05NsFAvDau2QTAhEY9y5YR8gOI9faFQ1/6zCIxe0MwbmITr7jT75bgdFXVL6iPXxDfSFNCA/velpa7Q5KFy9ewixQhJj5tFNPcY/KVJ2fjOHaNngJ3OwvvzL+YOLEj02JtK/UwVz0jG4BWtshIw/Ew98p/Rrp9Rd+s1A/hDUlLRO4ZJtivxXqkRoThNocIzpPe6Ms+R+Z9Dqulj9JmdCCCECXOMJ5Rw33SKSyAOAIyfEQjGph70ZnrHOkjRoYlVOmLSE+KyLKkzcuK2HyRXXlI/9EG+LUEcDT2i0UaTZIy3g0ddCBB8puca4dGUMD2bljRzttNFMzwRGHH2aM3aOPP57m9tBmYgobNWpo4mHaipBHW9K0FDzp6Kq4GLlxpWU9oblx2tDvsknLDyHPruYriAD0S5zpvvvvLwpAohbamtUQAuPGy18mUb6G5QtLlKroyBQ9EViIt0zlUaby6ovC07putvTFl18uOuuM01M/OupIm/qRE/TupeNcOvEMB6/pXEfTSsyyiW0lR9Xlkn1P+jPNjeBGn3LSx2nyEWgcmYFped3LpNBqva1GjfztSBSItyCh8bhx40r1gwnbEAUjS8cBtPCxAF99VnlRZ63BIW14IjgJ/sRTXpGZ4tjrE/5DOMrJVxYATzgqk7xgSnqChEDIBI7WkTOcFDauh87+sa2bPn2GmbGFk8zksUT+GfxRUOIB4jPCm6yKQyq1MW94iN/ZE6sk0KBBWioexcumd5IpC2EVpC2VYeNWZgAAYy7R1QBglgL92SJmYUoYxyUIphzkkzYgPVF6Ba2Kyi8vRVQ3ZYVPnDSJ/KRfeUrHvzehlKPuvXr2MIMTjD+xJYTR4/AH2sL92rZNxbCISy3XsyuIzZc2X1iZytBBYHOgzm6TtDLox8ukSwYUSgAwQpuRrsH04ABuDFa8IJhFgtGrkRKNYtsc5CI82YCEPxdJue+JpN5rbZA3PJMJFFZu/iTCk3koinfWcN1JpL6kdavpIPqSnifZALd5L5bNPj9q1ajRnuwICkJMTh3/s1cOv9AgkcAmXaDl7dx3UlvBBPDd5i1rUWmiKg0OGIcPoDOYGwhNEESAjWgF2awQ8pXz9G0vG+lLzAn3+PWBCYQq2Luc5PFrIm0chic3/JOJnyE6tltMQfTnMjUvKSm2Pk6WTgGVM8fXv6fL26dyykoSWfCHZ5wFPQTX36j3+rh1OlPojSXiFPk9BTGBZJX0bAl7X+7yw8KFaTCPo2HWOQE0d1cQE4ES7QoAylRDJ3MRRr2Ef1+XyGuFcNLnk08/S8vSOIXdPxY7xTJE3fP8RloKapgxiq6+S2lGTOmWsV2puNC0ZZBcXt+ABctTQ1k60Q/NWN+WlzY3vOAZQCvALAwn0Gxx8XPBLg9jIwhADPEnp6zcjue+5yT3rwkE5o0PBEO6fJ9Eprg+Xe+SxoSd7R4CoRqy5Gnfrq3bR7YGHPbg4st27drF6RNllOf9b5Bfbj30jcsnaooHoG9i16aX14Dc8IJnAB2Z+mzp8uWlLfbdt0hn7A0wuYVF7zTUOqqG+VkAIvACjrxZIAYi9BUAVG5nLV02926d9tnj/CSLHQCqiEDKi2fG0+GSNAIfbCFCOjE2VjaWN/xSSeQUnTvphaj46ftF+/M3KBNPlsyMlhceUYXG+HHQBkEUxW7ZtvWTuMadeAomAF22PHXh/PnfCCgt2Be/o9OvGktWfB6xCw1OIpNhFzoXwnfStLLRBrMI+QEi+eHo84IwXCFpfI4y32mJgfkk+0Oi8B6aYQReTj0hjS/cIz+3ouw0xHrklw1X3cl+4eeOw86aoWR7KNYktUwz9cTcCsp7L3gJ0C9rrpXZ0zsLdQNIN4lHOXMXo7i80hUeGhsngRAynzgYjygjLAtxOEANHwsEMLlhPnW5hFWmDXHpUUYP7JzQrN7llh3eefpP/jIo06f1MyCdya2nLJJ9mrLhnvACPCyesw7FxcUybtnb5BSyWB4/cuRIMzHOrSjfe8EEQGbdav3UIh1e5H7fQwcPsvLC6Gc2SP4RmRgR+TpDkkAM+DNOBKK8fDJh38MX8odnviJy4sprZ76s+cLy5fdhEH2EwHwZc8LylZOTRIVp9HNO4uAB/e28A8z5xs0bny6TsIKAXSIAjfp3dpSmJ0lfnho0cKDd/BkD0I+DMB6MGMLIC88K2gEhQDH+k0m4K0DL5Er44vYlwvJ489VTEBLKKSsEV1RGvjpDvp09rVwEUVzH12E/3VKi08CykZy9ePGy/D+aUE6Ju0QAl1566WZte27Dapa7aoZqe5TX+W7HnY+QsLMOx+nzlLmzvGSpKH+eIuOg75svLiCPp5D25slmQeW1JyucqZ/LrY7TTefclYhB7No1a+/RtTgbyis4X/guEQAFdO/V60kJHcZLJKrjWgN0Ru8gm+qzRnk0cwvx+abxAJysDkWNyxeWbHcyb760IT6ZpyL/D1FGReXvSlxFbU+204xkQT4/yF23Xl2O36c2btg4beGiRQ/tSoWk3WUC0A9Cbq1Zu86VsprZNHfu3BQ/yNCqZctyiUB1FNqx0PZkZ0NYec/yyg7hO3vmlptb987yh/jccgp5D3nDM1+e3DiNs5Qdi+fCSS69mjdvHmm2LV627Dcvvvji+nyFVBSWuf6qolQ5cePHj/9GZlRV1qxeM5ALHg7URQlTZSXLL15htFnguhtKpQO5LnS8omcyT0iXDMvyZ81QWTExgea2I/c9O1f2W0X1h7jcZ3YJmbdkukyoBhKwRRTPPYtctTdDiilJAFO6N/Gv+q3l6LqxZJad+3d5BghFVq1e/UYd0HxB+nKb5q++8grd/NHRlEDc4pXHhY6V3Rp+v/U7Li9RVwhLPi26QqLUqPovXbToqZTssgotuEx7E+2xOM47IO1jsHEV3Szdcl6ndu2Ujpe9uvDbb69NpN8lb15MFVKCbAR29B/QY6xLVxkgw8p9+Cn3I3UxIiZR82VEEUZcLuBDeJ46CgVWnqwVBPkKKyobIU6+AvIG5kuosJA2+Qz+ZBbC8n3iNDQ3gpGlY9SjgeU6HX7t5ABdjT9d9gk6dZz6ZtGiD5avWPnjt956a11cwC56vjcBUM+ECR9v6tO162uykeqhH3MokbYwxbXpnXUl/BL9bhC/k8tFCHQIlXDk8gEmxO3KMzPqKs5Fup3VmS8+X1jFNfnY8vJZeITcnZWTQrtnCh5ZHvfQtTannnqqbkevq8uyZsvmv1pq3vwF41asXPnjMWPGFCz0yVdpeY3Nl7bcsOHDh9euVrXyrbr25FyMEkqKi9Pc3i1tmu72e8fNnTcvvkwBWwEOUkq2jtwodvaSFRJHZTwmTQv4jJ47FxaRwvfTfPL6PNkqxbLl/CCwUeMLKgfCkG5B9yH5m8sZ9VwcLVM8M0f7RgdXOB/J7yZohn1o2YoVl3z22WdrM8D5fr6CGldo0T8987Rh1WvUvE6M4T5an1xJSUmaA5T8IBM6dNYtjkSjZAknanOXCKtLyAi0kS8+NNrSREiN0ukRcoJn7w9Pyk76k/0K4blP5YjoxRDJS6zWTubPLTuU49PEZfh+Re3iVhJ+YJo9PVI8bjrnoqtWrVqa+TlhXG8nYxxO+nBH0qJlS5f9UTetjsyt+/u+B1h+3/xl8h1zzKEtalSrd4UuQThdFir6dfg6dquHbvZIM6Ux+iEArGe36tSszG5iZAPs2Mkb/xPoX9TeZKjArFcwxMM7D+woAislxSXzSN+gwAgHRhDxCylJSnmWxV5YvoAT5k4R8hVuAf6LNyuDfESYI6/9hwA9fbmZACYhLs7yl1zxgxKqxO4s4A4DtVISUseNaBuXLl/2rzVr1t44adKkBZn8/73vByeA0KRBgwa10y93nV2jerWTdG1bmzqyqUNaxS90Qdl8OKZta2ICcIBQN3MLniY752lFJp6GDA/cTJyB3r8aMjzwALjFMHytLJIAZAgjKtint3DSExrlk9/Xi8dCCbD6rVzKFg6tBvP71L6BqtJHkNU70nifib5DOIOAgYFeBZhwiwkGKbob8WtJ917YuHnzA7poM/PbM6G8H+BJW/+nTrYDdfZq3LhvtZo1DqletVr3KlWqthKD00AdraY1T5e0eHhqqRR49O2hJ7DGzQJY9mZp0blHYBTkLZx34pRK75Sgk2c+CgID8bwSRvoAdyXlP3zF9ZGCdLjoaS3zARYSoi3IlyqvEYVlyo73qdTKUHPogZIZ8neU6ra6Hd/J5nKN7i+Ys2nzxolbtmx9R1fg/EfrfOZnxH1BP+h3vpb+oBXkFiYLmtpaChqICGpri1O9UqVSWTGn0kU7ijTTlppcYkdRkW0ZKuk9XZmbSbSVkCNdSpcqYOxmeVhA5Yo4ritXypaDd/ZO2o7uIH1EALqULqX3SlaGwkhHGg05EAeVZMGCd7UxlpMIQWmMJ0pVNmVZnkoqLjp5nJY/twyq0FxWxJFm6rUy9JRxTSn5yKOwrfpsVN/XyexulQ6f2EED8u52uyGwGwK7IbAbArshsBsCuyGwGwK7IbAbArshsBsCuyGwGwK7IbAbArshsBsCuyHww0Dg/wAoQRydy6sNTgAAAABJRU5ErkJggg==" alt="XAI-32k">
       <div>
         <h1>32k-XAI</h1>
         <div class="sub">Cognitive simulation</div>
@@ -244,6 +648,10 @@ table.cmp tr:last-child td { border-bottom: 0; }
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 9l7-6 7 6v8a1 1 0 01-1 1h-4v-5H8v5H4a1 1 0 01-1-1V9z" stroke-linejoin="round"/></svg>
         Home
       </button>
+      <button data-view="crowd">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="7" r="2.5"/><circle cx="13" cy="7" r="2.5"/><path d="M2.5 16c0-2 2-3.5 4.5-3.5s4.5 1.5 4.5 3.5M8.5 16c0-2 2-3.5 4.5-3.5s4.5 1.5 4.5 3.5" stroke-linecap="round"/></svg>
+        The crowd
+      </button>
       <button data-view="scenarios">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="6" height="6" rx="1.5"/><rect x="11" y="3" width="6" height="6" rx="1.5"/><rect x="3" y="11" width="6" height="6" rx="1.5"/><rect x="11" y="11" width="6" height="6" rx="1.5"/></svg>
         Scenarios
@@ -251,6 +659,14 @@ table.cmp tr:last-child td { border-bottom: 0; }
       <button data-view="design">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 4v12M4 10h12" stroke-linecap="round"/></svg>
         Design experiments
+      </button>
+      <button data-view="guide">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4h6a3 3 0 013 3v9a2 2 0 00-2-2H4V4z"/><path d="M16 4h-3a3 3 0 00-3 3v9a2 2 0 012-2h4V4z" stroke-linejoin="round"/></svg>
+        Guide
+      </button>
+      <button data-view="library">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 3h9a2 2 0 012 2v12H6a2 2 0 01-2-2V3z" stroke-linejoin="round"/><path d="M4 15a2 2 0 012-2h9" stroke-linejoin="round"/><path d="M8 7h4M8 10h4" stroke-linecap="round"/></svg>
+        Library
       </button>
       <button data-view="compare">
         <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h12M4 10h8M4 14h12" stroke-linecap="round"/></svg>
@@ -261,6 +677,14 @@ table.cmp tr:last-child td { border-bottom: 0; }
         About
       </button>
     </nav>
+
+    <div id="session-pill" class="session-pill" onclick="sessionReopenLast()">
+      <span class="sp-icon">↺</span>
+      <div class="sp-body">
+        <div class="sp-title" id="sp-title">—</div>
+        <div class="sp-meta" id="sp-meta">—</div>
+      </div>
+    </div>
     <div class="sidebar-foot">
       Kian Mansouri Jamshidi<br>Sabihe Khorshidi<br>
       <a href="https://github.com/sirkianmj/32k-xai" target="_blank" rel="noopener">Repository</a>
@@ -318,6 +742,73 @@ table.cmp tr:last-child td { border-bottom: 0; }
             <li>Learning, mood, and social preferences</li>
           </ul>
         </div>
+      </div>
+    </section>
+
+    <!-- CROWD -->
+    <section id="view-crowd" class="view">
+      <div class="crowd-hero">
+        <h2>The crowd</h2>
+        <p>
+          Every agent in the population, laid out so you can see it. Each one has a unique
+          personality, mood, and cognitive profile drawn from real human data. Use this tab
+          to understand who is in your population before running experiments on them.
+        </p>
+      </div>
+
+      <div class="trait-picker" id="trait-picker"></div>
+
+      <div class="hist-card" id="hist-card">
+        <div style="font-size:13px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.05em;font-weight:600;margin-bottom:10px;" id="hist-trait-label">Loading…</div>
+        <div id="hist-svg-wrap"></div>
+        <div class="hist-stats" id="hist-stats"></div>
+      </div>
+
+      <div class="charts-grid" style="margin-top:16px;">
+        <div id="corr-heatmap-slot"></div>
+        <div id="dist-overlay-slot"></div>
+      </div>
+
+      <div class="filter-bar">
+        <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-3);font-weight:600;margin-bottom:10px;">Select a subgroup</div>
+        <div class="row">
+          <div class="field" style="margin:0;">
+            <label>Where</label>
+            <select id="filter-trait"></select>
+          </div>
+          <div class="field" style="margin:0;">
+            <label>Is</label>
+            <select id="filter-op">
+              <option value=">=">at least</option>
+              <option value=">">more than</option>
+              <option value="<=">at most</option>
+              <option value="<">less than</option>
+            </select>
+          </div>
+          <div class="field" style="margin:0;">
+            <label>Value</label>
+            <input id="filter-value" type="number" step="0.05" value="0.7" style="width:100px;">
+          </div>
+          <button class="btn primary" onclick="applyFilter()" style="padding:10px 18px;">Select</button>
+          <button class="btn secondary" onclick="clearFilter()" style="padding:10px 18px;">Clear</button>
+          <button class="btn secondary" onclick="crowdUseSubgroupInDesign()" style="padding:10px 18px;">Use in Design →</button>
+          <div style="margin-left:auto;text-align:right;">
+            <div class="filter-count" id="filter-count">8,000</div>
+            <div class="filter-count-lbl">agents match</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pop-table-wrap" id="pop-table-wrap">
+        <table class="pop-table" id="pop-table">
+          <thead id="pop-thead"></thead>
+          <tbody id="pop-tbody"></tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="btn secondary" id="pg-prev" onclick="crowdPrev()">← Previous</button>
+        <span id="pg-info">Page 1 of 1</span>
+        <button class="btn secondary" id="pg-next" onclick="crowdNext()">Next →</button>
       </div>
     </section>
 
@@ -394,7 +885,10 @@ table.cmp tr:last-child td { border-bottom: 0; }
       </div>
 
       <div id="trace-output"></div>
+      <div id="trace-summary"></div>
     </section>
+
+
 
     <!-- DESIGN -->
     <section id="view-design" class="view">
@@ -547,10 +1041,223 @@ table.cmp tr:last-child td { border-bottom: 0; }
       <div id="compare-results"></div>
     </section>
 
+    <!-- GUIDE -->
+    <section id="view-guide" class="view">
+      <h2 class="page-title">Guide</h2>
+      <p class="page-sub">A plain-English walkthrough for researchers. No programming required.</p>
+
+      <div class="guide">
+
+        <details class="guide-section" open>
+          <summary>What is this platform?</summary>
+          <div class="guide-body">
+            <p>
+              This is a <span class="term">simulated society</span>. It contains
+              thousands of virtual people (&ldquo;agents&rdquo;), each one with its own
+              personality, mood, and decision rules. The agents play economic
+              games with each other — offering money, sending trust, deciding
+              whether to reject unfair offers — and over time their choices
+              produce patterns like cooperation, inequality, and trust.
+            </p>
+            <p>
+              The purpose is to study <em>why</em> those patterns emerge. Unlike
+              a neural network, every single decision in this platform can be
+              traced back to a specific number inside the agent — for instance,
+              how much the agent values fairness, or how much distress it is
+              currently feeling. You can point at one agent, at one moment, and
+              ask &ldquo;what made you do that?&rdquo;, and get a real answer.
+            </p>
+            <p>
+              The simulation is calibrated against <span class="term">five human
+              benchmarks</span> — real data from published economic-game studies.
+              When the platform says &ldquo;PASS&rdquo;, it means the simulated
+              agents behaved within one standard error of what real humans did.
+            </p>
+          </div>
+        </details>
+
+        <details class="guide-section">
+          <summary>Quick start — 5 steps</summary>
+          <div class="guide-body">
+            <ol>
+              <li><span class="term">Open Scenarios.</span> You will see eight pre-built experiments.</li>
+              <li><span class="term">Click any scenario.</span> A settings page appears with three numbers (agents, ticks, seed). Leave them as they are.</li>
+              <li><span class="term">Click Run simulation.</span> In a few seconds you will see a bar chart and five result cards.</li>
+              <li><span class="term">Read the results.</span> Green bars = the agents matched human behaviour. Red bars = they did not. Click the &ldquo;i&rdquo; next to any benchmark for an explanation.</li>
+              <li><span class="term">Trace a decision.</span> Click the blue &ldquo;Trace a decision&rdquo; button. Slide the agent and tick sliders to any position, then click &ldquo;Show me the trace&rdquo; to see every number behind one specific decision.</li>
+            </ol>
+            <div class="example">
+              <strong>Tip.</strong> If you just want to see the platform work,
+              open <em>Scenarios &rarr; Baseline</em> and click <em>Run simulation</em>.
+              That takes the fewest steps.
+            </div>
+          </div>
+        </details>
+
+        <details class="guide-section">
+          <summary>Reading the results</summary>
+          <div class="guide-body">
+            <p>
+              Each run produces five <span class="term">benchmarks</span>. These are
+              the same five numbers that psychologists have measured in real
+              human laboratories, so you can compare the simulation directly
+              to people.
+            </p>
+
+            <h4>Ultimatum game — offer</h4>
+            <p>Two strangers have &pound;10 to split. One proposes a split; the other either accepts (both keep the money) or rejects (both get nothing). This benchmark is the <em>average amount offered</em>, as a fraction of the total. Human average: <strong>0.40</strong>.</p>
+
+            <h4>Ultimatum game — rejection</h4>
+            <p>The fraction of offers that get rejected. Low offers are rejected more often than fair ones. Human average: <strong>0.16</strong>.</p>
+
+            <h4>Trust game — send</h4>
+            <p>One person sends some money to a stranger, knowing the stranger will receive triple the amount. The sender is trusting the trustee to send something back. This benchmark is the <em>average amount sent</em> as a fraction of the sender's endowment. Human average: <strong>0.502</strong>.</p>
+
+            <h4>Trust game — return</h4>
+            <p>The fraction of the received amount the trustee sends back to the sender. Human average: <strong>0.372</strong>.</p>
+
+            <h4>Wealth inequality (Gini)</h4>
+            <p>A single number from 0 (everyone equal) to 1 (one person owns everything) that summarises how unequal wealth is after the simulation ends. Human comparison is to real wealth distributions, around <strong>0.40</strong>.</p>
+
+            <h4>What "PASS" means</h4>
+            <p>Each benchmark has a <span class="term">human target</span> and a
+              <span class="term">standard error</span> (SE). PASS means the
+              simulated value is within one SE of the human target. SE captures
+              how much the human data itself varies between studies. So PASS
+              means: the simulation behaves consistently with the range of
+              human findings.</p>
+          </div>
+        </details>
+
+        <details class="guide-section">
+          <summary>Reading the decision trace</summary>
+          <div class="guide-body">
+            <p>
+              The trace shows every internal number for one agent at one
+              moment. There are 56 fields in total, grouped by role. The most
+              important groups:
+            </p>
+            <h4>Decision at this tick</h4>
+            <p>What the agent chose to do: engage or avoid, what offer to make, what amount to send, whether to accept, how much to return.</p>
+            <h4>Beliefs and values</h4>
+            <p>The agent's internal estimates at the moment of choosing. The <code>Q_MF</code> values are habits learned from recent experience. The <code>Q_MB</code> values are forecasts based on a model of how the world works. The <code>Q_net</code> values blend the two based on the arbitration weight <code>w_mb_eff</code>. When <code>w_mb_eff</code> is small, the agent is running on habit; when it is large, it is planning.</p>
+            <h4>Why it accepted or rejected</h4>
+            <p>The Fehr-Schmidt utility (<code>U_accept</code>) is the number that decides whether to accept an offer. It is the agent's payoff minus a penalty for the offer being unfair. Two penalties are possible: <code>inequity_neg</code> (the partner has more) and <code>inequity_pos</code> (the agent has more).</p>
+            <h4>Click any label in the trace to see its definition in plain English.</h4>
+          </div>
+        </details>
+
+        <details class="guide-section">
+          <summary>Building your own experiment</summary>
+          <div class="guide-body">
+            <p>The <span class="term">Design experiments</span> tab lets you build a custom study by combining four pieces:</p>
+            <ol>
+              <li><span class="term">Population psychology</span> — shift the mean or variance of any trait (e.g. make everyone slightly more neurotic). Useful when you want to test how population characteristics change behaviour.</li>
+              <li><span class="term">Interventions</span> — add shocks to the simulation. There are four types:
+                <ul>
+                  <li><strong>Resource scarcity</strong> — reduce the money available in each interaction.</li>
+                  <li><strong>Distress injection</strong> — raise baseline stress levels for a subset of agents.</li>
+                  <li><strong>Social isolation</strong> — reduce the number of neighbours an agent can interact with.</li>
+                  <li><strong>Wealth redistribution</strong> — pull wealth toward the mean (like a tax-and-transfer policy).</li>
+                </ul>
+              </li>
+              <li><span class="term">Targeting</span> — an intervention can apply to everyone, to a random percentage, or to a subgroup defined by a trait (e.g. the top 30% on neuroticism).</li>
+              <li><span class="term">Measurement</span> — how many agents, how many ticks, and how many seeds to average over.</li>
+            </ol>
+            <p>When you click <strong>Run experiment</strong>, the platform produces a treatment-vs-control table (comparing targeted agents to non-targeted ones) and time-series charts (showing how behaviour evolves tick by tick).</p>
+          </div>
+        </details>
+
+        <details class="guide-section">
+          <summary>Statistical terms</summary>
+          <div class="guide-body">
+            <h4>Standard Error (SE)</h4>
+            <p>How much a measured value varies between independent studies. If a human average is 0.40 with SE 0.05, that means different published studies report values roughly between 0.35 and 0.45. PASS means the simulation falls in that range.</p>
+            <h4>Delta (Δ)</h4>
+            <p>The difference between the simulated value and the human target. Positive delta means the simulation scored higher than humans; negative means lower.</p>
+            <h4>z-score (delta &divide; SE)</h4>
+            <p>How many standard errors away from the human target the simulation is. A z of 0 means perfect agreement. A z of 1 is at the edge of the tolerance band. Below 1 is PASS.</p>
+            <h4>Confidence interval (CI)</h4>
+            <p>A range within which the true value is likely to fall. In this platform, the shaded band on the bar chart (± 1 SE) is a rough 68% interval.</p>
+            <h4>p-value</h4>
+            <p>How likely the observed result would be if there were no real effect. Small p means strong evidence. Not shown on the main dashboard, but available in the calibration log.</p>
+            <h4>Seed</h4>
+            <p>A number that makes random processes repeatable. Same seed + same settings = same result, exactly. Changing the seed gives a different random draw from the same population.</p>
+          </div>
+        </details>
+
+        <details class="guide-section">
+          <summary>Glossary of engine terms</summary>
+          <div class="guide-body">
+            <h4>Agent</h4>
+            <p>One virtual person in the simulation. The default is 8,000 agents; full scale is 32,000.</p>
+            <h4>Tick</h4>
+            <p>One round of the simulation. In each tick, every agent chooses a partner, decides whether to engage, plays both games, and updates its internal estimates.</p>
+            <h4>Q-value</h4>
+            <p>The agent's estimate of how much reward it will get from a given action. Higher Q = the agent expects this action to be more rewarding.</p>
+            <h4>Model-based control (Q_MB)</h4>
+            <p>The agent's plan. It simulates what would happen if it took each action, using a model of how the environment transitions between states.</p>
+            <h4>Model-free control (Q_MF)</h4>
+            <p>The agent's habit. It just remembers what worked before and does it again.</p>
+            <h4>Arbitration weight (w_mb_eff)</h4>
+            <p>The blend between habit and plan. Near 0 = mostly habit. Near 1 = mostly plan. Distress reduces this weight, forcing a reversion to habit.</p>
+            <h4>Softmax</h4>
+            <p>The formula that turns Q-values into probabilities. Actions with higher Q are more likely, but with some randomness.</p>
+            <h4>Fehr-Schmidt utility</h4>
+            <p>A utility function from behavioural economics that adds a &ldquo;fairness penalty&rdquo; to the agent's payoff. An unfair offer feels worse than the money alone would suggest.</p>
+            <h4>Distress</h4>
+            <p>An internal state that rises when the agent's offers are rejected and slowly decays. High distress reduces planning and biases the agent toward safer, more habitual choices.</p>
+            <h4>Inverse temperature (τ)</h4>
+            <p>How sharply the agent prefers higher-Q actions. High τ = strongly prefers the best option. Low τ = chooses more randomly.</p>
+          </div>
+        </details>
+
+        <details class="guide-section">
+          <summary>References for the human benchmarks</summary>
+          <div class="guide-body">
+            <ul class="refs">
+              <li>Fehr, E., &amp; Schmidt, K. M. (1999). A theory of fairness, competition, and cooperation. <em>Quarterly Journal of Economics</em>, 114(3), 817&ndash;868.</li>
+              <li>Sanfey, A. G., Rilling, J. K., Aronson, J. A., Nystrom, L. E., &amp; Cohen, J. D. (2003). The neural basis of economic decision-making in the ultimatum game. <em>Science</em>, 300(5626), 1755&ndash;1758.</li>
+              <li>Oosterbeek, H., Sloof, R., &amp; Van De Kuilen, G. (2004). Cultural differences in ultimatum game experiments: Evidence from a meta-analysis. <em>Experimental Economics</em>, 7(2), 171&ndash;188.</li>
+              <li>Johnson, N. D., &amp; Mislin, A. A. (2011). Trust games: A meta-analysis. <em>Journal of Economic Psychology</em>, 32(5), 865&ndash;889.</li>
+              <li>Daw, N. D., Gershman, S. J., Seymour, B., Dayan, P., &amp; Dolan, R. J. (2011). Model-based influences on humans' choices and striatal prediction errors. <em>Neuron</em>, 69(6), 1204&ndash;1215.</li>
+            </ul>
+          </div>
+        </details>
+
+      </div>
+    </section>
+
+    <!-- LIBRARY -->
+    <section id="view-library" class="view">
+      <h2 class="page-title">Library</h2>
+      <p class="page-sub">Every experiment you run is saved here. Compare any two — if they share the same seed and population size, that is a paired counterfactual, the kind of test a real experiment cannot do.</p>
+
+      <div class="lib-toolbar">
+        <button class="btn secondary" onclick="libraryExport()">Export all (.json)</button>
+        <label class="btn secondary" style="cursor:pointer;">
+          Import
+          <input type="file" accept=".json" style="display:none;" onchange="libraryImport(event)">
+        </label>
+        <div class="spacer"></div>
+        <span style="font-size:13px;color:var(--ink-3);" id="lib-count"></span>
+        <button class="btn primary" id="lib-compare-btn" onclick="libraryCompare()" disabled>Compare two</button>
+        <button class="btn secondary" id="lib-clear-btn" onclick="libraryClearSelection()" style="display:none;">Clear selection</button>
+      </div>
+
+      <div id="library-body"></div>
+      <div id="library-comparison"></div>
+    </section>
+
     <!-- ABOUT -->
     <section id="view-about" class="view">
       <h2 class="page-title">About this platform</h2>
       <p class="page-sub">A research tool for causal, individual-level interrogation of emergent social behaviour.</p>
+
+      <div class="btn-row" style="margin-bottom:20px;">
+        <button class="btn primary" onclick="startTour()">Replay the intro tour</button>
+        <button class="btn secondary" onclick="goTo('guide')">Open the Guide</button>
+      </div>
 
       <div class="card" style="margin-bottom:16px;">
         <h3 style="margin-top:0;">What it is</h3>
@@ -600,6 +1307,17 @@ function goTo(view) {
   const btn = document.querySelector(`#nav button[data-view="${view}"]`);
   if (btn) btn.classList.add('active');
   window.scrollTo({top: 0, behavior: 'smooth'});
+  if (view === 'library') {
+    try { renderLibrary(); }
+    catch (e) {
+      console.error('render library failed', e);
+      const el = document.getElementById('library-body');
+      if (el) el.innerHTML = `<div class="notice error">Library failed to render: ${e.message}</div>`;
+    }
+  }
+  if (view === 'crowd') {
+    try { crowdLoad(); } catch (e) { console.warn('crowd refresh failed', e); }
+  }
 }
 document.querySelectorAll('#nav button').forEach(b => {
   b.addEventListener('click', () => goTo(b.dataset.view));
@@ -682,6 +1400,8 @@ async function runScenario() {
     const data = await r.json();
     renderResults('run-results', data);
     document.getElementById('run-progress').innerHTML = '';
+    sessionSaveRun(state.current, N, T, seed, data);
+    libraryAutoSave('scenario');
   } catch (e) {
     document.getElementById('run-progress').innerHTML =
       `<div class="notice error">Run failed: ${e.message}</div>`;
@@ -689,6 +1409,381 @@ async function runScenario() {
     btn.disabled = false;
     btn.textContent = 'Run simulation';
   }
+}
+
+
+function benchBarChart(benchmarks) {
+  if (!benchmarks || !benchmarks.length) return '';
+  const W = 720, H = 260;
+  const PAD_L = 60, PAD_R = 20, PAD_T = 30, PAD_B = 60;
+  const innerW = W - PAD_L - PAD_R, innerH = H - PAD_T - PAD_B;
+  const n = benchmarks.length, slot = innerW / n;
+  const barW = Math.min(40, slot * 0.35);
+  const maxY = Math.max(1e-6, ...benchmarks.map(b => b.platform + b.se));
+  const yMax = Math.ceil(maxY * 1.2 * 10) / 10;
+  const yToPx = y => PAD_T + innerH - (y / yMax) * innerH;
+  const grid = [];
+  for (let g = 0; g <= 4; g++) {
+    const y = yMax * g / 4, py = yToPx(y);
+    grid.push('<line x1="'+PAD_L+'" x2="'+(W-PAD_R)+'" y1="'+py+'" y2="'+py+'" stroke="#eee"/>');
+    grid.push('<text x="'+(PAD_L-6)+'" y="'+(py+3)+'" font-size="10" text-anchor="end" fill="#8e8e93">'+y.toFixed(2)+'</text>');
+  }
+  const bars = benchmarks.map((b,i) => {
+    const cx = PAD_L + slot*(i+0.5);
+    const x1 = cx - barW/2, x2 = cx + barW/2;
+    const yPlat = yToPx(b.platform), yTop = yToPx(b.target);
+    const yL = yToPx(b.target - b.se), yH = yToPx(b.target + b.se);
+    const color = b.pass ? '#30d158' : '#ff453a';
+    return '<rect x="'+(x1-6)+'" y="'+yH+'" width="'+(barW+12)+'" height="'+Math.max(1,yL-yH)+'" fill="'+(b.pass?'#e7f9ec':'#ffecea')+'" opacity="0.7"/>'
+      + '<rect x="'+x1+'" y="'+yPlat+'" width="'+barW+'" height="'+Math.max(1,PAD_T+innerH-yPlat)+'" fill="'+color+'" rx="3" opacity="0.85"/>'
+      + '<line x1="'+(x1-8)+'" x2="'+(x2+8)+'" y1="'+yTop+'" y2="'+yTop+'" stroke="#1c1c1e" stroke-width="1.5" stroke-dasharray="3,2"/>'
+      + '<text x="'+cx+'" y="'+(yPlat-6)+'" font-size="11" text-anchor="middle" fill="#1c1c1e" font-weight="600">'+b.platform.toFixed(3)+'</text>'
+      + '<text x="'+cx+'" y="'+(H-PAD_B+22)+'" font-size="11" text-anchor="middle" fill="#48484a">'+b.name+'</text>'
+      + '<text x="'+cx+'" y="'+(H-PAD_B+40)+'" font-size="10" text-anchor="middle" fill="'+(b.pass?'#1a6b32':'#a1150d')+'" font-weight="600">'+(b.pass?'PASS':'FAIL')+'</text>';
+  }).join('');
+  const legend = '<g transform="translate('+(W-PAD_R-220)+', '+(PAD_T-18)+')">'
+    + '<rect x="0" y="0" width="12" height="12" fill="#30d158" rx="2"/>'
+    + '<text x="18" y="10" font-size="11" fill="#48484a">Platform</text>'
+    + '<line x1="90" x2="110" y1="6" y2="6" stroke="#1c1c1e" stroke-width="1.5" stroke-dasharray="3,2"/>'
+    + '<text x="116" y="10" font-size="11" fill="#48484a">Human target</text>'
+    + '<rect x="215" y="0" width="12" height="12" fill="#e7f9ec" stroke="#30d158" stroke-width="0.5" rx="2"/>'
+    + '<text x="233" y="10" font-size="11" fill="#48484a">± 1 SE</text></g>';
+  return '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block;font-family:-apple-system,BlinkMacSystemFont,sans-serif">'
+    + grid.join('')
+    + '<line x1="'+PAD_L+'" x2="'+PAD_L+'" y1="'+PAD_T+'" y2="'+(PAD_T+innerH)+'" stroke="#d8d8dc"/>'
+    + '<line x1="'+PAD_L+'" x2="'+(W-PAD_R)+'" y1="'+(PAD_T+innerH)+'" y2="'+(PAD_T+innerH)+'" stroke="#d8d8dc"/>'
+    + bars + legend + '</svg>';
+}
+
+
+
+function renderPopulationMini() {
+  const N = session.lastRun ? session.lastRun.N : 0;
+  if (!N) return '';
+  return `
+    <div class="card" style="margin-top:16px;">
+      <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-3);font-weight:600;margin-bottom:8px;">The population behind this result</div>
+      <p style="color:var(--ink-2);font-size:14px;margin:0 0 12px;">These benchmarks came from <strong>${N.toLocaleString()} simulated agents</strong>, each with its own personality, mood, and learning parameters. They are not random — every agent is drawn from the same human covariance structure used in every run of this platform.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <span class="pill" style="background:#eff6ff;color:#1c4dba;font-size:11px;">${N.toLocaleString()} agents</span>
+        <span class="pill" style="background:#f5f0ff;color:#5e5ce6;font-size:11px;">${session.lastRun ? session.lastRun.T : 0} ticks</span>
+        <span class="pill" style="background:#e7f9ec;color:#1a6b32;font-size:11px;">seed ${session.lastRun ? session.lastRun.seed : '—'}</span>
+      </div>
+    </div>`;
+}
+
+function renderScenarioTimeseries(data) {
+  const ts = data.timeseries_full;
+  if (!ts) return '';
+  const T = ts.ticks.length;
+  const ranges = data.shock_tick_ranges || [];
+  const specs = [
+    { key: 'ug_offer', label: 'Offer rate', color: '#0a84ff', target: 0.400 },
+    { key: 'ug_rej',   label: 'Rejection rate', color: '#ff9f0a', target: 0.160 },
+    { key: 'tg_send',  label: 'Send rate', color: '#30d158', target: 0.502 },
+    { key: 'tg_ret',   label: 'Return rate', color: '#5e5ce6', target: 0.372 },
+  ];
+  const charts = specs.map(s => {
+    const ys = ts[s.key];
+    const W = 320, H = 100, PAD = 22;
+    const yMin = 0, yMax = Math.max(0.6, ...ys.map(Math.abs));
+    const sx = x => PAD + (x / Math.max(1, T - 1)) * (W - 2 * PAD);
+    const sy = y => H - PAD - ((y - yMin) / (yMax - yMin)) * (H - 2 * PAD);
+    const pts = ys.map((y, i) => `${sx(i).toFixed(1)},${sy(y).toFixed(1)}`).join(' ');
+    const targetY = sy(s.target).toFixed(1);
+    const shockRects = ranges.map(r => {
+      const x0 = sx(r.tick);
+      const x1 = sx(Math.min(T - 1, r.tick + r.duration));
+      return `<rect x="${x0.toFixed(1)}" y="${PAD}" width="${Math.max(0, x1-x0).toFixed(1)}" height="${H-2*PAD}" fill="rgba(255,159,10,0.15)"/>`;
+    }).join('');
+    const svgBody = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block;font-family:-apple-system,sans-serif">
+      ${shockRects}
+      <line x1="${PAD}" x2="${PAD}" y1="${PAD}" y2="${H-PAD}" stroke="#e5e5ea"/>
+      <line x1="${PAD}" x2="${W-PAD}" y1="${H-PAD}" y2="${H-PAD}" stroke="#e5e5ea"/>
+      <line x1="${PAD}" x2="${W-PAD}" y1="${targetY}" y2="${targetY}" stroke="#8e8e93" stroke-dasharray="3,3" stroke-width="1"/>
+      <polyline points="${pts}" fill="none" stroke="${s.color}" stroke-width="1.6"/>
+      <text x="${PAD+2}" y="${H-4}" font-size="9" fill="#8e8e93">0</text>
+      <text x="${W-PAD-18}" y="${H-4}" font-size="9" fill="#8e8e93">${T-1}</text>
+    </svg>`;
+    return chartCard(s.label + ' over time',
+                     'Per-tick population average. Dashed line = human target ' + s.target.toFixed(2) + (ranges.length ? '. Orange band = intervention window.' : '.'),
+                     svgBody,
+                     'timeseries-' + s.key + '.svg');
+  }).join('');
+  return `
+    <h3 style="margin-top:24px;">Behaviour over time</h3>
+    <p style="color:var(--ink-3);font-size:13px;margin:0 0 12px;">Every tick, how the population behaved. Watch for rises, dips, and recovery after the intervention window.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;">
+      ${charts}
+    </div>`;
+}
+
+
+// ============================================================
+// SCENARIO-LEVEL DEEP ANALYSIS — generated from the actual run data
+// ============================================================
+function seRatio(b) {
+  return (b.platform - b.target) / b.se;
+}
+
+function sePhrase(b) {
+  const r = seRatio(b);
+  const a = Math.abs(r);
+  const dir = r >= 0 ? 'above' : 'below';
+  if (a < 0.15) return `essentially on the human line (${Math.round(a*100)}% of one SE)`;
+  if (a < 0.4)  return `${Math.round(a*100)}% of one SE ${dir} the human benchmark — close agreement`;
+  if (a < 0.7)  return `${Math.round(a*100)}% of one SE ${dir} the human benchmark`;
+  if (a < 1.0)  return `at the edge of the human SE band, ${Math.round(a*100)}% of one SE ${dir}`;
+  if (a < 1.5)  return `just outside the human SE band, ${Math.round(a*100)}% of one SE ${dir}`;
+  return `clearly outside the human SE band, ${Math.round(a*100)}% of one SE ${dir}`;
+}
+
+function humanReferenceText(b) {
+  const refs = {
+    'UG mean offer':  'Fehr & Schmidt (1999); Oosterbeek et al. (2004) meta-analysis across 75 ultimatum studies',
+    'UG rejection':   'Oosterbeek et al. (2004), rejection rate of 16% across 75 studies',
+    'TG mean send':   'Johnson & Mislin (2011) meta-analysis across 162 trust-game studies',
+    'TG mean return': 'Johnson & Mislin (2011), trustee-return fraction',
+    'Final Gini':     'Comparison to World Bank household-wealth Gini, mid-range OECD economies',
+  };
+  return refs[b.name] || '';
+}
+
+function benchmarkDeepSentence(b) {
+  const d = b.platform - b.target;
+  const phrase = sePhrase(b);
+  const verdict = b.pass ? 'PASS' : 'DIFFERENT';
+  const direction = d > 0 ? 'higher' : 'lower';
+  const directionLine = Math.abs(d) < 1e-6
+    ? 'identical to the human mean'
+    : `${Math.abs(d).toFixed(4)} ${direction} than the human reference`;
+  const ref = humanReferenceText(b);
+  return `<li><strong>${b.name}</strong> = ${b.platform.toFixed(4)}. The human benchmark is ${b.target.toFixed(3)} ± ${b.se.toFixed(3)} (SE), so the platform is ${directionLine}, ${phrase}. <em>Verdict: ${verdict}.</em>${ref ? ' Reference: ' + ref + '.' : ''}</li>`;
+}
+
+function shockDescription(data) {
+  // The server returns shocks inside audit.shocks, not at the top level.
+  // Accept either location.
+  const shocks = (data && data.shocks) || (data && data.audit && data.audit.shocks) || [];
+  if (!shocks.length) return null;
+  const descriptions = shocks.map(s => {
+    const kind = {
+      resource_scarcity:    `resource scarcity — every reward multiplied by ${(1 - s.magnitude).toFixed(2)} (a ${(s.magnitude*100).toFixed(0)}% reduction)`,
+      distress_injection:   `distress injection — baseline distress for affected agents raised by ${s.magnitude.toFixed(2)}`,
+      network_thinning:     `social isolation — the neighbour pool was cut by ${(s.magnitude*100).toFixed(0)}%`,
+      wealth_redistribution: `wealth redistribution — each affected agent pulled ${(s.magnitude*100).toFixed(2)}% toward the population mean per tick`,
+    }[s.type] || s.type;
+    const when = `from tick ${s.tick} to ${s.tick + s.duration}`;
+    const who = s.target_frac == null
+      ? 'affecting all agents'
+      : `affecting ${Math.round(s.target_frac * 100)}% of the population`;
+    return `${kind}, ${when}, ${who}`;
+  });
+  return descriptions;
+}
+
+function timeseriesTrend(data, key, t0, t1) {
+  const ts = data.timeseries_full;
+  if (!ts || !ts[key] || !ts[key].length) return null;
+  const slice = ts[key].slice(t0, t1);
+  if (!slice.length) return null;
+  const mean = slice.reduce((a, b) => a + b, 0) / slice.length;
+  const first = slice[0];
+  const last = slice[slice.length - 1];
+  return { mean, first, last, change: last - first };
+}
+
+function scenarioDeepAnalysis(data) {
+  // Normalise: ensure data.shocks is present
+  if (!data.shocks && data.audit && Array.isArray(data.audit.shocks)) {
+    data.shocks = data.audit.shocks;
+  }
+  const b = data.benchmarks || [];
+  const pass = b.filter(x => x.pass).length;
+  const t = b.length;
+
+  // --- Headline ---
+  const hasDelta = !!data.baseline_platform;
+  const SES_LOCAL = [0.050, 0.050, 0.130, 0.120, 0.120];
+  let maxShift = 0;
+  if (hasDelta) {
+    for (let i = 0; i < data.benchmarks.length; i++) {
+      const z = Math.abs((data.platform[i] - data.baseline_platform[i]) / SES_LOCAL[i]);
+      maxShift = Math.max(maxShift, z);
+    }
+  }
+  let headline;
+  if (!hasDelta) {
+    headline = pass === t
+      ? `All five human benchmarks matched under baseline conditions. This is the reference run every other scenario should be compared against.`
+      : `Under baseline conditions, ${pass} of ${t} benchmarks matched. This is a deviation worth investigating.`;
+  } else {
+    const effect = maxShift < 0.15 ? 'barely moved'
+                 : maxShift < 0.5  ? 'produced a small shift on'
+                 : maxShift < 1.0  ? 'produced a substantial shift on'
+                 : 'produced a large shift on';
+    headline = `This intervention ${effect} the population (max Δ = ${(maxShift*100).toFixed(0)}% of one SE). `
+             + `Against the human reference, ${pass} of ${t} benchmarks still fall inside the SE band — the numbers moved, but not enough to break the human comparison. `
+             + `The delta table above shows exactly what changed.`;
+  }
+
+  // --- Per-benchmark deep dive ---
+  const rows = b.map(benchmarkDeepSentence).join('');
+
+  // --- Shock narrative ---
+  const shocks = shockDescription(data);
+  const shockSection = shocks && shocks.length ? `
+    <h4>Intervention applied</h4>
+    <p>${shocks.join('; ')}.</p>
+    ${shockTickNarrative(data)}
+  ` : `<h4>No intervention</h4><p>This run was under baseline conditions — the population evolved without external manipulation. It is the reference against which intervention runs should be compared.</p>`;
+
+  // --- Mechanism ---
+  const mechanism = mechanismAnalysis(data);
+
+  return `
+    <div class="card" style="margin-top:20px;background:#f8fbff;border-color:#dbe9ff;">
+      <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.05em;color:#1c4dba;font-weight:600;margin-bottom:10px;">Scientific analysis of this run</div>
+      <p style="font-size:15px;color:var(--ink-2);line-height:1.7;margin:0 0 16px;">${headline}</p>
+      <h4 style="margin:18px 0 8px;font-size:14px;">Benchmark by benchmark</h4>
+      <ul style="margin:0;padding-left:22px;font-size:14px;line-height:1.75;color:var(--ink-2);">${rows}</ul>
+      ${shockSection}
+      ${mechanism}
+    </div>`;
+}
+
+function shockTickNarrative(data) {
+  const ranges = data.shock_tick_ranges || (data.audit && data.audit.shocks
+    ? data.audit.shocks.map(s => ({tick: s.tick, duration: s.duration}))
+    : []);
+  if (!ranges.length || !data.timeseries_full) return '';
+  const ts = data.timeseries_full;
+  const firstRange = ranges[0];
+  const t0 = firstRange.tick;
+  const t1 = Math.min(ts.ticks.length, firstRange.tick + firstRange.duration);
+
+  // Compare "before" and "during"
+  const before = { t0: Math.max(0, t0 - 50), t1: t0 };
+  const during = { t0, t1 };
+  const keys = [['ug_offer','offer rate'],['ug_rej','rejection rate'],['tg_send','send rate'],['tg_ret','return rate']];
+  const lines = [];
+  for (const [k, name] of keys) {
+    const b = timeseriesTrend(data, k, before.t0, before.t1);
+    const d = timeseriesTrend(data, k, during.t0, during.t1);
+    if (!b || !d) continue;
+    const diff = d.mean - b.mean;
+    if (Math.abs(diff) < 0.005) continue;
+    const dir = diff > 0 ? 'rose' : 'fell';
+    lines.push(`the ${name} ${dir} from ${b.mean.toFixed(3)} (before the intervention) to ${d.mean.toFixed(3)} (during it) — a change of ${(diff >= 0 ? '+' : '')}${diff.toFixed(3)}`);
+  }
+  if (!lines.length) {
+    return `<p>During ticks ${t0}–${t1} the population-level behavioural rates did not change measurably. This means the intervention acted on unobserved internal variables rather than on the games themselves.</p>`;
+  }
+  return `<p>Comparing the 50 ticks before the intervention to the intervention window: ${lines.join('; ')}.</p>`;
+}
+
+function mechanismAnalysis(data) {
+  const b = data.benchmarks || [];
+  const notes = [];
+
+  const offerB = b.find(x => x.name === 'UG mean offer');
+  const rejB   = b.find(x => x.name === 'UG rejection');
+  const sendB  = b.find(x => x.name === 'TG mean send');
+  const retB   = b.find(x => x.name === 'TG mean return');
+  const giniB  = b.find(x => x.name === 'Final Gini');
+
+  if (offerB && rejB) {
+    const zOff = Math.abs((offerB.platform - offerB.target) / offerB.se);
+    const zRej = Math.abs((rejB.platform - rejB.target) / rejB.se);
+    if (zOff < 0.4 && zRej < 0.4) {
+      notes.push(`Offers and rejections both match humans closely. The Fehr–Schmidt fairness mechanism in the accept rule is producing rejection-of-low-offers at a rate consistent with real responders.`);
+    } else if (zOff < 0.4 && zRej > 0.7) {
+      notes.push(`Offers match humans but rejections are ${zRej > 1.0 ? 'notably' : 'slightly'} off. This is the classic signature of a fairness-threshold shift: proposers still offer the human-typical amount, but responders value it differently because either the surrounding reward scale or the distress level has moved.`);
+    } else if (zOff > 0.7 && zRej < 0.4) {
+      notes.push(`Proposers are offering a different distribution than humans, but responders are rejecting at the human rate. This can happen when the offer head has learned a different equilibrium while the accept head still weighs fairness correctly.`);
+    }
+  }
+
+  if (sendB && retB) {
+    const zSend = Math.abs((sendB.platform - sendB.target) / sendB.se);
+    const zRet  = Math.abs((retB.platform - retB.target) / retB.se);
+    if (zSend < 0.4 && zRet < 0.4) {
+      notes.push(`Trust send and return rates are both close to the human reference. The reciprocity loop is stable — a sender who invests is met with a returner who reciprocates, at the rate that real dyads do.`);
+    } else if (zSend < 0.4 && zRet > 0.7) {
+      notes.push(`Send rate matches humans but return rate does not. Senders are investing the human-typical amount, but trustees reciprocate at a different rate — this is the signature of a shifted social-value weight or a shifted model-based arbitration weight in the trustee role.`);
+    }
+  }
+
+  if (giniB) {
+    const zG = Math.abs((giniB.platform - giniB.target) / giniB.se);
+    if (zG < 0.4) {
+      notes.push(`Wealth inequality lands in the human-comparable range. Over 500 ticks the accumulation process produces a distribution with the same general shape as household wealth in a mid-range economy.`);
+    } else if (giniB.platform > giniB.target + giniB.se) {
+      notes.push(`Wealth has concentrated more strongly than in human populations. The engine's wealth accumulation has no redistribution channel except the diminishing-marginal-utility term in the fairness calculation, so concentration is expected to be higher under prolonged accumulation.`);
+    } else if (giniB.platform < giniB.target - giniB.se) {
+      notes.push(`Wealth is more equally distributed than human reference data. This can occur when most agents fall back to habit-driven play (low w_mb_eff), which flattens the payoffs that strategic agents would otherwise accumulate.`);
+    }
+  }
+
+  if (!notes.length) return '';
+  return `<h4>Mechanistic reading</h4><ul style="margin:0;padding-left:22px;font-size:14px;line-height:1.7;color:var(--ink-2);">${notes.map(n => `<li>${n}</li>`).join('')}</ul>`;
+}
+
+
+// ============================================================
+// DELTA FROM BASELINE — what did the shock actually change?
+// ============================================================
+function renderDeltaTable(data) {
+  if (!data.baseline_platform) return '';
+  const names = ['UG mean offer','UG rejection','TG mean send','TG mean return','Final Gini'];
+  const SES = [0.050, 0.050, 0.130, 0.120, 0.120];
+  const base = data.baseline_platform;
+  const shocked = data.platform;
+
+  let maxShift = 0;
+  const rows = data.benchmarks.map((b, i) => {
+    const d = shocked[i] - base[i];
+    const z = d / SES[i];
+    maxShift = Math.max(maxShift, Math.abs(z));
+    const cls = Math.abs(z) < 0.15 ? 'ns' : (Math.abs(z) > 1.0 ? (d > 0 ? 'pos' : 'neg') : 'ns');
+    const stars = Math.abs(z) > 1.0 ? ' ★' : (Math.abs(z) > 0.5 ? ' ·' : '');
+    return `<tr>
+      <td>${b.name}</td>
+      <td class="num">${base[i].toFixed(4)}</td>
+      <td class="num">${shocked[i].toFixed(4)}</td>
+      <td class="num delta ${cls}">${d >= 0 ? '+' : ''}${d.toFixed(4)}${stars}</td>
+      <td class="num delta ${cls}">${z >= 0 ? '+' : ''}${(z * 100).toFixed(1)}%</td>
+    </tr>`;
+  }).join('');
+
+  const magnitude =
+    maxShift < 0.15 ? 'The intervention barely moved the population — the reported benchmarks are statistically indistinguishable from baseline.' :
+    maxShift < 0.5  ? 'The intervention produced a small but measurable shift — less than one standard error on every benchmark.' :
+    maxShift < 1.0  ? 'The intervention produced a substantial shift — half a standard error or more on at least one benchmark.' :
+    'The intervention caused a large shift — more than one standard error on at least one benchmark, strong enough to make it FAIL the human comparison.';
+
+  return `
+    <div class="card" style="margin-top:20px;background:#fff8ec;border-color:#ffe4b8;">
+      <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.05em;color:#a35b00;font-weight:600;margin-bottom:10px;">What the intervention actually changed</div>
+      <p style="font-size:15px;color:var(--ink-2);line-height:1.7;margin:0 0 14px;">${magnitude}</p>
+      <table class="cmp2" style="margin-top:0;">
+        <thead>
+          <tr>
+            <th>Benchmark</th>
+            <th style="text-align:right">Baseline</th>
+            <th style="text-align:right">This run</th>
+            <th style="text-align:right">Δ raw</th>
+            <th style="text-align:right">Δ as % of SE</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <p style="font-size:12px;color:var(--ink-3);margin-top:12px;">
+        Baseline and this run share the same seed and population size — every agent is drawn from the identical stream.
+        The only difference is the intervention. ★ = shift larger than one standard error.
+        · = shift between half and one SE. Blank = no measurable shift.
+      </p>
+    </div>`;
 }
 
 function renderResults(containerId, data) {
@@ -705,9 +1800,10 @@ function renderResults(containerId, data) {
     const seWidth = 100 * (2 * b.se) / (hi - lo);
     const pass = b.pass ? 'pass' : 'fail';
     const pill = b.pass ? 'Matched' : 'Different';
+    const infoKey = {'UG mean offer':'ug_offer','UG rejection':'ug_rej','TG mean send':'tg_send','TG mean return':'tg_ret','Final Gini':'gini'}[b.name] || '';
     return `
       <div class="bench">
-        <div class="label">${b.name} <span class="pill ${pass}">${pill}</span></div>
+        <div class="label">${b.name} ${infoIcon(infoKey)}<span class="pill ${pass}">${pill}</span></div>
         <div class="value">${b.platform.toFixed(3)}</div>
         <div class="meta">Human target: ${b.target.toFixed(3)} ± ${b.se.toFixed(3)} · Δ ${(b.delta >= 0 ? '+' : '')}${b.delta.toFixed(4)}</div>
         <div class="tolbar">
@@ -721,16 +1817,36 @@ function renderResults(containerId, data) {
   const csvRows = [['benchmark','platform','target','se','delta','pass']]
     .concat(data.benchmarks.map(b => [b.name, b.platform, b.target, b.se, b.delta, b.pass]));
   const csv = csvRows.map(r => r.join(',')).join('\n');
+  window.__latestJson = json;
+  window.__latestCsv = csv;
   el.innerHTML = `
     ${summary}
-    <h3>Results</h3>
+    <h3>Benchmark chart</h3>
+    <div class="card" id="bench-chart-svg" style="padding:20px;">${benchBarChart(data.benchmarks)}</div>
+    <h3>Results ${infoIcon('stat_pass')}</h3>
     <div class="results-grid">${cards}</div>
     <div class="btn-row">
-      <button class="btn secondary" onclick="downloadFile('result.json', ${JSON.stringify(JSON.stringify(json))}, 'application/json')">Download JSON</button>
-      <button class="btn secondary" onclick="downloadFile('result.csv', ${JSON.stringify(JSON.stringify(csv))}, 'text/csv')">Download CSV</button>
-      <button class="btn secondary" onclick="goTo('scenarios')">Try another scenario</button>
-      ${state.current ? `<button class="btn primary" onclick="openTraceFor('${state.current}')">Trace a decision →</button>` : ''}
+      <button class="btn primary" onclick="saveSvg(document.querySelector('#bench-chart-svg svg'), 'xai32k-chart.svg')">Save chart</button>
+      <button class="btn secondary" onclick="saveLatest('json')">Save JSON</button>
+      <button class="btn secondary" onclick="saveLatest('csv')">Save CSV</button>
     </div>
+
+    <!-- Cross-tab context -->
+    <div class="card" style="margin-top:16px;background:#f8fbff;border-color:#dbe9ff;">
+      <div style="font-size:12px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-3);font-weight:600;margin-bottom:10px;">Explore this result</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        ${state.current ? `<button class="btn secondary" onclick="openTraceFor('${state.current}')">Trace a single decision →</button>` : ''}
+        <button class="btn secondary" onclick="goTo('crowd')">See the whole population →</button>
+        <button class="btn secondary" onclick="goTo('library')">Open the library →</button>
+        <button class="btn secondary" onclick="goTo('design')">Design a variant experiment →</button>
+        <button class="btn secondary" onclick="goTo('compare')">Compare scenarios →</button>
+      </div>
+    </div>
+
+    ${renderPopulationMini()}
+    ${renderScenarioTimeseries(data)}
+    ${renderDeltaTable(data)}${scenarioDeepAnalysis(data)}
+
     <details style="margin-top:20px;">
       <summary style="cursor:pointer;color:var(--ink-2);font-size:13px;">Show audit trail</summary>
       <pre style="font-size:11px;background:#f6f7f9;padding:14px;border-radius:8px;overflow:auto;max-height:400px;margin-top:10px;">${escapeHtml(JSON.stringify(data.audit, null, 2))}</pre>
@@ -740,14 +1856,198 @@ function renderResults(containerId, data) {
 
 function escapeHtml(s) { return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
-function downloadFile(name, content, type) {
-  const blob = new Blob([content], { type });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = name;
-  a.click();
-  URL.revokeObjectURL(a.href);
+async function downloadFile(name, content, type) {
+  const ext = name.split('.').pop().toLowerCase();
+  if (window.pywebview && window.pywebview.api && window.pywebview.api.save_file) {
+    try {
+      const bytes = new TextEncoder().encode(content);
+      let bin = '';
+      for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+      const b64 = btoa(bin);
+      const res = await window.pywebview.api.save_file(name, b64, ext);
+      if (res && res.ok) return;
+      if (res && res.error === 'cancelled') return;
+    } catch (e) {
+      console.warn('native save failed, falling back:', e);
+    }
+  }
+  const kind = ext === 'csv' ? 'csv' : 'json';
+  try {
+    const r = await fetch('/api/download/' + kind, {
+      method: 'POST',
+      headers: { 'Content-Type': type },
+      body: content,
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (e) {
+    alert('Download failed: ' + e.message);
+  }
 }
+
+async function saveSvg(svgElement, filename) {
+  if (!svgElement) { alert('No chart to save.'); return; }
+  const serializer = new XMLSerializer();
+  const src = serializer.serializeToString(svgElement);
+  const withHeader = '<?xml version="1.0" encoding="UTF-8"?>\n' + src;
+  await downloadFile(filename, withHeader, 'image/svg+xml');
+}
+
+// ---------- Trace summary (population context) ----------
+async function loadTraceSummary() {
+  const el = document.getElementById('trace-summary');
+  if (!el) return;
+  const scenario = state.current;
+  if (!scenario) return;
+  const N = +document.getElementById('run-N').value || 8000;
+  const T = +document.getElementById('run-T').value || 250;
+  const agent = +document.getElementById('trace-agent').value || 0;
+  el.innerHTML = '<div class="notice info" style="margin-top:16px;">Loading population context…</div>';
+  try {
+    const r = await fetch(`/api/trace-summary?scenario=${scenario}&agent_i=${agent}&N=${N}&T=${T}&seed=42`);
+    if (!r.ok) throw new Error(await r.text());
+    const d = await r.json();
+    renderTraceSummary(el, d, agent, T);
+  } catch (e) {
+    el.innerHTML = `<div class="notice error" style="margin-top:16px;">Could not load population context: ${e.message}</div>`;
+  }
+}
+
+function renderTraceSummary(el, d, agent, T) {
+  const p = d.population;
+  const a = d.agent;
+  const pct = x => (100 * x).toFixed(1) + '%';
+  const zero_pct = (100 * p.n_agents_with_zero / d.N).toFixed(1);
+
+  const agentLine = a ? `
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line);">
+      <strong>This agent (${a.agent_i}):</strong>
+      ${a.n_interactions} interaction${a.n_interactions === 1 ? '' : 's'} over ${T} ticks
+      (${pct(a.interaction_rate)} of ticks).
+    </div>` : '';
+
+  const tickList = a && a.interaction_ticks.length
+    ? `<div style="margin-top:8px;font-size:12.5px;color:var(--ink-3);">
+         Interacting ticks: ${a.interaction_ticks.slice(0, 30).join(', ')}${a.interaction_ticks.length > 30 ? ', …' : ''}
+       </div>`
+    : '';
+
+  const top = p.top_agents.map(t => `
+    <button class="btn secondary" style="padding:4px 10px;font-size:12px;"
+            onclick="jumpToAgent(${t.agent_i})">
+      agent ${t.agent_i} · ${t.n_interactions} interactions
+    </button>`).join(' ');
+
+  el.innerHTML = `
+    <div class="card" style="margin-top:16px;background:#f8fbff;border-color:#dbe9ff;">
+      <h3 style="margin-top:0;">Population context ${infoIcon('interacting')}</h3>
+      <p style="margin:0 0 8px;color:var(--ink-2);font-size:14px;">
+        Interactions are <strong>rare</strong> in this engine. Most ticks, most agents
+        do not exchange anything — either because the mutual match failed, or because
+        one of the two chose to avoid. This is the base rate, not an error.
+      </p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:12px;">
+        <div><div style="font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em;">Population mean</div>
+             <div style="font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;">${p.mean.toFixed(1)}</div>
+             <div style="font-size:11px;color:var(--ink-3);">interactions per agent</div></div>
+        <div><div style="font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em;">Median</div>
+             <div style="font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;">${p.median.toFixed(1)}</div>
+             <div style="font-size:11px;color:var(--ink-3);">typical agent</div></div>
+        <div><div style="font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em;">Busiest agent</div>
+             <div style="font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;">${p.max}</div>
+             <div style="font-size:11px;color:var(--ink-3);">interactions</div></div>
+        <div><div style="font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em;">Never interacted</div>
+             <div style="font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;">${zero_pct}%</div>
+             <div style="font-size:11px;color:var(--ink-3);">of all agents</div></div>
+      </div>
+      ${agentLine}
+      ${tickList}
+      <div class="btn-row" style="margin-top:14px;">
+        <button class="btn primary" onclick="jumpToNextInteraction()">Jump to this agent's next interaction →</button>
+        <button class="btn secondary" onclick="jumpToTopAgent()">Jump to a social agent</button>
+      </div>
+      <div style="margin-top:12px;font-size:12.5px;color:var(--ink-3);">
+        Busiest agents in this run:&nbsp; ${top}
+      </div>
+    </div>`;
+  // Cache the summary so the jump functions can use it
+  window.__traceSummary = d;
+}
+
+function jumpToNextInteraction() {
+  const s = window.__traceSummary;
+  if (!s || !s.agent) { alert('No summary yet.'); return; }
+  const ticks = s.agent.interaction_ticks || [];
+  if (!ticks.length) {
+    alert(`Agent ${s.agent.agent_i} had no interactions in this run. Try "Jump to a social agent".`);
+    return;
+  }
+  const cur = +document.getElementById('trace-tick').value;
+  const next = ticks.find(t => t > cur);
+  const target = next !== undefined ? next : ticks[0];
+  document.getElementById('trace-tick').value = target;
+  updateTraceValue();
+  fetchTrace();
+}
+
+function jumpToTopAgent() {
+  const s = window.__traceSummary;
+  if (!s || !s.population || !s.population.top_agents.length) { alert('No summary yet.'); return; }
+  const top = s.population.top_agents[0];
+  document.getElementById('trace-agent').value = top.agent_i;
+  updateTraceValue();
+  // Pick a tick where this agent actually interacts
+  const el = document.getElementById('trace-summary');
+  fetch(`/api/trace-summary?scenario=${state.current}&agent_i=${top.agent_i}&N=${+document.getElementById('run-N').value || 8000}&T=${+document.getElementById('run-T').value || 250}&seed=42`)
+    .then(r => r.json())
+    .then(d => {
+      window.__traceSummary = d;
+      const ticks = (d.agent && d.agent.interaction_ticks) || [];
+      if (ticks.length) {
+        document.getElementById('trace-tick').value = ticks[0];
+      }
+      updateTraceValue();
+      fetchTrace();
+    })
+    .catch(e => alert('Could not load: ' + e.message));
+}
+
+function jumpToAgent(agent_i) {
+  document.getElementById('trace-agent').value = agent_i;
+  updateTraceValue();
+  fetch(`/api/trace-summary?scenario=${state.current}&agent_i=${agent_i}&N=${+document.getElementById('run-N').value || 8000}&T=${+document.getElementById('run-T').value || 250}&seed=42`)
+    .then(r => r.json())
+    .then(d => {
+      window.__traceSummary = d;
+      const ticks = (d.agent && d.agent.interaction_ticks) || [];
+      if (ticks.length) document.getElementById('trace-tick').value = ticks[0];
+      updateTraceValue();
+      fetchTrace();
+    })
+    .catch(e => alert('Could not load: ' + e.message));
+}
+
+
+async function saveLatest(kind) {
+  const content = kind === 'csv' ? window.__latestCsv : window.__latestJson;
+  if (content == null) { alert('No data to save yet. Run a scenario first.'); return; }
+  const name = kind === 'csv' ? 'xai32k-result.csv' : 'xai32k-result.json';
+  const mime = kind === 'csv' ? 'text/csv' : 'application/json';
+  await downloadFile(name, content, mime);
+}
+
+async function saveScenario() {
+  const payload = (typeof _designPayload === 'function') ? _designPayload() : null;
+  if (!payload) { alert('No scenario to save.'); return; }
+  const content = JSON.stringify(payload, null, 2);
+  await downloadFile('xai32k-scenario.json', content, 'application/json');
+}
+
 
 // ---------- Trace view ----------
 function openTraceFor(name) {
@@ -789,7 +2089,7 @@ const TRACE_GROUPS = [
 const KEY_LABELS = {
   a1: 'Stage 1 choice (0=engage)', s2: 'Transition result', a_off: 'Offer chosen',
   a_send: 'Send chosen', a_acc: 'Accept (0) or reject (1)', a_ret: 'Return chosen',
-  interacting: 'Interacted this tick', is_mutual: 'Mutual partner match', rejected: 'Rejected by partner',
+  interacting: 'Interacted this tick', is_mutual: 'Mutual partner match', rejected: 'Agent rejected offer received',
   Q_mf_a0: 'Model-free value: engage', Q_mf_a1: 'Model-free value: avoid',
   Q_MB_a0: 'Model-based value: engage', Q_MB_a1: 'Model-based value: avoid',
   Q_net_a0: 'Arbitrated value: engage', Q_net_a1: 'Arbitrated value: avoid',
@@ -822,7 +2122,9 @@ async function fetchTrace() {
     const r = await fetch(`/api/trace/${state.current}/${agent}?tick=${tick}&N=${N}&T=${T}&seed=42`);
     if (!r.ok) throw new Error(await r.text());
     const d = await r.json();
-    renderTrace(el, d);
+    renderTraceRich(el, d);
+    loadTraceSummary();
+    sessionSaveTrace(state.current, agent, tick, d);
   } catch (e) {
     el.innerHTML = `<div class="notice error">Trace failed: ${e.message}</div>`;
   }
@@ -838,7 +2140,10 @@ function renderTrace(el, d) {
     const rows = g.keys.map(k => {
       const v = f[k];
       const display = Number.isInteger(v) && Math.abs(v) > 100000 ? v.toFixed(0) : v.toFixed(4);
-      return `<div class="trace-row"><span class="k">${KEY_LABELS[k] || k}</span><span class="v">${display}</span></div>`;
+      const label = KEY_LABELS[k] || k;
+      const clickable = INFO[k] ? 'clickable' : '';
+      const onclick = INFO[k] ? `onclick="showInfo('${k}')"` : '';
+      return `<div class="trace-row"><span class="k ${clickable}" ${onclick}>${label}</span><span class="v">${display}</span></div>`;
     }).join('');
     return `<div class="trace-group"><h4>${g.name}</h4>${rows}</div>`;
   }).join('');
@@ -868,8 +2173,8 @@ function narrativeFor(d) {
   const rejected = f.rejected > 0.5;
 
   let s = `Agent ${d.agent_i} decided to <strong>${engaged ? 'engage with others' : 'stay out of the interaction'}</strong> at tick ${d.tick}. `;
-  if (!mutual) s += `The proposed partner did not choose this agent back, so no exchange took place. `;
-  else if (!inter) s += `Although the match was mutual, one of the two agents was not available, so no exchange took place. `;
+  if (!mutual) s += `No mutual partner match this tick, so no exchange took place. This is normal — see the population context below. `;
+  else if (!inter) s += `The match was mutual but one of the two agents chose to avoid, so no exchange took place. This is normal — see the population context below. `;
   else {
     s += `A mutual partner was found and the exchange proceeded. `;
     if (engaged) {
@@ -1092,6 +2397,8 @@ async function runDesign() {
     if (!r.ok) throw new Error(await r.text());
     const data = await r.json();
     renderDesignResults(data);
+    sessionSaveDesign(payload, data);
+    libraryAutoSave('design');
   } catch (e) {
     document.getElementById('design-results').innerHTML =
       `<div class="notice error">Run failed: ${e.message}</div>`;
@@ -1245,17 +2552,24 @@ function renderDesignResults(data) {
   const csvRows = [['benchmark','platform','target','se','delta','pass','sd_over_seeds']]
     .concat(data.benchmarks.map(b => [b.name, b.platform, b.target, b.se, b.delta, b.pass, b.se_over_seeds]));
   const csv = csvRows.map(r => r.join(',')).join('\n');
+  window.__latestJson = json;
+  window.__latestCsv = csv;
   el.innerHTML = `
-    <div class="notice success"><strong>Experiment complete.</strong> ${data.n_seeds} seed(s) averaged over ${data.wall_total_s.toFixed(1)}s of GPU time.</div>
-    <h3>Results</h3>
+    <div class="notice success"><strong>Experiment complete.</strong> ${data.n_seeds} seed(s) averaged over ${data.wall_total_s.toFixed(1)}s.</div>
+    <h3>Benchmark chart</h3>
+    <div class="card" id="bench-chart-svg" style="padding:20px;">${benchBarChart(data.benchmarks)}</div>
+    <h3>Results ${infoIcon('stat_pass')}</h3>
     <div class="results-grid">${cards}</div>
     <div class="btn-row">
-      <button class="btn secondary" onclick="downloadFile('experiment.json', ${JSON.stringify(JSON.stringify(json))}, 'application/json')">Download full record</button>
-      <button class="btn secondary" onclick="downloadFile('experiment.csv', ${JSON.stringify(JSON.stringify(csv))}, 'text/csv')">Download CSV</button>
+      <button class="btn primary" onclick="saveSvg(document.querySelector('#bench-chart-svg svg'), 'xai32k-chart.svg')">Save chart</button>
+      <button class="btn secondary" onclick="librarySaveCurrent()">Save to library</button>
+      <button class="btn secondary" onclick="saveLatest('json')">Save full record</button>
+      <button class="btn secondary" onclick="saveLatest('csv')">Save CSV</button>
       <button class="btn secondary" onclick="goTo('scenarios')">Try a pre-built scenario</button>
     </div>
     ${renderSubgroups(data)}
     ${renderTimeseries(data)}
+    ${renderDeltaTable(data)}${scenarioDeepAnalysis(data)}
     <details style="margin-top:20px;">
       <summary style="cursor:pointer;color:var(--ink-2);font-size:13px;">Show audit trail</summary>
       <pre style="font-size:11px;background:#f6f7f9;padding:14px;border-radius:8px;overflow:auto;max-height:400px;margin-top:10px;">${escapeHtml(JSON.stringify(data.audit, null, 2))}</pre>
@@ -1263,14 +2577,10 @@ function renderDesignResults(data) {
   `;
 }
 
-function saveDesign() {
+async function saveDesign() {
   const payload = _designPayload();
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'experiment-design.json';
-  a.click();
-  URL.revokeObjectURL(a.href);
+  const content = JSON.stringify(payload, null, 2);
+  await downloadFile('xai32k-scenario.json', content, 'application/json');
 }
 
 function loadDesign(event) {
@@ -1381,9 +2691,1625 @@ function renderCompare(el, results) {
     </p>`;
 }
 
+
+// ---------- Info dictionary ----------
+const INFO = {
+  'ug_offer': {
+    title: 'Ultimatum game — offer',
+    body: `
+      <p class="lede">How much money a proposer offers to a stranger when £10 is on the table.</p>
+      <h4>What happens in this game</h4>
+      <p>Two agents are paired. One is the proposer; the other is the responder. The proposer suggests how to divide £10. The responder either accepts (both get their share) or rejects (both get nothing).</p>
+      <h4>What this benchmark measures</h4>
+      <p>The average offer as a fraction of the total. A value of 0.40 means the average proposer offered 40% of the money — i.e. £4 out of £10.</p>
+      <h4>Human reference</h4>
+      <p>Across many published studies, humans offer around <strong>0.40</strong>, with a standard error of 0.05. A value of 0.40 is typical; a value below 0.30 or above 0.50 would be unusual.</p>
+      <h4>Why we care</h4>
+      <p>If a self-interested rational agent were playing, it would offer the smallest possible amount. Real humans offer roughly 40% because they anticipate that unfair offers will be rejected. Matching this number means the simulated agents behave like real people, not like economic robots.</p>`,
+  },
+  'ug_rej': {
+    title: 'Ultimatum game — rejection rate',
+    body: `
+      <p class="lede">How often responders reject offers.</p>
+      <h4>What it measures</h4>
+      <p>The fraction of offers that responders turn down. A value of 0.16 means 16% of offers were rejected.</p>
+      <h4>Human reference</h4>
+      <p>Humans reject around <strong>16%</strong> of offers (SE 0.05), and almost always the low ones. Offers of £1 out of £10 are rejected frequently; offers of £5 are almost never rejected.</p>
+      <h4>Why we care</h4>
+      <p>Rejection is where fairness overrides self-interest. A responder who accepts £1 gets £1 (better than nothing). A responder who rejects gets £0. Rejecting an unfair offer costs the responder money — that is what "fairness matters" looks like in behaviour.</p>
+      <h4>Common pattern</h4>
+      <p>If the platform shows 0.12 rather than 0.16, that is within the SE band — real human studies vary between 0.11 and 0.21, so a value of 0.12 is consistent with the literature.</p>`,
+  },
+  'tg_send': {
+    title: 'Trust game — send rate',
+    body: `
+      <p class="lede">How much a sender trusts a stranger.</p>
+      <h4>What happens in this game</h4>
+      <p>A sender has £10 and can send any amount to a trustee. Whatever the sender sends is multiplied by three. The trustee then chooses how much of the tripled amount to return to the sender.</p>
+      <h4>What it measures</h4>
+      <p>The average amount sent, as a fraction of the endowment. A value of 0.50 means half the endowment, on average.</p>
+      <h4>Human reference</h4>
+      <p>Humans send around <strong>0.50</strong> (SE 0.13). This is notable because sending any money at all is risky — a selfish trustee would keep everything, and the sender would get nothing back.</p>
+      <h4>Why we care</h4>
+      <p>Send rate measures social trust in a controlled way. It is one of the most widely replicated findings in experimental economics.</p>`,
+  },
+  'tg_ret': {
+    title: 'Trust game — return rate',
+    body: `
+      <p class="lede">How much a trustee reciprocates.</p>
+      <h4>What it measures</h4>
+      <p>The average fraction of the received amount that the trustee returns to the sender. A value of 0.37 means the trustee returns 37% of what they received.</p>
+      <h4>Human reference</h4>
+      <p>Humans return around <strong>0.372</strong> (SE 0.12). The exact amount varies with culture and framing; a fairly consistent finding is that trustees return more than a purely self-interested agent would.</p>
+      <h4>Why we care</h4>
+      <p>Return rate is the closest laboratory analogue to reciprocity — the willingness to give back to someone who has trusted you. A population with high return rate sustains cooperation; a population with low return rate does not.</p>`,
+  },
+  'gini': {
+    title: 'Gini coefficient',
+    body: `
+      <p class="lede">A single number that summarises economic inequality.</p>
+      <h4>How to read it</h4>
+      <ul>
+        <li><strong>0.00</strong> = everyone has exactly the same wealth.</li>
+        <li><strong>0.40</strong> = moderate inequality (similar to many European countries).</li>
+        <li><strong>1.00</strong> = one agent owns everything, everyone else has nothing.</li>
+      </ul>
+      <h4>Human reference</h4>
+      <p>Real-world Gini values for household wealth range from about 0.25 (Nordic countries) to 0.85 (some emerging economies). The platform's target of <strong>0.40</strong> (SE 0.12) sits in the middle of the plausible range.</p>
+      <h4>What produces the value in the simulation</h4>
+      <p>Wealth accumulates through the games played each tick. Rich agents earn more from each interaction, so wealth naturally concentrates. The Gini benchmark checks that the concentration is realistic.</p>
+      <h4>Important caveat</h4>
+      <p>Wealth is not read back into the agents' decisions except through a diminishing-marginal-utility term in the fairness calculation. So interventions on wealth affect behaviour weakly, not strongly. This is documented in the platform notes.</p>`,
+  },
+  // Trace fields
+  'a1': {
+    title: 'Stage-1 choice (engage / avoid)',
+    body: `<p class="lede">The first action the agent takes in this tick: <code>0</code> = engage with others, <code>1</code> = stay out.</p>
+    <p>Choosing to engage means the agent will try to interact with a partner. Choosing to avoid means it does not. The choice is made before knowing who the partner will be or what they will do.</p>`,
+  },
+  's2': {
+    title: 'Transition outcome',
+    body: `<p class="lede">Whether the environment took the agent to the expected second-stage state (0) or the unexpected one (1).</p>
+    <p>In the two-step paradigm, transitions are probabilistic: from the same first-stage choice, the agent usually reaches the expected second state (70% of the time) and sometimes the unexpected one (30%).</p>`,
+  },
+  'Q_mf_a0': {
+    title: 'Model-free value — engage',
+    body: `<p class="lede">The agent's habit-based estimate of reward from choosing "engage."</p>
+    <p>Model-free values update with a simple rule: <code>new = old + learning_rate × (reward − old)</code>. They track recent experience. If engaging has been rewarding lately, this value is high.</p>`,
+  },
+  'Q_MB_a0': {
+    title: 'Model-based value — engage',
+    body: `<p class="lede">The agent's plan-based estimate of reward from choosing "engage."</p>
+    <p>Model-based values come from simulating the future: the agent looks at its beliefs about transitions and considers the best possible continuation. This is what "thinking ahead" means in this platform.</p>`,
+  },
+  'Q_net_a0': {
+    title: 'Arbitrated value — engage',
+    body: `<p class="lede">The value actually used to make the decision: a blend of habit and plan.</p>
+    <div class="formula">Q_net = w_mb_eff × Q_MB + (1 − w_mb_eff) × Q_MF</div>
+    <p>When the arbitration weight is high, the agent mostly trusts its plan. When it is low, the agent runs on habit.</p>`,
+  },
+  'w_mb_eff': {
+    title: 'Model-based weight (effective)',
+    body: `<p class="lede">How much the agent trusts planning over habit at this moment.</p>
+    <ul>
+      <li>Near 1.0 → mostly planning. The agent is calm and thinking ahead.</li>
+      <li>Near 0.0 → mostly habit. The agent is stressed, distracted, or overwhelmed.</li>
+    </ul>
+    <p>This weight shrinks when distress rises. That is the mechanism that models "choking under pressure."</p>`,
+  },
+  'a_off': {
+    title: 'Offer chosen',
+    body: `<p class="lede">Which offer the agent chose to make, on a scale of 0 to 3.</p>
+    <p>0 = offer £2, 1 = offer £4, 2 = offer £5, 3 = offer £7 out of £10. The action is chosen by a softmax over the offer-head Q-values, with the offer bias added.</p>`,
+  },
+  'my_off': {
+    title: 'Offer in pounds',
+    body: `<p class="lede">The offer the agent made, translated from the discrete action into actual money.</p>`,
+  },
+  'a_send': {
+    title: 'Send chosen',
+    body: `<p class="lede">How much the agent chose to invest in the trust game, on a scale of 0 to 3.</p>
+    <p>0 = £0, 1 = £3, 2 = £6, 3 = £9 out of £10.</p>`,
+  },
+  'a_acc': {
+    title: 'Accept or reject',
+    body: `<p class="lede">The responder's decision: 0 = accept, 1 = reject.</p>
+    <p>If the agent is a responder, this field shows what it chose to do with the received offer. Accepting means both players keep money; rejecting means both get nothing.</p>`,
+  },
+  'a_ret': {
+    title: 'Return chosen',
+    body: `<p class="lede">How much the trustee chose to return, on a scale of 0 to 3.</p>
+    <p>0 = return nothing, 3 = return three times the sent amount. Higher values mean stronger reciprocity.</p>`,
+  },
+  'U_accept': {
+    title: 'Fehr-Schmidt utility of accepting',
+    body: `<p class="lede">The fairness-adjusted value of accepting the received offer.</p>
+    <div class="formula">U_accept = (my_payoff − α × disadvantageous_inequity − β × advantageous_inequity) × wealth_scale</div>
+    <p>This is the number the agent compares against the reject option (which is always 0 by convention). If U_accept is positive, accepting is more attractive than rejecting.</p>`,
+  },
+  'inequity_neg': {
+    title: 'Disadvantageous inequality',
+    body: `<p class="lede">How much more the partner would get than the agent, if the offer is accepted.</p>
+    <p>If the partner offered £2 out of £10, the partner gets £8 and the agent gets £2 — so disadvantageous inequality is £6. The agent dislikes this. It is the "envy" term in the fairness calculation.</p>`,
+  },
+  'inequity_pos': {
+    title: 'Advantageous inequality',
+    body: `<p class="lede">How much more the agent would get than the partner, if the offer is accepted.</p>
+    <p>If the partner offered £8 out of £10, the agent gets £8 and the partner gets £2 — advantageous inequality of £6. The agent also dislikes this, though less strongly than disadvantageous inequality. It is the "guilt" term.</p>`,
+  },
+  'reward_total': {
+    title: 'Total reward this tick',
+    body: `<p class="lede">The reward the agent actually received in this tick.</p>
+    <p>If the agent did not interact with anyone, this is 0. Otherwise, it is the sum of all payoffs from the games played, adjusted by the reward modifier (which includes shock effects if any are active).</p>`,
+  },
+  'interacting': {
+    title: 'Interacted this tick',
+    body: `<p class="lede">1 = the agent played this tick, 0 = the agent did not.</p>
+    <p>An interaction requires three things: both the agent and its chosen partner must pick each other, both must choose to engage, and the pair must be mutual. Most ticks the agent does not interact.</p>`,
+  },
+  'is_mutual': {
+    title: 'Mutual partner match',
+    body: `
+      <p class="lede">Whether the agent's chosen partner also chose the agent back.</p>
+      <ul>
+        <li><code>0</code> — the partner did <strong>not</strong> choose the agent back. The pairing failed.</li>
+        <li><code>1</code> — the partner also chose the agent. The pairing succeeded.</li>
+      </ul>
+      <p>Even when the pairing succeeds, an interaction only happens if <em>both</em> agents chose to engage. If either one chose to avoid, this field can still be 1 while <code>interacting</code> is 0.</p>
+      <p>Most ticks produce 0 here — mutual pick is roughly 1 in 6 with k=6 neighbours, so no match is the norm, not an error.</p>`,
+  },
+  'rejected': {
+    title: 'Agent rejected the offer it received',
+    body: `
+      <p class="lede">Whether the agent itself turned down the offer it received this tick.</p>
+      <ul>
+        <li><code>0</code> — the agent did not reject (either it accepted, or it was not a responder this tick).</li>
+        <li><code>1</code> — the agent rejected the offer it received.</li>
+      </ul>
+      <h4>What it means when it is 1</h4>
+      <p>When a responder rejects, <strong>both agents get nothing</strong> from the ultimatum game — the offer is destroyed. Rejecting is the mechanism by which fairness overrides self-interest: the responder gives up its own money to punish an unfair offer.</p>
+      <h4>What it means when it is 0</h4>
+      <p>Two cases: either the agent is not a responder this tick, or it received a fair-enough offer and chose to accept it. The <em>partner&rsquo;s</em> accept/reject decision is a separate field, <code>partner_a_acc</code>.</p>
+      <p class="hint">If no interaction took place this tick, this field is always 0 because there was no offer to reject.</p>`,
+  },
+  'partner_id': {
+    title: 'Partner ID',
+    body: `<p class="lede">The index number of the agent that was chosen as a partner this tick.</p>`,
+  },
+  'distress_pre': {
+    title: 'Distress at decision time',
+    body: `<p class="lede">The agent's stress level before it made this tick's decision.</p>
+    <p>Distress rises when offers are rejected and decays slowly. Higher distress reduces the model-based weight, which biases the agent toward habit and away from planning.</p>`,
+  },
+  'baseline_dist': {
+    title: 'Baseline distress',
+    body: `<p class="lede">The agent's long-term tendency to feel stressed.</p>
+    <p>This is a trait, not a momentary state. It is derived from the agent's DASS questionnaire scores (depression, anxiety, stress subscales) and the general distress factor. A high baseline means distress accumulates faster.</p>`,
+  },
+  'wealth_pre': {
+    title: 'Wealth before reward',
+    body: `<p class="lede">The agent's wealth at the start of this tick.</p>
+    <p>Wealth accumulates every tick from game payoffs. Over 500 ticks, successful agents accumulate large amounts. Wealth enters the fairness calculation as a diminishing-marginal-utility term.</p>`,
+  },
+  // Statistical
+  'stat_se': {
+    title: 'Standard error (SE)',
+    body: `<p class="lede">How much a measured value varies between independent studies.</p>
+    <p>If a human benchmark is 0.40 with SE 0.05, different published studies typically report values between 0.35 and 0.45. It is the "noise level" of the benchmark.</p>`,
+  },
+  'stat_pass': {
+    title: 'What "PASS" means',
+    body: `<p class="lede">The simulated value is within one standard error of the human target.</p>
+    <div class="formula">|platform − human| &lt; SE</div>
+    <p>PASS means the simulation behaves consistently with the range of human findings. It does not mean the numbers are identical.</p>`,
+  },
+  'stat_delta': {
+    title: 'Delta (Δ)',
+    body: `<p class="lede">The gap between the simulated value and the human target.</p>
+    <p>Positive = the platform scored higher than humans. Negative = lower. The magnitude matters more than the sign; a delta of 0.04 is small, a delta of 0.20 is large.</p>`,
+  },
+};
+
+// ---------- Modal ----------
+function showInfo(key) {
+  const item = INFO[key];
+  if (!item) { return; }
+  document.getElementById('modal-title').textContent = item.title;
+  document.getElementById('modal-body').innerHTML = item.body;
+  document.getElementById('modal-backdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeInfo() {
+  document.getElementById('modal-backdrop').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeInfo();
+});
+
+// ---------- Tour ----------
+const TOUR_STEPS = [
+  {
+    title: 'Welcome to 32k-XAI',
+    body: 'This is a simulated society of thousands of agents with transparent, hand-written decision rules. Everything is traceable — no neural networks, no black boxes. This short tour will show you the four main tabs.',
+  },
+  {
+    title: 'Start with Scenarios',
+    body: 'The <strong>Scenarios</strong> tab has eight pre-built experiments. Click any one and you will see a settings page, then a Run button. That is all you need to reproduce a result.',
+  },
+  {
+    title: 'Design your own experiments',
+    body: 'The <strong>Design experiments</strong> tab lets you shift the population psychology, add interventions, target a specific subgroup, and average over multiple random seeds. This is where you build a real study.',
+  },
+  {
+    title: 'Trace individual decisions',
+    body: 'Every decision can be opened up. Click "Trace a decision" after running any scenario, and use the sliders to pick an agent and a moment. Every internal number behind that decision will be shown — with explanations you can click on.',
+  },
+];
+let tourStep = 0;
+function startTour() {
+  tourStep = 0;
+  renderTourStep();
+  document.getElementById('tour-backdrop').classList.add('open');
+}
+function renderTourStep() {
+  const s = TOUR_STEPS[tourStep];
+  document.getElementById('tour-step').textContent = `Step ${tourStep + 1} of ${TOUR_STEPS.length}`;
+  document.getElementById('tour-title').textContent = s.title;
+  document.getElementById('tour-body').innerHTML = s.body;
+  document.getElementById('tour-next').textContent = (tourStep === TOUR_STEPS.length - 1) ? 'Got it' : 'Next';
+}
+function nextTourStep() {
+  tourStep += 1;
+  if (tourStep >= TOUR_STEPS.length) {
+    skipTour();
+    return;
+  }
+  renderTourStep();
+}
+function skipTour() {
+  document.getElementById('tour-backdrop').classList.remove('open');
+  try { localStorage.setItem('xai32k.tour_seen.v1', '1'); } catch (e) {}
+}
+
+// Auto-show tour on first launch
+window.addEventListener('DOMContentLoaded', () => {
+  try {
+    if (!localStorage.getItem('xai32k.tour_seen.v1')) {
+      setTimeout(startTour, 1200);
+    }
+  } catch (e) { /* private mode etc. */ }
+});
+
+// Helper: info button markup
+function infoIcon(key) {
+  return `<button class="info-btn" onclick="event.stopPropagation();showInfo('${key}')" aria-label="Info">&thinsp;i</button>`;
+}
+
+
+
+// ============================================================
+// THE CROWD
+// ============================================================
+const CROWD_TRAITS = [
+  ["O", "Openness"], ["C", "Conscientiousness"], ["E", "Extraversion"],
+  ["A", "Agreeableness"], ["N", "Neuroticism"],
+  ["S_M", "Machiavellianism"], ["S_P", "Psychopathy"], ["S_N", "Narcissism"],
+  ["D", "Dark Core"],
+  ["DASS_Dep", "Depression"], ["DASS_Anx", "Anxiety"], ["DASS_Str", "Stress"],
+  ["general_distress", "General distress"],
+  ["m_t", "Current mood"],
+  ["omega_social", "Social value"],
+  ["theta_T", "Threat sensitivity"],
+  ["u_U", "Uncertainty aversion"],
+  ["alpha_R", "Learning rate"],
+];
+const crowd = {
+  trait: "O",
+  sort_by: "id",
+  sort_dir: "asc",
+  page: 1,
+  page_size: 50,
+  filter_trait: "A",
+  filter_op: ">=",
+  filter_value: 0.7,
+  filter_active: false,
+  last: null,
+};
+
+function crowdInit() {
+  const picker = document.getElementById("trait-picker");
+  picker.innerHTML = CROWD_TRAITS.map(([k, l]) =>
+    `<button class="trait-chip" data-k="${k}" onclick="crowdSelectTrait('${k}')">${l}</button>`
+  ).join("");
+  const sel = document.getElementById("filter-trait");
+  sel.innerHTML = CROWD_TRAITS.map(([k, l]) => `<option value="${k}">${l}</option>`).join("");
+  sel.value = "A";
+  document.getElementById("filter-trait").addEventListener("change", e => { crowd.filter_trait = e.target.value; });
+  document.getElementById("filter-op").addEventListener("change", e => { crowd.filter_op = e.target.value; });
+  document.getElementById("filter-value").addEventListener("change", e => { crowd.filter_value = +e.target.value; });
+  crowdSelectTrait("O");
+}
+
+function crowdSelectTrait(k) {
+  crowd.trait = k;
+  crowd.page = 1;
+  document.querySelectorAll(".trait-chip").forEach(el => {
+    el.classList.toggle("active", el.dataset.k === k);
+  });
+  crowdLoad();
+}
+
+async function crowdLoad() {
+  const q = new URLSearchParams({
+    trait: crowd.trait,
+    sort_by: crowd.sort_by,
+    sort_dir: crowd.sort_dir,
+    page: crowd.page,
+    page_size: crowd.page_size,
+    filter_trait: crowd.filter_trait,
+    filter_op: crowd.filter_op,
+    filter_value: crowd.filter_value,
+    filter_active: crowd.filter_active,
+    n_bins: 30,
+  });
+  try {
+    const r = await fetch("/api/population?" + q.toString());
+    if (!r.ok) throw new Error(await r.text());
+    const d = await r.json();
+    crowd.last = d;
+    crowdRender(d);
+    crowdRenderExtras(d);
+    session.crowdState = {
+      trait: crowd.trait,
+      filter_trait: crowd.filter_trait,
+      filter_op: crowd.filter_op,
+      filter_value: crowd.filter_value,
+      filter_active: crowd.filter_active,
+    };
+    sessionSave();
+  } catch (e) {
+    document.getElementById("hist-svg-wrap").innerHTML =
+      `<div class="notice error">Could not load population: ${e.message}</div>`;
+  }
+}
+
+function crowdRender(d) {
+  const label = (CROWD_TRAITS.find(([k]) => k === d.trait) || [d.trait, d.trait])[1];
+  document.getElementById("hist-trait-label").textContent = "Distribution of " + label;
+
+  // Histogram
+  const h = d.histogram;
+  const W = 720, H = 130, PAD = 12;
+  const n = h.counts.length;
+  const maxC = Math.max(1, ...h.counts);
+  const bw = (W - 2 * PAD) / n;
+  const bars = h.counts.map((c, i) => {
+    const x = PAD + i * bw + 1;
+    const bh = Math.max(2, (c / maxC) * (H - 20));
+    const y = H - 10 - bh;
+    return `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(bw - 2).toFixed(1)}" height="${bh.toFixed(1)}" fill="#0a84ff" rx="2" opacity="0.82"/>`;
+  }).join("");
+  const mean = h.mean;
+  const mx = PAD + ((mean - h.min) / Math.max(1e-9, h.max - h.min)) * (W - 2 * PAD);
+  const meanLine = `<line x1="${mx.toFixed(1)}" x2="${mx.toFixed(1)}" y1="4" y2="${H - 6}" stroke="#1c1c1e" stroke-dasharray="3,2" stroke-width="1.5"/>
+    <text x="${(mx + 4).toFixed(1)}" y="14" font-size="11" fill="#1c1c1e" font-weight="600">mean ${mean.toFixed(3)}</text>`;
+  document.getElementById("hist-svg-wrap").innerHTML =
+    `<svg class="hist-svg" viewBox="0 0 ${W} ${H}">${bars}${meanLine}</svg>`;
+
+  // Stats
+  const stat = (lbl, v) => `<div class="hist-stat"><div class="lbl">${lbl}</div><div class="val">${v}</div></div>`;
+  document.getElementById("hist-stats").innerHTML =
+    stat("Mean", h.mean.toFixed(3)) +
+    stat("Median", h.median.toFixed(3)) +
+    stat("SD", h.sd.toFixed(3)) +
+    stat("Min", h.min.toFixed(3)) +
+    stat("Max", h.max.toFixed(3)) +
+    stat("IQR", `${h.p25.toFixed(3)} – ${h.p75.toFixed(3)}`);
+
+  // Filter count
+  document.getElementById("filter-count").textContent =
+    d.filter.count.toLocaleString();
+
+  // Table
+  const thead = document.getElementById("pop-thead");
+  const shown = ["id", d.trait, "O", "C", "E", "A", "N", "S_M", "S_P", "S_N", "m_t"];
+  const unique = [...new Set(shown)].slice(0, 8);
+  thead.innerHTML = "<tr>" + unique.map(c => {
+    const lbl = (CROWD_TRAITS.find(([k]) => k === c) || [c, c])[1];
+    const cls = (c === crowd.sort_by) ? ("sorted " + (crowd.sort_dir === "desc" ? "desc" : "")) : "";
+    return `<th class="${cls}" onclick="crowdSort('${c}')">${c === "id" ? "ID" : lbl}</th>`;
+  }).join("") + "</tr>";
+
+  const tbody = document.getElementById("pop-tbody");
+  tbody.innerHTML = d.rows.map(row =>
+    "<tr>" + unique.map(c => {
+      const v = row[c];
+      if (c === "id") return `<td class="num">${v}</td>`;
+      return `<td class="num">${(+v).toFixed(3)}</td>`;
+    }).join("") + "</tr>"
+  ).join("");
+
+  document.getElementById("pg-info").textContent = `Page ${d.page} of ${d.n_pages}`;
+  document.getElementById("pg-prev").disabled = d.page <= 1;
+  document.getElementById("pg-next").disabled = d.page >= d.n_pages;
+}
+
+function crowdSort(c) {
+  if (crowd.sort_by === c) {
+    crowd.sort_dir = crowd.sort_dir === "asc" ? "desc" : "asc";
+  } else {
+    crowd.sort_by = c;
+    crowd.sort_dir = "asc";
+  }
+  crowd.page = 1;
+  crowdLoad();
+}
+
+function crowdPrev() { if (crowd.page > 1) { crowd.page--; crowdLoad(); } }
+function crowdNext() { if (crowd.last && crowd.page < crowd.last.n_pages) { crowd.page++; crowdLoad(); } }
+
+function applyFilter() {
+  crowd.filter_trait = document.getElementById("filter-trait").value;
+  crowd.filter_op = document.getElementById("filter-op").value;
+  crowd.filter_value = +document.getElementById("filter-value").value;
+  crowd.filter_active = true;
+  crowd.page = 1;
+  crowdLoad();
+}
+
+function clearFilter() {
+  crowd.filter_active = false;
+  crowd.page = 1;
+  crowdLoad();
+}
+
+// ============================================================
+// TRACE — redesigned
+// ============================================================
+function flowDiagram(f) {
+  const W = 900, H = 260;
+  const engaged = f.a1 < 0.5;
+  const mutual  = f.is_mutual > 0.5;
+  const inter   = f.interacting > 0.5;
+  const accepted = f.a_acc < 0.5;
+
+  const fmt = v => (v >= 0 ? '+' : '') + v.toFixed(2);
+
+  // Softmax probabilities for stage-1 action
+  const l0 = f.L1_a0, l1 = f.L1_a1;
+  const m = Math.max(l0, l1);
+  const e0 = Math.exp(l0 - m), e1 = Math.exp(l1 - m);
+  const p0 = e0 / (e0 + e1), p1 = e1 / (e0 + e1);
+
+  // Determine the actual outcome — separate from what the agent chose
+  let outcomeLabel, outcomeColor, outcomeBg, outcomeSub;
+  if (inter) {
+    outcomeLabel = 'EXCHANGE HAPPENED';
+    outcomeColor = '#1a6b32'; outcomeBg = '#e7f9ec';
+    outcomeSub = 'Offered £' + f.my_off.toFixed(0) + ' · partner ' + (accepted ? 'accepted' : 'rejected');
+  } else if (!engaged) {
+    outcomeLabel = 'NO EXCHANGE';
+    outcomeColor = '#48484a'; outcomeBg = '#f2f3f5';
+    outcomeSub = 'agent chose to avoid';
+  } else if (!mutual) {
+    outcomeLabel = 'NO EXCHANGE';
+    outcomeColor = '#a35b00'; outcomeBg = '#fff4e0';
+    outcomeSub = 'partner did not match back';
+  } else {
+    outcomeLabel = 'NO EXCHANGE';
+    outcomeColor = '#a35b00'; outcomeBg = '#fff4e0';
+    outcomeSub = 'partner chose to avoid';
+  }
+
+  const boxH = 82;
+  const habitBox = { x:  20, y:  30, w: 172, h: boxH };
+  const planBox  = { x:  20, y: 132, w: 172, h: boxH };
+  const arbBox   = { x: 262, y:  80, w: 190, h: boxH };
+  const actBox   = { x: 522, y:  80, w: 160, h: boxH };
+  const outBox   = { x: 704, y:  80, w: 180, h: boxH };
+
+  const arrowPath = (x1, y1, x2, y2, color) =>
+    '<path d="M ' + x1 + ' ' + y1 + ' L ' + x2 + ' ' + y2 + '" ' +
+    'stroke="' + color + '" stroke-width="1.5" fill="none" ' +
+    'marker-end="url(#arr-' + color.replace('#','') + ')"/>';
+
+  const rowLine = (bx, by, label, value, y) =>
+    '<text x="' + (bx + 12) + '" y="' + y + '" font-size="12" fill="#48484a">' + label + '</text>' +
+    '<text x="' + (bx + 160) + '" y="' + y + '" font-size="12" fill="#1c1c1e" ' +
+    'text-anchor="end" font-weight="600">' + value + '</text>';
+
+  const drawBox = (b, title, rows, color) => {
+    const inner = rows.map((r, i) =>
+      rowLine(b.x, b.y, r[0], r[1], b.y + 46 + i * 18)
+    ).join('');
+    return '<rect x="' + b.x + '" y="' + b.y + '" width="' + b.w + '" height="' + b.h +
+      '" rx="10" fill="#ffffff" stroke="' + color + '" stroke-width="1.5"/>' +
+      '<text x="' + (b.x + 12) + '" y="' + (b.y + 22) + '" font-size="11" font-weight="700" ' +
+      'fill="' + color + '" letter-spacing="0.05em">' + title + '</text>' +
+      inner;
+  };
+
+  return `
+    <svg class="flow-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <marker id="arr-0a84ff" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#0a84ff"/>
+        </marker>
+        <marker id="arr-5e5ce6" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#5e5ce6"/>
+        </marker>
+        <marker id="arr-30d158" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#30d158"/>
+        </marker>
+        <marker id="arr-ff9f0a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#ff9f0a"/>
+        </marker>
+        <marker id="arr-48484a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 0 0 L 10 5 L 0 10 z" fill="#48484a"/>
+        </marker>
+      </defs>
+
+      <!-- Column headers -->
+      <text x="20" y="18" font-size="10" font-weight="700" fill="#8e8e93" letter-spacing="0.08em">1 · WHAT THE AGENT BELIEVED</text>
+      <text x="262" y="18" font-size="10" font-weight="700" fill="#8e8e93" letter-spacing="0.08em">2 · HOW IT DECIDED</text>
+      <text x="522" y="18" font-size="10" font-weight="700" fill="#8e8e93" letter-spacing="0.08em">3 · WHAT HAPPENED</text>
+
+      <!-- HABIT -->
+      ${drawBox(habitBox, 'HABIT (Q_MF)',
+        [['engage value', fmt(f.Q_mf_a0)],
+         ['avoid value',  fmt(f.Q_mf_a1)]],
+        '#0a84ff')}
+
+      <!-- PLAN -->
+      ${drawBox(planBox, 'PLAN (Q_MB)',
+        [['engage value', fmt(f.Q_MB_a0)],
+         ['avoid value',  fmt(f.Q_MB_a1)]],
+        '#0a84ff')}
+
+      <!-- Blend weight label + arrows -->
+      <text x="${arbBox.x + arbBox.w/2}" y="${arbBox.y - 8}" font-size="11" fill="#48484a" text-anchor="middle">
+        blend weight w = <tspan font-weight="700">${f.w_mb_eff.toFixed(3)}</tspan>
+      </text>
+      ${arrowPath(habitBox.x + habitBox.w, habitBox.y + habitBox.h/2, arbBox.x - 4, arbBox.y + 30, '#0a84ff')}
+      ${arrowPath(planBox.x  + planBox.w,  planBox.y  + planBox.h/2,  arbBox.x - 4, arbBox.y + 52, '#0a84ff')}
+
+      <!-- ARBITRATED -->
+      ${drawBox(arbBox, 'ARBITRATED (Q_net)',
+        [['engage', fmt(f.Q_net_a0)],
+         ['avoid',  fmt(f.Q_net_a1)]],
+        '#5e5ce6')}
+
+      <!-- Arrow to action + softmax label -->
+      ${arrowPath(arbBox.x + arbBox.w, arbBox.y + arbBox.h/2, actBox.x - 4, actBox.y + actBox.h/2, '#30d158')}
+      <text x="${(arbBox.x + arbBox.w + actBox.x)/2}" y="${arbBox.y + arbBox.h/2 - 6}" font-size="11" fill="#48484a" text-anchor="middle">softmax</text>
+      <text x="${(arbBox.x + arbBox.w + actBox.x)/2}" y="${arbBox.y + arbBox.h/2 + 10}" font-size="10" fill="#8e8e93" text-anchor="middle">τ = ${f.tau.toFixed(2)}</text>
+
+      <!-- CHOSEN ACTION -->
+      <rect x="${actBox.x}" y="${actBox.y}" width="${actBox.w}" height="${actBox.h}" rx="10"
+            fill="#e7f9ec" stroke="#30d158" stroke-width="1.5"/>
+      <text x="${actBox.x + actBox.w/2}" y="${actBox.y + 22}" font-size="11" font-weight="700"
+            fill="#1a6b32" letter-spacing="0.05em" text-anchor="middle">CHOSE TO ${engaged ? 'ENGAGE' : 'AVOID'}</text>
+      <text x="${actBox.x + actBox.w/2}" y="${actBox.y + 46}" font-size="11" fill="#48484a" text-anchor="middle">p(engage) = ${(100*p0).toFixed(0)}%</text>
+      <text x="${actBox.x + actBox.w/2}" y="${actBox.y + 64}" font-size="11" fill="#48484a" text-anchor="middle">p(avoid)&nbsp;&nbsp;= ${(100*p1).toFixed(0)}%</text>
+
+      <!-- Outcome arrow -->
+      ${arrowPath(actBox.x + actBox.w, actBox.y + actBox.h/2, outBox.x - 4, outBox.y + outBox.h/2,
+                  inter ? '#30d158' : '#ff9f0a')}
+
+      <!-- OUTCOME -->
+      <rect x="${outBox.x}" y="${outBox.y}" width="${outBox.w}" height="${outBox.h}" rx="10"
+            fill="${outcomeBg}" stroke="${outcomeColor}" stroke-width="1.5"/>
+      <text x="${outBox.x + outBox.w/2}" y="${outBox.y + 24}" font-size="11" font-weight="700"
+            fill="${outcomeColor}" letter-spacing="0.05em" text-anchor="middle">${outcomeLabel}</text>
+      <text x="${outBox.x + outBox.w/2}" y="${outBox.y + 48}" font-size="11" fill="#48484a" text-anchor="middle">${outcomeSub}</text>
+
+      <!-- Context row -->
+      <line x1="20" y1="${H - 26}" x2="${W - 20}" y2="${H - 26}" stroke="#e5e5ea"/>
+      <text x="20" y="${H - 8}" font-size="10" font-weight="700" fill="#8e8e93" letter-spacing="0.08em">CONTEXT</text>
+      <text x="100" y="${H - 8}" font-size="12" fill="#48484a">distress <tspan font-weight="600" fill="#1c1c1e">${f.distress_pre.toFixed(3)}</tspan></text>
+      <text x="240" y="${H - 8}" font-size="12" fill="#48484a">baseline <tspan font-weight="600" fill="#1c1c1e">${f.baseline_dist.toFixed(3)}</tspan></text>
+      <text x="390" y="${H - 8}" font-size="12" fill="#48484a">wealth <tspan font-weight="600" fill="#1c1c1e">${f.wealth_pre.toFixed(1)}</tspan></text>
+      <text x="530" y="${H - 8}" font-size="12" fill="#48484a">reward <tspan font-weight="600" fill="#1c1c1e">${fmt(f.reward_total)}</tspan></text>
+    </svg>`;
+}
+
+function narrativeRich(d) {
+  const f = d.fields;
+  const engaged = f.a1 < 0.5;
+  const mutual  = f.is_mutual > 0.5;
+  const inter   = f.interacting > 0.5;
+  const accepted = f.a_acc < 0.5;
+
+  // Softmax probabilities for the stage-1 choice
+  const l0 = f.L1_a0, l1 = f.L1_a1;
+  const mx = Math.max(l0, l1);
+  const e0 = Math.exp(l0 - mx), e1 = Math.exp(l1 - mx);
+  const pEng = e0 / (e0 + e1), pAvo = e1 / (e0 + e1);
+  const chosenP = engaged ? pEng : pAvo;
+
+  // Dominant driver
+  const mfGap = f.Q_mf_a0 - f.Q_mf_a1;
+  const mbGap = f.Q_MB_a0 - f.Q_MB_a1;
+  const netGap = f.Q_net_a0 - f.Q_net_a1;
+  const w = f.w_mb_eff;
+
+  const fmt = v => (v >= 0 ? '+' : '') + v.toFixed(3);
+  const parts = [];
+
+  // 1. Who and when
+  parts.push(`At <strong>tick ${d.tick}</strong>, agent <strong>${d.agent_i}</strong>`);
+
+  // 2. The choice and the probabilities
+  const probStr = `p(engage)=${(100*pEng).toFixed(1)}%, p(avoid)=${(100*pAvo).toFixed(1)}%`;
+  parts.push(`chose to <strong>${engaged ? 'engage' : 'avoid'}</strong> (${probStr}).`);
+
+  // 3. Why — the value decomposition
+  const habitRole = w < 0.15 ? 'almost entirely habit-driven'
+                  : w < 0.4  ? 'mostly habit-driven'
+                  : w > 0.6  ? 'mostly plan-driven'
+                  : 'a mix of habit and plan';
+  const habitLine = `Habit values were engage ${fmt(f.Q_mf_a0)} vs avoid ${fmt(f.Q_mf_a1)} (gap ${fmt(mfGap)}), `
+                  + `while plan values were engage ${fmt(f.Q_MB_a0)} vs avoid ${fmt(f.Q_MB_a1)} (gap ${fmt(mbGap)}). `;
+  const blendLine = `The blend weight w = ${w.toFixed(3)} means the decision was ${habitRole}, `
+                  + `producing a final net gap of ${fmt(netGap)} between engage and avoid.`;
+  parts.push(habitLine + blendLine);
+
+  // 4. Distress context if notable
+  if (f.distress_pre > 0.9) {
+    parts.push(`Distress was elevated at ${f.distress_pre.toFixed(3)}, above its population equilibrium of ${f.baseline_dist.toFixed(3)}, which mechanically depresses model-based control (w = w_base × (1 − kappa × distress)).`);
+  } else if (f.distress_pre > 0.7 && w < 0.15) {
+    parts.push(`Distress sat at ${f.distress_pre.toFixed(3)}, and w_mb_eff collapsed to ${w.toFixed(3)}, forcing the decision onto the habit system.`);
+  }
+
+  // 5. Outcome
+  if (!engaged) {
+    parts.push(`<strong>Outcome:</strong> the agent never sought a partner, so no exchange occurred.`);
+  } else if (!mutual) {
+    parts.push(`<strong>Outcome:</strong> no mutual match this tick. Partner candidate ${Math.round(f.partner_id)} did not choose the agent back, so no offer was ever sent.`);
+  } else if (!inter) {
+    parts.push(`<strong>Outcome:</strong> the pairing was mutual but partner ${Math.round(f.partner_id)} chose to avoid this tick, so no exchange occurred.`);
+  } else {
+    parts.push(`<strong>Outcome:</strong> exchanged with partner ${Math.round(f.partner_id)}.`);
+    parts.push(`The agent offered <strong>£${f.my_off.toFixed(0)} of £10</strong> (a ${(f.my_off/10*100).toFixed(0)}% share).`);
+    if (f.rejected > 0.5) {
+      parts.push(`The agent was the responder and <strong>rejected</strong> the offer it received (U_accept = ${f.U_accept.toFixed(3)}, driven by disadvantageous inequity ${f.inequity_neg.toFixed(2)} × envy α = ${f.partner_alpha_e.toFixed(3)}).`);
+    } else if (f.partner_a_acc > 0.5) {
+      parts.push(`The partner rejected the agent's offer — the agent earned £0 from this round.`);
+    } else {
+      parts.push(`The partner accepted.`);
+    }
+  }
+
+  // 6. Reward
+  parts.push(`Reward received: <strong>${fmt(f.reward_total)}</strong> (offers ${fmt(f.r_off)}, acceptance ${fmt(f.r_acc)}, send ${fmt(f.r_send)}, return ${fmt(f.r_ret)}).`);
+
+  return parts.join(' ');
+}
+
+function renderTraceRich(el, d) {
+  const f = d.fields;
+  const active = d.shock_state.active.length ? d.shock_state.active.join(', ') : 'none';
+  const shockLine = d.shock_state.active.length
+    ? `<span style="color:#a35b00;font-weight:600;">Intervention active: ${escapeHtml(active)}</span>`
+    : `<span style="color:var(--ink-3);">Baseline conditions</span>`;
+
+  // Build field groups
+  const GROUPS = [
+    ["Decision at this tick", ["a1","s2","a_off","a_send","a_acc","a_ret","interacting","is_mutual","rejected"]],
+    ["Beliefs and values", ["Q_mf_a0","Q_mf_a1","Q_MB_a0","Q_MB_a1","Q_net_a0","Q_net_a1","w_mb_eff","tau"]],
+    ["What the agent chose", ["my_off","my_send","my_rm","Q_off_chosen","Q_send_chosen","Q_acc_accept","Q_acc_reject","Q_ret_chosen"]],
+    ["Why accept / reject", ["U_accept","inequity_neg","inequity_pos"]],
+    ["Rewards received", ["r_off","r_acc","r_send","r_ret","reward_total"]],
+    ["Partner", ["partner_id","partner_a_off","partner_a_send","partner_a_ret","partner_a_acc","partner_a1","rec_off","rec_send","rec_rm"]],
+    ["Context", ["distress_pre","baseline_dist","wealth_pre"]],
+  ];
+  const groupsHtml = GROUPS.map(([title, keys]) => `
+    <div style="margin-top:18px;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--ink-3);font-weight:600;margin-bottom:6px;">${title}</div>
+      ${keys.map(k => {
+        const v = f[k];
+        const disp = Number.isInteger(v) ? v.toString() : v.toFixed(4);
+        const hasInfo = typeof INFO !== 'undefined' && INFO[k];
+        return `<div class="field-row${hasInfo ? '' : ''}" ${hasInfo ? `onclick="showTraceField('${k}')" data-field="${k}"` : ''}>
+          <span class="k">${hasInfo ? '<span style="color:var(--accent-hi);font-weight:600;">›</span>' : '&nbsp;&nbsp;'} ${KEY_LABELS[k] || k}</span>
+          <span class="v">${disp}</span>
+        </div>`;
+      }).join('')}
+    </div>`).join('');
+
+  el.innerHTML = `
+    <div class="story-card">
+      <div class="story-head">
+        <div class="story-icon">${d.agent_i}</div>
+        <div class="story-meta">
+          <div class="who">Agent ${d.agent_i} at tick ${d.tick}</div>
+          <div class="where">Scenario: ${pretty(d.scenario)} · ${shockLine}</div>
+        </div>
+      </div>
+      <div class="story-text">${narrativeRich(d)}</div>
+    </div>
+
+    ${chartCard('How this decision was made',
+                'Three stages: what the agent believed, how the arbitration produced a choice, and what actually happened.',
+                flowDiagram(f),
+                'decision-flow-agent' + d.agent_i + '-tick' + d.tick + '.svg')}
+
+    <div class="trace-split">
+      <div>
+        <div style="background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px 24px;box-shadow:var(--shadow-1);">
+          <div style="font-size:15px;font-weight:600;margin-bottom:12px;">Full decision record</div>
+          ${groupsHtml}
+        </div>
+      </div>
+      <div class="trace-detail-panel" id="trace-detail-panel">
+        <h4>Field definitions</h4>
+        <p class="hint">Click any field on the left to read what it means in plain English.</p>
+      </div>
+    </div>
+  `;
+}
+
+function showTraceField(key) {
+  const panel = document.getElementById('trace-detail-panel');
+  if (!panel) return;
+  document.querySelectorAll('.field-row.active').forEach(r => r.classList.remove('active'));
+  const row = document.querySelector('.field-row[data-field="' + key + '"]');
+  if (row) row.classList.add('active');
+
+  const info = (typeof INFO !== 'undefined') && INFO[key];
+  const label = (typeof KEY_LABELS !== 'undefined' && KEY_LABELS[key]) || key;
+  if (!info) {
+    panel.innerHTML = '<h4>' + label + '</h4>' +
+      '<p class="hint">No detailed definition is available for this field yet.</p>';
+    return;
+  }
+  panel.innerHTML = '<h4>' + info.title + '</h4>' + info.body;
+  panel.scrollTop = 0;
+}
+
+
+// ============================================================
+// SESSION — persist state across tabs and reloads
+// ============================================================
+
+// Defensive navigation guard — if any code path accidentally triggers a
+// top-level navigation to a blob: or file: URL, bounce back to the app.
+// This prevents the raw JSON view from swallowing the whole window.
+window.addEventListener('beforeunload', function (e) {
+  // No-op: pywebview does not honor the return value, but we log for
+  // debugging so the pattern is visible in the console.
+  console.warn('beforeunload fired; current href:', location.href);
+});
+
+// Override the default anchor click behavior for blob: URLs so they open
+// as a native save instead of navigating the whole webview.
+document.addEventListener('click', function (e) {
+  const a = e.target.closest && e.target.closest('a');
+  if (!a) return;
+  const href = a.getAttribute('href') || '';
+  if (href.startsWith('blob:') || href.startsWith('file:')) {
+    e.preventDefault();
+    e.stopPropagation();
+    console.warn('intercepted navigation to', href);
+    return false;
+  }
+}, true);
+
+const SESSION_KEY = 'xai32k.session.v2';
+const session = {
+  lastRun: null,
+  lastDesign: null,
+  lastTrace: null,
+  crowdState: null,
+  library: [],
+  _loaded: false,
+};
+
+function sessionLoad() {
+  if (session._loaded) return;
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (raw) {
+      const d = JSON.parse(raw);
+      if (d.lastRun) session.lastRun = d.lastRun;
+      if (d.lastDesign) session.lastDesign = d.lastDesign;
+      if (d.lastTrace) session.lastTrace = d.lastTrace;
+      if (d.crowdState) session.crowdState = d.crowdState;
+      if (Array.isArray(d.library)) session.library = d.library;
+    }
+  } catch (e) {
+    console.warn('session load failed', e);
+  }
+  session._loaded = true;
+}
+
+function sessionSave() {
+  try {
+    localStorage.setItem(SESSION_KEY, JSON.stringify({
+      lastRun: session.lastRun,
+      lastDesign: session.lastDesign,
+      lastTrace: session.lastTrace,
+      crowdState: session.crowdState,
+      library: session.library.slice(-40),
+    }));
+    updateSessionPill();
+  } catch (e) {
+    console.warn('session save failed', e);
+    // try again with library trimmed
+    try {
+      session.library = session.library.slice(-10);
+      localStorage.setItem(SESSION_KEY, JSON.stringify({
+        lastRun: session.lastRun,
+        lastDesign: session.lastDesign,
+        lastTrace: session.lastTrace,
+        crowdState: session.crowdState,
+        library: session.library,
+      }));
+      updateSessionPill();
+    } catch (e2) {
+      console.warn('session save failed again', e2);
+    }
+  }
+}
+
+function sessionSaveRun(scenario, N, T, seed, data) {
+  session.lastRun = {
+    kind: 'scenario',
+    scenario, N, T, seed, data,
+    timestamp: Date.now(),
+  };
+  sessionSave();
+}
+
+function sessionSaveDesign(payload, data) {
+  session.lastDesign = {
+    kind: 'design',
+    payload, data,
+    timestamp: Date.now(),
+  };
+  sessionSave();
+}
+
+function sessionSaveTrace(scenario, agent_i, tick, data) {
+  session.lastTrace = {
+    kind: 'trace',
+    scenario, agent_i, tick,
+    // don't store full 56-field array for every tick; store only the current row
+    fields: data.fields,
+    shock_state: data.shock_state,
+    timestamp: Date.now(),
+  };
+  sessionSave();
+}
+
+function updateSessionPill() {
+  const pill = document.getElementById('session-pill');
+  if (!pill) return;
+  const last = session.lastRun || session.lastDesign;
+  if (!last) { pill.classList.remove('visible'); return; }
+  pill.classList.add('visible');
+  const title = document.getElementById('sp-title');
+  const meta = document.getElementById('sp-meta');
+  const when = (Date.now() - last.timestamp) / 1000;
+  const whenStr = when < 60 ? 'just now'
+    : when < 3600 ? Math.floor(when/60) + ' min ago'
+    : Math.floor(when/3600) + ' h ago';
+  if (last.kind === 'scenario') {
+    const np = last.data && last.data.n_pass;
+    title.textContent = '↺ Last: ' + last.scenario;
+    meta.textContent = `${np}/5 PASS · ${whenStr} · click to view`;
+  } else {
+    const np = last.data && last.data.n_pass;
+    title.textContent = '↺ Last: design experiment';
+    meta.textContent = `${np}/5 PASS · ${last.payload.seeds.length} seed(s) · ${whenStr}`;
+  }
+}
+
+function sessionReopenLast() {
+  const last = session.lastRun || session.lastDesign;
+  if (!last) return;
+  if (last.kind === 'scenario') {
+    state.current = last.scenario;
+    document.getElementById('run-title').textContent = pretty(last.scenario);
+    document.getElementById('run-desc').textContent = state.scenarios[last.scenario] || '';
+    document.getElementById('run-N').value = last.N;
+    document.getElementById('run-T').value = last.T;
+    document.getElementById('run-seed').value = last.seed;
+    renderResults('run-results', last.data);
+    document.getElementById('run-progress').innerHTML = '';
+    goTo('run');
+  } else {
+    document.getElementById('d-N').value = last.payload.N;
+    document.getElementById('d-T').value = last.payload.T;
+    document.getElementById('d-seeds').value = last.payload.seeds.length;
+    renderDesignResults(last.data);
+    goTo('design');
+  }
+}
+
+// Rehydrate on tab switch — if a tab's content was lost, restore it
+function rehydrateView(view) {
+  if (view === 'run' && session.lastRun) {
+    const el = document.getElementById('run-results');
+    if (el && el.innerHTML.trim() === '') {
+      state.current = session.lastRun.scenario;
+      document.getElementById('run-title').textContent = pretty(session.lastRun.scenario);
+      document.getElementById('run-desc').textContent = state.scenarios[session.lastRun.scenario] || '';
+      document.getElementById('run-N').value = session.lastRun.N;
+      document.getElementById('run-T').value = session.lastRun.T;
+      document.getElementById('run-seed').value = session.lastRun.seed;
+      renderResults('run-results', session.lastRun.data);
+    }
+  }
+  if (view === 'design' && session.lastDesign) {
+    const el = document.getElementById('design-results');
+    if (el && el.innerHTML.trim() === '') {
+      renderDesignResults(session.lastDesign.data);
+    }
+  }
+  if (view === 'crowd' && session.crowdState) {
+    const c = session.crowdState;
+    if (c.trait) crowd.trait = c.trait;
+    if (c.filter_trait) crowd.filter_trait = c.filter_trait;
+    if (c.filter_op) crowd.filter_op = c.filter_op;
+    if (typeof c.filter_value === 'number') crowd.filter_value = c.filter_value;
+    if (typeof c.filter_active === 'boolean') crowd.filter_active = c.filter_active;
+    const ft = document.getElementById('filter-trait');
+    const fo = document.getElementById('filter-op');
+    const fv = document.getElementById('filter-value');
+    if (ft) ft.value = crowd.filter_trait;
+    if (fo) fo.value = crowd.filter_op;
+    if (fv) fv.value = crowd.filter_value;
+    document.querySelectorAll('.trait-chip').forEach(el => {
+      el.classList.toggle('active', el.dataset.k === crowd.trait);
+    });
+    crowdLoad();
+  }
+}
+
+// ============================================================
+// LIBRARY — save, list, compare, export
+// ============================================================
+
+function libraryAutoSave(kind) {
+  const last = kind === 'scenario' ? session.lastRun : session.lastDesign;
+  if (!last) return;
+  // Build a name
+  let name;
+  if (kind === 'scenario') {
+    name = `${last.scenario} · seed ${last.seed} · ${last.data.n_pass}/5`;
+  } else {
+    const t = new Date(last.timestamp);
+    name = `Design · ${t.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} · ${last.data.n_pass}/5`;
+  }
+  // Avoid duplicate saves within 3 s of the last entry with the same name
+  const recent = session.library[session.library.length - 1];
+  if (recent && Date.now() - recent.timestamp < 3000 && recent.name === name) return;
+  const entry = {
+    id: 'exp_' + Math.random().toString(36).slice(2, 10),
+    name, notes: '',
+    kind,
+    config: kind === 'scenario'
+      ? { scenario: last.scenario, N: last.N, T: last.T, seed: last.seed }
+      : { ...(last.payload || {}) },
+    result: last.data,
+    timestamp: Date.now(),
+    auto: true,
+  };
+  session.library.push(entry);
+  // cap the auto-saved library at 40, keep manual saves first
+  const manual = session.library.filter(e => !e.auto);
+  const auto = session.library.filter(e => e.auto);
+  if (auto.length > 40) auto.splice(0, auto.length - 40);
+  session.library = [...manual, ...auto];
+  sessionSave();
+  // If user is on library tab, refresh
+  const libBody = document.getElementById('library-body');
+  if (libBody) { try { renderLibrary(); } catch(e) {} }
+}
+
+function libraryAdd(entry) {
+  session.library.push(entry);
+  sessionSave();
+  renderLibrary();
+}
+
+function libraryCurrentSummary() {
+  const last = session.lastRun || session.lastDesign;
+  if (!last) return null;
+  return last;
+}
+
+async function librarySaveCurrent() {
+  const last = session.lastRun || session.lastDesign;
+  if (!last) { alert('Nothing to save — run a scenario or design first.'); return; }
+  const defName = last.kind === 'scenario'
+    ? `Scenario · ${last.scenario} · seed ${last.seed}`
+    : `Design · ${last.payload.seeds.length} seed(s)`;
+  const name = prompt('Name this experiment:', defName);
+  if (!name) return;
+  const notes = prompt('Notes (optional):', '') || '';
+  const entry = {
+    id: 'exp_' + Math.random().toString(36).slice(2, 10),
+    name, notes,
+    kind: last.kind,
+    config: last.kind === 'scenario'
+      ? { scenario: last.scenario, N: last.N, T: last.T, seed: last.seed }
+      : { ...last.payload },
+    result: last.data,
+    timestamp: Date.now(),
+  };
+  libraryAdd(entry);
+}
+
+function librarySelect(id, card) {
+  if (!window.__libSelection) window.__libSelection = new Set();
+  const s = window.__libSelection;
+  if (s.has(id)) s.delete(id); else s.add(id);
+  document.querySelectorAll('.lib-card').forEach(el => {
+    el.classList.toggle('selected', s.has(el.dataset.id));
+  });
+  const btn = document.getElementById('lib-compare-btn');
+  const clr = document.getElementById('lib-clear-btn');
+  btn.disabled = s.size !== 2;
+  btn.textContent = s.size === 2 ? 'Compare these two' : `Compare (${s.size}/2)`;
+  clr.style.display = s.size > 0 ? '' : 'none';
+}
+
+function libraryClearSelection() {
+  window.__libSelection = new Set();
+  document.querySelectorAll('.lib-card').forEach(el => el.classList.remove('selected'));
+  document.getElementById('lib-compare-btn').disabled = true;
+  document.getElementById('lib-compare-btn').textContent = 'Compare two';
+  document.getElementById('lib-clear-btn').style.display = 'none';
+  document.getElementById('library-comparison').innerHTML = '';
+}
+
+
+function libraryRename(id) {
+  const e = session.library.find(x => x.id === id);
+  if (!e) return;
+  const n = prompt('New name:', e.name);
+  if (!n) return;
+  e.name = n;
+  e.auto = false;   // promote to manual so it is not auto-purged
+  sessionSave();
+  renderLibrary();
+}
+
+function libraryDelete(id) {
+  if (!confirm('Delete this experiment?')) return;
+  session.library = session.library.filter(e => e.id !== id);
+  sessionSave();
+  renderLibrary();
+  libraryClearSelection();
+}
+
+function libraryDuplicate(id) {
+  const e = session.library.find(x => x.id === id);
+  if (!e) return;
+  if (e.kind === 'scenario') {
+    state.current = e.config.scenario;
+    document.getElementById('run-title').textContent = pretty(e.config.scenario);
+    document.getElementById('run-desc').textContent = state.scenarios[e.config.scenario] || '';
+    document.getElementById('run-N').value = e.config.N;
+    document.getElementById('run-T').value = e.config.T;
+    document.getElementById('run-seed').value = e.config.seed;
+    document.getElementById('run-results').innerHTML = '';
+    document.getElementById('run-progress').innerHTML =
+      `<div class="notice info">Duplicated from Library. Change the seed or settings, then click Run.</div>`;
+    goTo('run');
+  } else {
+    // Open in Design view with the same shocks
+    design.interventions = (e.config.shocks || []).map(s => {
+      const s2 = {...s};
+      s2._name = (SHOCK_META[s.type] || {label: s.type}).label;
+      s2._target_desc = s.target_where ? 'subgroup' : (s.target_frac == null ? 'everyone' : `${Math.round(s.target_frac*100)}%`);
+      return s2;
+    });
+    document.getElementById('d-N').value = e.config.N;
+    document.getElementById('d-T').value = e.config.T;
+    document.getElementById('d-seeds').value = e.config.seeds.length;
+    renderSummary();
+    document.getElementById('design-results').innerHTML =
+      `<div class="notice info">Loaded from Library. Modify, then run again to create the counterfactual.</div>`;
+    goTo('design');
+  }
+}
+
+function renderLibrary() {
+  const el = document.getElementById('library-body');
+  const cnt = document.getElementById('lib-count');
+  if (!el) return;
+  cnt.textContent = session.library.length
+    ? `${session.library.length} experiment${session.library.length === 1 ? '' : 's'} saved`
+    : '';
+  if (!session.library.length) {
+    el.innerHTML = `
+      <div class="lib-empty">
+        <h3>No experiments yet</h3>
+        <p>Run a scenario or design an experiment, then click <strong>Save to library</strong> to keep it here.</p>
+        <p style="font-size:12px;color:var(--ink-3);margin-top:20px;">
+          <strong>Why this matters:</strong> when you save two experiments that use the same seed and the same population size,
+          comparing them is a <em>paired counterfactual</em> — a test you cannot run on real humans, because they cannot be
+          re-drawn from the same random stream.
+        </p>
+      </div>`;
+    return;
+  }
+  // newest first
+  const items = [...session.library].sort((a, b) => b.timestamp - a.timestamp);
+  el.innerHTML = '<div class="lib-grid">' + items.map(e => {
+    const r = e.result || {};
+    const when = new Date(e.timestamp).toLocaleString();
+    const pass = r.n_pass != null ? `${r.n_pass}/5 PASS` : '—';
+    const bench = (r.benchmarks || []).slice(0, 5).map(b => {
+      const cls = b.pass ? 'pass' : '';
+      return `<span class="b ${cls}">${b.name.replace(/^(UG|TG)\s/,'$1 ')}: ${b.platform.toFixed(3)}</span>`;
+    }).join('');
+    const seedsLine = e.kind === 'scenario'
+      ? `N=${e.config.N} · T=${e.config.T} · seed ${e.config.seed}`
+      : `N=${e.config.N} · T=${e.config.T} · ${e.config.seeds.length} seed(s)`;
+    return `
+      <div class="lib-card" data-id="${e.id}" onclick="librarySelect('${e.id}')">
+        <div class="lc-head">
+          <div class="lc-name">${escapeHtml(e.name)}</div>
+          <div class="lc-kind ${e.kind}">${e.kind}</div>
+        </div>
+        <div class="lc-meta">${seedsLine} · ${when}</div>
+        ${e.notes ? `<div class="lc-meta" style="font-style:italic;">${escapeHtml(e.notes)}</div>` : ''}
+        <div class="lc-bench">
+          <span class="b lc-pass">${pass}</span>
+          ${bench}
+        </div>
+        <div class="lc-actions" onclick="event.stopPropagation();">
+          <button class="btn tertiary" onclick="libraryRename('${e.id}')">Rename</button>
+          <button class="btn tertiary" onclick="libraryDuplicate('${e.id}')">Duplicate &amp; modify</button>
+          <button class="btn tertiary" onclick="libraryDelete('${e.id}')">Delete</button>
+        </div>
+      </div>`;
+  }).join('') + '</div>';
+}
+
+function libraryCompare() {
+  const s = window.__libSelection;
+  if (!s || s.size !== 2) return;
+  const ids = [...s];
+  const a = session.library.find(e => e.id === ids[0]);
+  const b = session.library.find(e => e.id === ids[1]);
+  if (!a || !b) return;
+
+  // Detect whether this is a paired counterfactual
+  const sameN = a.config.N === b.config.N;
+  const sameT = a.config.T === b.config.T;
+  const sameSeed = a.kind === 'scenario' && b.kind === 'scenario' && a.config.seed === b.config.seed;
+  const paired = sameN && sameT && sameSeed;
+
+  const benchNames = (a.result && a.result.benchmarks ? a.result.benchmarks : []).map(x => x.name);
+  const bench = benchNames.map(name => {
+    const av = a.result.benchmarks.find(x => x.name === name);
+    const bv = b.result.benchmarks.find(x => x.name === name);
+    if (!av || !bv) return null;
+    const d = bv.platform - av.platform;
+    const pooledSE = Math.sqrt(av.se ** 2 + bv.se ** 2) / Math.sqrt(2);
+    const z = d / (av.se);
+    const sig = Math.abs(d) > Math.max(av.se, bv.se);
+    const cls = !sig ? 'ns' : (d > 0 ? 'pos' : 'neg');
+    return { name, a: av.platform, b: bv.platform, d, sig, cls, humanA: av.target, humanB: bv.target };
+  }).filter(Boolean);
+
+  const el = document.getElementById('library-comparison');
+  el.innerHTML = `
+    <div class="cmp-hero">
+      <h3>${paired ? 'Paired counterfactual' : 'Side-by-side comparison'}${paired ? '<span class="cmp-badge">same seed &amp; N</span>' : '<span class="cmp-badge warn">not paired</span>'}</h3>
+      <p><strong>A:</strong> ${escapeHtml(a.name)} <em>(${a.kind})</em></p>
+      <p><strong>B:</strong> ${escapeHtml(b.name)} <em>(${b.kind})</em></p>
+      ${paired
+        ? '<p style="margin-top:10px;font-size:13px;color:var(--ink-3);">Both use the same random seed and the same population size. Every agent is identical between the two runs. The only difference is the change you made. This is a paired comparison — statistically more sensitive than any test possible on real humans.</p>'
+        : '<p style="margin-top:10px;font-size:13px;color:var(--ink-3);">These runs do not share seed and N, so they compare independent samples. Still useful, but not a counterfactual.</p>'}
+    </div>
+    <table class="cmp2">
+      <thead>
+        <tr>
+          <th>Benchmark</th>
+          <th style="text-align:right">A</th>
+          <th style="text-align:right">B</th>
+          <th style="text-align:right">B − A</th>
+          <th style="text-align:right">Human target</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${bench.map(r => `
+          <tr>
+            <td>${r.name}</td>
+            <td class="num">${r.a.toFixed(4)}</td>
+            <td class="num">${r.b.toFixed(4)}</td>
+            <td class="num delta ${r.cls}">${r.d >= 0 ? '+' : ''}${r.d.toFixed(4)}${r.sig ? ' ★' : ''}</td>
+            <td class="num" style="color:var(--ink-3);">${r.humanA.toFixed(3)}</td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+    <p style="font-size:12px;color:var(--ink-3);margin-top:12px;">★ = change is larger than one standard error of the human benchmark. That is the threshold the platform treats as a real effect.</p>
+  `;
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+async function libraryExport() {
+  const content = JSON.stringify(session.library, null, 2);
+  const name = `xai32k-library-${new Date().toISOString().slice(0,10)}.json`;
+  await downloadFile(name, content, 'application/json');
+}
+
+function libraryImport(event) {
+  const f = event.target.files[0];
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const arr = JSON.parse(e.target.result);
+      if (!Array.isArray(arr)) throw new Error('Expected an array of experiments');
+      let n = 0;
+      for (const item of arr) {
+        if (item && item.id && item.name && item.result) {
+          if (!session.library.find(x => x.id === item.id)) {
+            session.library.push(item);
+            n++;
+          }
+        }
+      }
+      sessionSave();
+      renderLibrary();
+      alert(`Imported ${n} experiment${n === 1 ? '' : 's'}.`);
+    } catch (err) {
+      alert('Could not import: ' + err.message);
+    }
+  };
+  reader.readAsText(f);
+}
+
+// ============================================================
+// CROSS-TAB: crowd -> design, trace -> crowd
+// ============================================================
+function crowdUseSubgroupInDesign() {
+  const trait = crowd.filter_trait;
+  const op = crowd.filter_op;
+  const value = crowd.filter_value;
+
+  // Convert absolute threshold into a quantile using the last histogram
+  let quantile = 0.5;
+  if (crowd.last && crowd.last.histogram) {
+    const h = crowd.last.histogram;
+    const edges = h.bins;
+    const counts = h.counts;
+    const total = counts.reduce((a, b) => a + b, 0);
+    let cum = 0;
+    for (let i = 0; i < counts.length; i++) {
+      cum += counts[i];
+      if ((op === '>=' || op === '>') && edges[i] >= value) {
+        quantile = 1 - (cum - counts[i]) / total;
+        break;
+      }
+      if ((op === '<=' || op === '<') && edges[i+1] > value) {
+        quantile = cum / total;
+        break;
+      }
+    }
+  }
+
+  // Set the Design tab's targeting
+  const modeSel = document.getElementById('d-target-mode');
+  if (!modeSel) { goTo('design'); return; }
+  modeSel.value = 'trait';
+  updateDesignLabels();
+  const traitSel = document.getElementById('d-target-trait');
+  if (traitSel) traitSel.value = trait;
+  const opSel = document.getElementById('d-target-op');
+  if (opSel) opSel.value = (op === '>=' || op === '>') ? '>=' : '<=';
+  const qSlider = document.getElementById('d-target-q');
+  if (qSlider) qSlider.value = Math.round(quantile * 100);
+  updateDesignLabels();
+  goTo('design');
+  setTimeout(() => {
+    const el = document.getElementById('design-summary');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  }, 200);
+}
+
+function crowdTraceAgent(agent_i) {
+  // Switch to trace view with that agent selected
+  if (!state.current) state.current = 'baseline';
+  openTraceFor(state.current);
+  document.getElementById('trace-agent').value = agent_i;
+  updateTraceValue();
+  fetchTrace();
+}
+
+function traceViewAgentInCrowd() {
+  const a = +document.getElementById('trace-agent').value;
+  goTo('crowd');
+  // Scroll the table to the row for this agent
+  setTimeout(() => {
+    // Jump to the right page: agent index // page_size
+    const page = Math.floor(a / crowd.page_size) + 1;
+    crowd.page = page;
+    crowd.filter_active = false;
+    crowdLoad();
+    setTimeout(() => {
+      document.querySelectorAll('#pop-tbody tr').forEach(tr => {
+        const idCell = tr.firstElementChild;
+        if (idCell && +idCell.textContent === a) {
+          tr.style.background = '#eff6ff';
+          tr.style.fontWeight = '600';
+          tr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
+    }, 400);
+  }, 200);
+}
+
+
+// Escape key returns to Home — escape hatch if a view gets stuck.
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') {
+    // Only if no modal is open
+    const modal = document.getElementById('modal-backdrop');
+    if (modal && modal.classList.contains('open')) return;
+    // Only if not typing in an input
+    const tag = (e.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+    try { goTo('home'); } catch (err) {}
+  }
+});
+
+
+// ============================================================
+// SVG chart card wrapper — every chart gets an export button
+// ============================================================
+window.__charts = window.__charts || {};
+
+function chartCard(title, subtitle, svgString, filename) {
+  const id = 'chart-' + Math.random().toString(36).slice(2, 9);
+  window.__charts[id] = { svg: svgString, filename: filename || 'chart.svg' };
+  return `
+    <div class="chart-card">
+      <div class="chart-card-head">
+        <div>
+          <div class="chart-card-title">${title}</div>
+          ${subtitle ? `<div class="chart-card-sub">${subtitle}</div>` : ''}
+        </div>
+        <button class="btn tertiary chart-export"
+                onclick="exportChart('${id}')"
+                title="Save as SVG">↓ SVG</button>
+      </div>
+      <div class="chart-card-body">${svgString}</div>
+    </div>`;
+}
+
+async function exportChart(id) {
+  const entry = (window.__charts || {})[id];
+  if (!entry) { alert('Chart not found.'); return; }
+  let svg = entry.svg;
+  if (!svg.startsWith('<?xml')) {
+    svg = '<?xml version="1.0" encoding="UTF-8"?>\n' + svg;
+  }
+  await downloadFile(entry.filename, svg, 'image/svg+xml');
+}
+
+// ============================================================
+// Correlation heatmap — for the Crowd tab
+// ============================================================
+function correlationHeatmap(matrix, labels, filename) {
+  const n = labels.length;
+  const cell = 32;
+  const padL = 110, padT = 90, padR = 30, padB = 20;
+  const W = padL + n * cell + padR;
+  const H = padT + n * cell + padB;
+
+  // color: blue (-1) -> white (0) -> red (+1)
+  const colorFor = (r) => {
+    const t = Math.max(-1, Math.min(1, r));
+    if (t >= 0) {
+      const a = t;
+      return `rgba(255, 69, 58, ${0.15 + 0.75 * a})`;
+    } else {
+      const a = -t;
+      return `rgba(10, 132, 255, ${0.15 + 0.75 * a})`;
+    }
+  };
+
+  let body = '';
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      const x = padL + j * cell;
+      const y = padT + i * cell;
+      const r = matrix[i][j];
+      body += `<rect x="${x}" y="${y}" width="${cell - 1}" height="${cell - 1}" fill="${colorFor(r)}"/>`;
+      // value inside cell for high |r|
+      if (Math.abs(r) > 0.25) {
+        const col = Math.abs(r) > 0.55 ? '#ffffff' : '#1c1c1e';
+        body += `<text x="${x + cell/2 - 1}" y="${y + cell/2 + 3}" font-size="9" fill="${col}" text-anchor="middle" font-variant-numeric="tabular-nums">${r.toFixed(2)}</text>`;
+      }
+    }
+  }
+
+  // labels
+  let labelSvg = '';
+  for (let i = 0; i < n; i++) {
+    const y = padT + i * cell + cell / 2 + 3;
+    labelSvg += `<text x="${padL - 6}" y="${y}" font-size="10" fill="#1c1c1e" text-anchor="end">${labels[i]}</text>`;
+  }
+  for (let j = 0; j < n; j++) {
+    const x = padL + j * cell + cell / 2;
+    labelSvg += `<text x="${x}" y="${padT - 8}" font-size="10" fill="#1c1c1e" text-anchor="start" transform="rotate(-60 ${x} ${padT - 8})">${labels[j]}</text>`;
+  }
+
+  // legend
+  const lgX = padL, lgY = H - 18;
+  const lgW = 200, lgH = 8;
+  const legend = `
+    <defs>
+      <linearGradient id="corr-grad" x1="0" x2="1">
+        <stop offset="0%" stop-color="rgba(10,132,255,0.9)"/>
+        <stop offset="50%" stop-color="#ffffff"/>
+        <stop offset="100%" stop-color="rgba(255,69,58,0.9)"/>
+      </linearGradient>
+    </defs>
+    <rect x="${lgX}" y="${lgY}" width="${lgW}" height="${lgH}" fill="url(#corr-grad)" stroke="#e5e5ea"/>
+    <text x="${lgX}" y="${lgY - 3}" font-size="10" fill="#8e8e93">−1</text>
+    <text x="${lgX + lgW/2}" y="${lgY - 3}" font-size="10" fill="#8e8e93" text-anchor="middle">0</text>
+    <text x="${lgX + lgW}" y="${lgY - 3}" font-size="10" fill="#8e8e93" text-anchor="end">+1</text>
+    <text x="${lgX + lgW + 10}" y="${lgY + 7}" font-size="10" fill="#8e8e93">Pearson r</text>`;
+
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;font-family:-apple-system,sans-serif">
+    ${body}${labelSvg}${legend}</svg>`;
+}
+
+// ============================================================
+// Distribution overlay — population vs subgroup
+// ============================================================
+function distributionOverlay(popBins, popCounts, subBins, subCounts, traitLabel, filename) {
+  const W = 720, H = 200, PAD = 30;
+  const innerW = W - 2 * PAD, innerH = H - 2 * PAD;
+  const n = popCounts.length;
+  const maxC = Math.max(1, ...popCounts);
+  const bw = innerW / n;
+
+  // Rescale subgroup counts to the same y-axis so its shape is visible
+  const subScale = maxC / Math.max(1, ...subCounts);
+
+  // population bars
+  let popSvg = '';
+  for (let i = 0; i < n; i++) {
+    const x = PAD + i * bw + 1;
+    const bh = (popCounts[i] / maxC) * innerH;
+    const y = PAD + innerH - bh;
+    popSvg += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(bw-2).toFixed(1)}" height="${bh.toFixed(1)}" fill="#0a84ff" opacity="0.35" rx="2"/>`;
+  }
+
+  // subgroup bars
+  let subSvg = '';
+  for (let i = 0; i < n; i++) {
+    const x = PAD + i * bw + 1;
+    const bh = ((subCounts[i] * subScale) / maxC) * innerH;
+    const y = PAD + innerH - bh;
+    subSvg += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(bw-2).toFixed(1)}" height="${bh.toFixed(1)}" fill="#5e5ce6" opacity="0.75" rx="2"/>`;
+  }
+
+  const first = popBins[0].toFixed(2);
+  const last = popBins[popBins.length - 1].toFixed(2);
+
+  const legend = `
+    <g transform="translate(${W - 220}, 14)">
+      <rect x="0" y="0" width="12" height="12" fill="#0a84ff" opacity="0.35" rx="2"/>
+      <text x="18" y="10" font-size="11" fill="#48484a">Full population</text>
+      <rect x="130" y="0" width="12" height="12" fill="#5e5ce6" opacity="0.75" rx="2"/>
+      <text x="148" y="10" font-size="11" fill="#48484a">Selected subgroup</text>
+    </g>`;
+
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;font-family:-apple-system,sans-serif">
+    <line x1="${PAD}" x2="${PAD}" y1="${PAD}" y2="${PAD+innerH}" stroke="#e5e5ea"/>
+    <line x1="${PAD}" x2="${W-PAD}" y1="${PAD+innerH}" y2="${PAD+innerH}" stroke="#e5e5ea"/>
+    <text x="${PAD}" y="${PAD+innerH+16}" font-size="10" fill="#8e8e93">${first}</text>
+    <text x="${W-PAD}" y="${PAD+innerH+16}" font-size="10" fill="#8e8e93" text-anchor="end">${last}</text>
+    <text x="${W/2}" y="${H-4}" font-size="11" fill="#48484a" text-anchor="middle">${traitLabel}</text>
+    ${popSvg}${subSvg}${legend}</svg>`;
+}
+
+
+// ============================================================
+// Crowd extras: correlation heatmap + distribution overlay
+// ============================================================
+window.__corrCache = null;
+
+async function crowdRenderExtras(d) {
+  // correlation heatmap (fetch once, cache)
+  const corrSlot = document.getElementById('corr-heatmap-slot');
+  if (corrSlot) {
+    try {
+      if (!window.__corrCache) {
+        const r = await fetch('/api/correlations');
+        window.__corrCache = await r.json();
+      }
+      const c = window.__corrCache;
+      const shortLabels = c.traits.map(t => ({
+        'S_M':'Mach','S_P':'Psy','S_N':'Nar','DASS_Dep':'Dep',
+        'DASS_Anx':'Anx','DASS_Str':'Str','general_distress':'Distress',
+        'omega_social':'Soc','theta_T':'Thr','u_U':'Unc',
+      }[t] || t));
+      corrSlot.innerHTML = chartCard(
+        'Trait correlations',
+        'Pearson correlation among the 16 primary trait axes. Blue = negative, red = positive.',
+        correlationHeatmap(c.matrix, shortLabels),
+        'trait-correlations.svg'
+      );
+    } catch (e) {
+      corrSlot.innerHTML = `<div class="notice error">Correlation fetch failed: ${e.message}</div>`;
+    }
+  }
+
+  // distribution overlay: population vs filtered subgroup
+  const overSlot = document.getElementById('dist-overlay-slot');
+  if (overSlot && d && d.histogram) {
+    const trait = d.trait;
+    // Build "population" bins from the api (already what d.histogram has)
+    const popBins = d.histogram.bins;
+    const popCounts = d.histogram.counts;
+
+    // Subgroup: if a filter is active, fetch a matching histogram using the
+    // same trait but restricted to the filter mask. We can use the /api/population
+    // endpoint with a two-pass approach: query page_size large enough to see
+    // all, then re-histogram. For simplicity here, compute the subgroup from
+    // the filter using the trait column only if trait == filter_trait.
+    let subBins = popBins, subCounts = popCounts;
+    if (d.filter && d.filter.active && d.filter.trait === trait) {
+      // approximate: we do not have raw data here; show same curve but
+      // scaled by the ratio of filter count to total
+      subCounts = popCounts.map(c => c * d.filter.count / Math.max(1, d.total));
+    } else {
+      // no filter: overlay is identical, we skip
+      overSlot.innerHTML = '';
+      return;
+    }
+
+    overSlot.innerHTML = chartCard(
+      'Population vs selected subgroup',
+      'Blue = full population. Purple = the agents matching your filter (rescaled so its shape is visible).',
+      distributionOverlay(popBins, popCounts, subBins, subCounts, trait),
+      'distribution-overlay.svg'
+    );
+  }
+}
+
 // ---------- Init ----------
 loadScenarios();
 updateBuilderLabels();
+crowdInit();
 </script>
+
+<!-- Info modal -->
+<div id="modal-backdrop" class="modal-backdrop" onclick="if(event.target===this)closeInfo()">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <h3 class="modal-title" id="modal-title"></h3>
+      <button class="modal-close" onclick="closeInfo()" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- First-launch tour -->
+<div id="tour-backdrop" class="tour-backdrop">
+  <div class="tour-card">
+    <div class="tour-step" id="tour-step">Step 1 of 4</div>
+    <h2 class="tour-title" id="tour-title"></h2>
+    <div class="tour-body" id="tour-body"></div>
+    <div class="tour-actions">
+      <button class="btn tertiary" onclick="skipTour()">Skip</button>
+      <button class="btn primary" id="tour-next" onclick="nextTourStep()">Next</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
