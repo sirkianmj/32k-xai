@@ -1,0 +1,1491 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>32k-XAI · Complete Guide and Pitch</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+:root {
+  --bg: #f6f7f9;
+  --paper: #ffffff;
+  --ink: #1c1c1e;
+  --ink-2: #48484a;
+  --ink-3: #8e8e93;
+  --line: #e5e5ea;
+  --accent: #0a84ff;
+  --accent-hi: #0071e3;
+  --ok: #30d158;
+  --warn: #ff9f0a;
+  --bad: #ff453a;
+  --code-bg: #f4f4f6;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Inter, system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+.page {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 48px 56px 96px;
+  background: var(--paper);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  min-height: 100vh;
+}
+h1 { font-size: 42px; letter-spacing: -0.02em; line-height: 1.15; margin: 0 0 10px; font-weight: 700; }
+h2 {
+  font-size: 28px; letter-spacing: -0.015em; margin: 72px 0 18px;
+  padding-bottom: 10px; border-bottom: 2px solid var(--ink); font-weight: 650;
+}
+h3 { font-size: 20px; margin: 40px 0 12px; font-weight: 600; letter-spacing: -0.01em; }
+h4 { font-size: 16px; margin: 24px 0 8px; font-weight: 600; color: var(--ink-2); }
+p { margin: 0 0 16px; }
+ul, ol { padding-left: 26px; margin: 8px 0 16px; }
+li { margin: 5px 0; }
+a { color: var(--accent-hi); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code, .mono {
+  font-family: ui-monospace, Menlo, "SF Mono", Consolas, monospace;
+  font-size: 0.88em; background: var(--code-bg); padding: 2px 6px; border-radius: 4px;
+}
+pre {
+  background: var(--code-bg); padding: 16px 18px; border-radius: 8px;
+  font-family: ui-monospace, Menlo, monospace; font-size: 13px; line-height: 1.55;
+  overflow-x: auto; margin: 12px 0; white-space: pre-wrap; word-break: break-word;
+}
+pre code { background: none; padding: 0; }
+blockquote {
+  border-left: 4px solid var(--accent); margin: 20px 0; padding: 6px 20px;
+  color: var(--ink-2); font-style: italic;
+}
+hr { border: 0; border-top: 1px solid var(--line); margin: 48px 0; }
+table {
+  width: 100%; border-collapse: collapse; font-size: 14px; margin: 16px 0;
+  border: 1px solid var(--line);
+}
+th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { background: #f6f7f9; font-weight: 600; font-size: 13px; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.cover {
+  padding: 40px 0 60px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 40px;
+}
+.cover .sub { font-size: 19px; color: var(--ink-2); margin: 12px 0 30px; }
+.cover .meta {
+  display: grid; grid-template-columns: 180px 1fr; gap: 6px 20px;
+  font-size: 14px; margin-top: 30px;
+}
+.cover .meta .k { color: var(--ink-3); }
+.cover .meta .v { font-family: ui-monospace, Menlo, monospace; font-size: 13px; }
+.tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 20px 0; }
+.tag { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+.tag.blue { background: #eff6ff; color: #1c4dba; }
+.tag.green { background: #e7f9ec; color: #1a6b32; }
+.tag.amber { background: #fff4e0; color: #a35b00; }
+.tag.red { background: #ffecea; color: #a1150d; }
+.tag.grey { background: #f2f3f5; color: #4a4a4c; }
+
+.toc {
+  background: #f8f9fb; border: 1px solid var(--line); border-radius: 12px;
+  padding: 24px 30px; margin: 30px 0;
+}
+.toc h3 { margin: 0 0 14px; font-size: 18px; }
+.toc ol { columns: 2; column-gap: 40px; padding-left: 24px; margin: 0; }
+.toc li { break-inside: avoid; font-size: 14.5px; margin: 6px 0; }
+
+.audience {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px; margin: 24px 0;
+}
+.audience .card {
+  background: #f8f9fb; border: 1px solid var(--line); border-radius: 12px;
+  padding: 22px 24px;
+}
+.audience .card h4 { margin: 0 0 10px; font-size: 15px; }
+.audience .card p { font-size: 14px; margin: 0; color: var(--ink-2); }
+
+.callout {
+  padding: 16px 22px; border-radius: 12px; margin: 20px 0; font-size: 15px;
+}
+.callout.info { background: #eff6ff; border: 1px solid #dde7ff; color: #1c4dba; }
+.callout.ok { background: #e7f9ec; border: 1px solid #c6f0cf; color: #1a6b32; }
+.callout.warn { background: #fff4e0; border: 1px solid #ffe4b8; color: #a35b00; }
+.callout.bad { background: #ffecea; border: 1px solid #ffd6d3; color: #a1150d; }
+
+.screenshot {
+  background: #f8f9fb; border: 1px solid var(--line); border-radius: 14px;
+  padding: 14px; margin: 20px 0;
+}
+.screenshot svg { display: block; width: 100%; height: auto; border-radius: 10px; }
+.screenshot .cap { font-size: 12.5px; color: var(--ink-3); margin-top: 10px; text-align: center; }
+
+.prov { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; }
+.prov.GROUNDED { background: #e7f9ec; color: #1a6b32; }
+.prov.PROXY { background: #fff4e0; color: #a35b00; }
+.prov.DERIVED { background: #eff6ff; color: #1c4dba; }
+.prov.SYNTHETIC { background: #ffecea; color: #a1150d; }
+.prov.INERT { background: #f2f3f5; color: #4a4a4c; }
+
+.flag {
+  display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px;
+  background: #fff4e0; color: #a35b00; margin: 2px 4px 2px 0;
+  font-family: ui-monospace, Menlo, monospace;
+}
+
+@media print {
+  body { background: white; font-size: 12px; }
+  .page { max-width: none; margin: 0; padding: 20mm; box-shadow: none; }
+  h2 { page-break-before: always; }
+  h2:first-of-type { page-break-before: avoid; }
+  .screenshot { break-inside: avoid; }
+  a { color: inherit; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- ============================================================ -->
+<!-- COVER                                                          -->
+<!-- ============================================================ -->
+<div class="cover">
+  <div class="tag-row">
+    <span class="tag blue">Complete Guide</span>
+    <span class="tag green">v2.0</span>
+    <span class="tag grey">2026-10-12</span>
+  </div>
+  <h1>32k-XAI</h1>
+  <div class="sub">A mechanistic simulation of 32,000 cognitive agents, and its complete guide for scientists, engineers, and everyone else.</div>
+  <div class="meta">
+    <div class="k">Project</div><div class="v">32k-XAI Cognitive Simulation Platform</div>
+    <div class="k">Lead architect</div><div class="v">Kian Mansouri Jamshidi</div>
+    <div class="k">Lead psychologist</div><div class="v">Sabihe Khorshidi</div>
+    <div class="k">Repository</div><div class="v">github.com/sirkianmj/32k-xai</div>
+    <div class="k">Version</div><div class="v">2.0 (Sprint 0 gated)</div>
+    <div class="k">Document generated</div><div class="v">2026-10-12</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- TOC                                                            -->
+<!-- ============================================================ -->
+<div class="toc">
+  <h3>Table of contents</h3>
+  <ol>
+    <li><a href="#exec">Executive summary</a></li>
+    <li><a href="#plain">What it is, in plain language</a></li>
+    <li><a href="#pitch-tech">Pitch for engineers</a></li>
+    <li><a href="#pitch-psych">Pitch for psychologists</a></li>
+    <li><a href="#pitch-public">Pitch for everyone else</a></li>
+    <li><a href="#science">Scientific foundations</a></li>
+    <li><a href="#benchmarks">The five human benchmarks</a></li>
+    <li><a href="#population">The population and its provenance</a></li>
+    <li><a href="#architecture">Architecture and decision loop</a></li>
+    <li><a href="#engine">The simulation engine</a></li>
+    <li><a href="#ui">Interface tour (illustrated)</a></li>
+    <li><a href="#features">Feature reference</a></li>
+    <li><a href="#defaults">Complete defaults catalog</a></li>
+    <li><a href="#api">API reference</a></li>
+    <li><a href="#flags">Specification flags and caveats</a></li>
+    <li><a href="#history">Version history (this session)</a></li>
+    <li><a href="#roadmap">What is left</a></li>
+    <li><a href="#glossary">Glossary</a></li>
+    <li><a href="#refs">References</a></li>
+  </ol>
+</div>
+
+<!-- ============================================================ -->
+<!-- EXECUTIVE SUMMARY                                              -->
+<!-- ============================================================ -->
+<h2 id="exec">Executive summary</h2>
+
+<p>
+  <strong>32k-XAI</strong> is a research platform that simulates a society of 32,000
+  autonomous cognitive agents. Each agent has a personality, a mood, a learning rate,
+  and a fairness parameter &mdash; and every one of those numbers is drawn from real
+  human psychometric data, not invented. At every tick, agents pair up, play an
+  ultimatum game and a trust game, update their internal values, and accumulate
+  wealth. Over hundreds of ticks, those individual decisions produce population-level
+  patterns: cooperation, rejection of unfair offers, trust, and inequality.
+</p>
+
+<p>
+  The platform does something that neural-network simulations cannot. Every decision
+  &mdash; who to interact with, what offer to make, whether to accept, how much to
+  return &mdash; can be traced back to the specific named parameters that produced it,
+  with documented uncertainty and provenance. There are no neural networks. There are
+  no large language models. Every agent's "brain" is a small, readable set of
+  mathematical functions.
+</p>
+
+<p>
+  The platform reproduces five published human benchmarks within one standard error:
+  ultimatum offer rate, ultimatum rejection rate, trust-game send rate, trust-game
+  return rate, and wealth Gini. That means it behaves like real human populations on
+  well-established economic-game measures.
+</p>
+
+<div class="audience">
+  <div class="card">
+    <h4>For engineers</h4>
+    <p>A JAX-vectorised multi-agent environment. 32,000 agents run end to end in
+      2.9 seconds on macOS Metal, 3.7 seconds on CPU, 0.26 seconds on a modest
+      NVIDIA GTX 1660 Ti. Deterministic given seed, N, T, and shocks. FastAPI
+      backend, single-page HTML frontend, zero external JavaScript dependencies.</p>
+  </div>
+  <div class="card">
+    <h4>For psychologists</h4>
+    <p>Population statistics drawn from IPIP-FFM (N=603k), SD3 (N=17k), DASS-21
+      (N=40k), and behavioural tasks. Bifactor CFA structures for Dark Triad and
+      DASS, replicated in large samples. Every trait carries a provenance badge
+      that tells you how much weight it deserves.</p>
+  </div>
+  <div class="card">
+    <h4>For everyone else</h4>
+    <p>You can run experiments on a simulated population without writing code.
+      Click a scenario, see the results, and look inside any single decision to
+      see exactly what the agent was thinking. Generate reports. Export data.
+      Everything is documented in the app's Guide tab.</p>
+  </div>
+</div>
+
+<div class="callout ok">
+  <strong>What the platform is not.</strong> It does not claim to be a 100% transparent
+  or strictly deterministic simulation of any real population. It is <em>within-agent
+  deterministic</em> and <em>between-agent stochastic</em>, parameterised by a fixed
+  seed. Every mechanistic trace carries documented uncertainty, reliability flags, and
+  provenance annotations. Claims are uncertainty-aware by design.
+</div>
+
+<!-- ============================================================ -->
+<!-- PLAIN LANGUAGE                                                 -->
+<!-- ============================================================ -->
+<h2 id="plain">What it is, in plain language</h2>
+
+<p>
+  Imagine you could build a small town of 32,000 people and watch what happens when
+  they play money games with each other for a few hundred days. Some people are
+  agreeable, some are suspicious, some are stressed, some are impulsive. Each one
+  decides who to talk to, whether to engage, how much money to offer in a split,
+  whether to accept what's offered, and how much to give back.
+</p>
+
+<p>
+  That is what 32k-XAI does. Each of the 32,000 agents is a character with a
+  personality profile drawn from real human data. At each tick, agents choose a
+  partner from their social network, decide whether to engage, play an ultimatum
+  game and a trust game in sequence, and update their expectations about the world.
+  Over hundreds of ticks, patterns emerge: cooperation, mistrust, wealth inequality,
+  retaliatory behaviour.
+</p>
+
+<p>
+  The difference between this and every other simulation platform is <em>what you
+  can ask it</em>. You can pause the simulation, pick one agent, pick one moment,
+  and see the full arithmetic behind its decision: the value it assigned to each
+  option, the weight it gave to habit versus planning, the fairness penalty it
+  applied, the reward it expected, the reward it got. Nothing is hidden.
+</p>
+
+<p>
+  You can then ask why that arithmetic produced that behaviour. And you can run
+  the simulation under different conditions &mdash; resource scarcity, psychological
+  distress, social isolation, wealth redistribution &mdash; and see exactly which
+  benchmarks move, by how much, and through which mechanism.
+</p>
+
+<h3>What you can do with it in five minutes</h3>
+<ol>
+  <li>Open the app. Click <strong>Scenarios</strong> in the sidebar.</li>
+  <li>Pick <strong>Baseline</strong>. The defaults (8,000 agents, 250 ticks,
+      seed 42) are fine for a first run. Click <strong>Run simulation</strong>.</li>
+  <li>After a few seconds, you see a benchmark chart and five result cards.
+      Green = the simulated agents matched real human behaviour. Red = they did not.</li>
+  <li>Click <strong>Trace this run's agents &rarr;</strong>. Pick an agent, pick
+      a tick, click <strong>Show me the trace</strong>. You are now looking at the
+      56 individual numbers that produced one decision.</li>
+  <li>Go back to <strong>Crowd</strong>. Click a trait chip. See where it came from
+      (grounded in a human sample, or a proxy, or a synthetic prior). Filter to a
+      subgroup and see the effect sizes.</li>
+</ol>
+
+<!-- ============================================================ -->
+<!-- PITCH — ENGINEERS                                              -->
+<!-- ============================================================ -->
+<h2 id="pitch-tech">Pitch for engineers</h2>
+
+<p>
+  You are looking at a 32,000-agent reinforcement-learning environment that runs
+  end to end in under three seconds on consumer hardware, with no neural networks
+  anywhere in the loop. It is built on JAX, uses <code>vmap</code> and
+  <code>lax.scan</code> to avoid per-agent Python overhead, and compiles to a
+  single XLA kernel per tick. Every agent is a row in a global tensor; every
+  action is a batched softmax over that tensor.
+</p>
+
+<h3>Performance</h3>
+<table>
+  <thead><tr><th>Backend</th><th style="text-align:right">32,000 &times; 500 ticks</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td>macOS M5, Metal (metaljax)</td><td class="num">2.88 s</td><td>Community Metal PJRT plugin</td></tr>
+    <tr><td>macOS M5, CPU</td><td class="num">3.68 s</td><td>Numerically equivalent to Metal</td></tr>
+    <tr><td>Windows, GTX 1660 Ti (CUDA)</td><td class="num">0.26 s</td><td>6 GB VRAM, compute capability 7.5</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Numerical equivalence between backends is verified: 4 of 5 benchmark outputs are
+  byte-identical, and Gini differs by 1.19&times;10<sup>-7</sup>.
+</p>
+
+<h3>Determinism and reproducibility</h3>
+<p>
+  The simulation is deterministic given a tuple of (seed, N, T, shocks). Two runs
+  with the same tuple produce bit-identical traces, benchmark outputs, and wealth
+  trajectories. The <code>run_id</code> is a SHA-256 hash of that tuple truncated
+  to 16 hex characters; two runs with the same <code>run_id</code> are guaranteed
+  to produce the same numbers. The canonical trace hash for the calibrated engine
+  is <code>905da509bf037d50e2565b807abc6b838bc61d64c439841cede337f0f312eaea</code>.
+</p>
+
+<h3>No black boxes</h3>
+<ul>
+  <li><strong>No DNNs.</strong> No PyTorch, no TensorFlow, no Keras in the decision loop.</li>
+  <li><strong>No LLMs.</strong> Not at inference, not at training, nowhere.</li>
+  <li><strong>Every parameter is named.</strong> The decision loop reads 9 calibrated scalars and 17 agent-level traits, all named and documented.</li>
+  <li><strong>Every decision is a formula.</strong> Softmax over Q-values. Fehr-Schmidt utility. TD update rule. Two-step Bellman backup.</li>
+</ul>
+
+<h3>Stack</h3>
+<table>
+  <thead><tr><th>Layer</th><th>Technology</th></tr></thead>
+  <tbody>
+    <tr><td>Engine</td><td>JAX 0.4+ with <code>jax.lax.scan</code>, <code>jax.vmap</code>, <code>jax.random</code></td></tr>
+    <tr><td>Copula generation</td><td>Python + scipy + custom D-Vine implementation</td></tr>
+    <tr><td>Backend</td><td>FastAPI + Uvicorn, ~900 lines of Python</td></tr>
+    <tr><td>Frontend</td><td>Single 330 KB HTML file. Zero external JS dependencies. No build step.</td></tr>
+    <tr><td>macOS bundle</td><td>Relocatable CPython 3.12 + venv + pywebview window</td></tr>
+    <tr><td>Container</td><td>python:3.12-slim, CPU-only JAX, ~1.5 GB image</td></tr>
+  </tbody>
+</table>
+
+<h3>What you can do with it in an hour</h3>
+<ul>
+  <li>Add a new shock type. It goes in <code>scenarios.py</code> and in the shock parser in <code>p6c_v5.py</code>; the frontend picks it up automatically from <code>/api/scenarios-with-meta</code>.</li>
+  <li>Add a new trait to the Crowd tab. Add it to <code>TRAIT_LABELS</code>, <code>TRAIT_PROVENANCE</code>, and <code>CROWD_TRAITS</code>. Done.</li>
+  <li>Swap the copula. Set <code>P6C_PARAMS</code> to a new pickle with the same column names. The engine reloads.</li>
+  <li>Change the decision loop. The whole loop is one <code>lax.scan</code> in <code>p6c_v5.py</code>, about 200 lines.</li>
+</ul>
+
+<!-- ============================================================ -->
+<!-- PITCH — PSYCHOLOGISTS                                          -->
+<!-- ============================================================ -->
+<h2 id="pitch-psych">Pitch for psychologists</h2>
+
+<p>
+  This is a computational platform that takes the bifactor structure of the Dark
+  Triad and of the DASS seriously, estimates individual-difference parameters from
+  real behavioural tasks with hierarchical Bayesian methods, and then uses those
+  estimates as the actual decision parameters of 32,000 simulated agents playing
+  economic games.
+</p>
+
+<h3>What is grounded, and in what</h3>
+<table>
+  <thead><tr><th>Trait</th><th>Source</th><th style="text-align:right">N</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td>O, C, E, A, N</td><td>IPIP-FFM</td><td class="num">603,000</td><td><span class="prov GROUNDED">GROUNDED</span></td></tr>
+    <tr><td>S_M, S_P, S_N</td><td>SD3 bifactor</td><td class="num">17,740</td><td><span class="prov GROUNDED">GROUNDED</span></td></tr>
+    <tr><td>D (Dark Core)</td><td>derived (bifactor)</td><td class="num">&mdash;</td><td><span class="prov DERIVED">DERIVED</span></td></tr>
+    <tr><td>DASS_Dep, DASS_Anx, DASS_Str</td><td>DASS-21</td><td class="num">39,775</td><td><span class="prov GROUNDED">GROUNDED</span></td></tr>
+    <tr><td>general_distress</td><td>derived (bifactor)</td><td class="num">&mdash;</td><td><span class="prov DERIVED">DERIVED</span></td></tr>
+    <tr><td>&alpha;_R, &beta;_choice, &phi;_per, w_MB</td><td>Daw two-step</td><td class="num">149</td><td><span class="prov GROUNDED">GROUNDED</span></td></tr>
+    <tr><td>k_DD</td><td>Delay discounting</td><td class="num">476</td><td><span class="prov GROUNDED">GROUNDED</span></td></tr>
+    <tr><td>a_inhib</td><td>SSRT</td><td class="num">264</td><td><span class="prov GROUNDED">GROUNDED</span></td></tr>
+    <tr><td>&lambda;_ineq</td><td>Ultimatum</td><td class="num">111</td><td><span class="prov GROUNDED">GROUNDED</span></td></tr>
+    <tr><td>m_t</td><td>PANAS</td><td class="num">329</td><td><span class="prov GROUNDED">GROUNDED</span></td></tr>
+    <tr><td>&theta;_T</td><td>HCP EMOTION FACE_MEDIAN_RT</td><td class="num">482</td><td><span class="prov PROXY">PROXY</span></td></tr>
+    <tr><td>u_U</td><td>HCP GAMBLING PUNISH_PROP_LARGER</td><td class="num">491</td><td><span class="prov PROXY">PROXY</span></td></tr>
+    <tr><td>&omega;_social</td><td>Trust-game investment</td><td class="num">113</td><td><span class="prov PROXY">PROXY</span></td></tr>
+    <tr><td>&eta;_vol</td><td>literature prior</td><td class="num">&mdash;</td><td><span class="prov SYNTHETIC">SYNTHETIC</span></td></tr>
+    <tr><td>&gamma;_sal</td><td>literature prior</td><td class="num">&mdash;</td><td><span class="prov SYNTHETIC">SYNTHETIC</span></td></tr>
+  </tbody>
+</table>
+
+<h3>What the platform measures and reports</h3>
+<ul>
+  <li><strong>Subgroup vs rest analysis.</strong> Cohen's <em>d</em>, 95% CI on the mean difference, and the honest observation that at N=32,000 the p-values carry no decision-relevant information.</li>
+  <li><strong>Joint distribution scatter.</strong> Pearson <em>r</em> with a 95% CI (Fisher z) and Spearman &rho; for any two traits, on the full 32,000-agent column.</li>
+  <li><strong>Bifactor CFA panels.</strong> Model comparison tables (3-correlated / unidimensional / bifactor) with per-item standardised loadings on the general and specific factors.</li>
+  <li><strong>APA-ready paragraphs.</strong> Methods and results sections generated from the actual data, with sample sizes, fit indices, and the exact reproducibility hash.</li>
+  <li><strong>Trace view.</strong> Per-agent, per-tick arithmetic with click-through definitions for all 56 fields.</li>
+</ul>
+
+<h3>What is honestly limited</h3>
+<div class="callout warn">
+  <ul style="margin:0;">
+    <li>The DASS bifactor CFA was run on DASS-42, not the spec-mandated DASS-21. The bifactor structure replicates in both, and the general-distress construction is unaffected, but this is documented as an honest deviation from the specification.</li>
+    <li>Fehr-Schmidt is simplified to envy-only: &alpha; = D + &lambda;_ineq, &beta; is a proxy from Agreeableness. Flagged <span class="flag">[ENVY-ONLY]</span> in every trace.</li>
+    <li>&alpha;_R and &alpha;_P were collapsed into a single learning rate because the seven-parameter model failed MCMC convergence. Flagged <span class="flag">[COLLAPSED-LR]</span>.</li>
+    <li>The reward scale used by the engine is not identical to the human-data scale in the ultimatum and trust games. Flagged <span class="flag">[REWARD-SCALE-DRIFT]</span>.</li>
+    <li>Two parameters remain synthetic priors: <span class="flag">[SYNTHETIC-PRIOR-PARAMS]</span>.</li>
+  </ul>
+</div>
+
+<!-- ============================================================ -->
+<!-- PITCH — PUBLIC                                                 -->
+<!-- ============================================================ -->
+<h2 id="pitch-public">Pitch for everyone else</h2>
+
+<p>
+  This is a simulation of a small society. It is a tool for asking what happens when
+  people's circumstances change &mdash; when resources get scarce, when people feel
+  stressed, when they lose their social connections, when wealth gets redistributed.
+</p>
+
+<p>
+  Real experiments on these questions are impossible. You cannot ethically starve a
+  population to see what happens. You cannot take the same 32,000 people and run them
+  twice, once with one condition and once with another, to see the difference. But you
+  can do both of those things in a simulation, if the simulation is good enough to
+  trust.
+</p>
+
+<p>
+  32k-XAI is designed to be good enough. Every agent's personality is drawn from real
+  human data. The way agents decide what to do matches how real people play economic
+  games, within the tolerance of the published literature. And crucially, you can
+  look inside any single decision to see what drove it.
+</p>
+
+<h3>An example</h3>
+<p>
+  Suppose you want to know what happens to trust in a society when people become
+  socially isolated &mdash; fewer friends, fewer connections. The app has a scenario
+  for that. You click it, and the app tells you: rejection rates rise, inequality
+  rises, and the people who lose connections become less trusting, not more. It also
+  shows you <em>why</em>, by letting you pick one affected agent and read every
+  number that went into its decisions.
+</p>
+
+<p>
+  You can print a report of the whole experiment. You can compare two experiments
+  side by side, controlling for everything that should be controlled. You can export
+  the data. Everything is reproducible: the same inputs give the same outputs, always.
+</p>
+
+<!-- ============================================================ -->
+<!-- SCIENCE                                                        -->
+<!-- ============================================================ -->
+<h2 id="science">Scientific foundations</h2>
+
+<h3>Three empirical pillars</h3>
+
+<h4>1. Bifactor Dark Triad</h4>
+<p>
+  The published DT&sup3; article triangulated across five computational layers and
+  found that Machiavellianism, Psychopathy, and Narcissism are best modelled as a
+  general Dark Core plus three specific factors. Our own CFA on the SD3
+  (N=17,740) replicates this: the bifactor model outperforms three correlated factors
+  by CFI +0.053, RMSEA 0.0566 vs 0.0675, and &#916;&chi;&sup2; = 9,053.7 on 24 df
+  (<em>p</em> &lt; 1e-100). The Dark Triad items do not merge into a single
+  community when isolated, but they do when embedded in the full personality space
+  &mdash; consistent with a Dark Core that collapses under broad covariance.
+</p>
+
+<h4>2. Bifactor DASS</h4>
+<p>
+  Across eight countries (N=2,580), the DASS-21 fits best as a bifactor structure:
+  one general distress factor plus three specifics. Our CFA on the DASS-42
+  (N=39,775) reaches the same conclusion: bifactor wins by CFI +0.034, RMSEA 0.0492
+  vs 0.0586, &#916;&chi;&sup2; = 36,794.9 on 39 df. This is why the platform's
+  stress-driven modulation of the arbitration weight uses the <em>general</em>
+  distress factor, not the three subscales independently.
+</p>
+
+<h4>3. Parameter recovery from behaviour</h4>
+<p>
+  Each agent-level parameter is estimated from a behavioural task with a documented
+  recovery metric. The recovery protocol is standard: generate synthetic subjects
+  with known parameters, fit the model family you intend to use on real data, and
+  report rank-order recovery (&rho;), bias, RMSE, and posterior coverage.
+</p>
+<table>
+  <thead><tr><th>Parameter</th><th>Task</th><th style="text-align:right">N</th><th style="text-align:right">Recovery &rho;</th></tr></thead>
+  <tbody>
+    <tr><td>w_MB (Daw)</td><td>Two-step, hybrid model</td><td class="num">149</td><td class="num">0.841</td></tr>
+    <tr><td>w_MB (Kool)</td><td>Modified two-step</td><td class="num">500</td><td class="num">0.862</td></tr>
+    <tr><td>w_MB (N=500 verification)</td><td>Daw, full protocol</td><td class="num">500</td><td class="num">0.782</td></tr>
+    <tr><td>&lambda;_ineq</td><td>Ultimatum</td><td class="num">111</td><td class="num">&mdash; (identifiability marginal)</td></tr>
+  </tbody>
+</table>
+
+<h3>Calibration status</h3>
+<p>
+  The engine is calibrated against five human benchmarks (below). As of the current
+  release, all five pass: every platform value is within one standard error of the
+  human target. Two mitigations were required to reach this state:
+</p>
+<ul>
+  <li>The learning rate was collapsed from two parameters to one (<span class="flag">[COLLAPSED-LR]</span>), because the two-parameter model is not identifiable on the available trial counts.</li>
+  <li>The Fehr-Schmidt utility function was simplified to envy-only (<span class="flag">[ENVY-ONLY]</span>), for the same reason.</li>
+</ul>
+<p>
+  Both simplifications are documented in the source code, in the audit block of
+  every run, and in every XAI trace.
+</p>
+
+<!-- ============================================================ -->
+<!-- BENCHMARKS                                                     -->
+<!-- ============================================================ -->
+<h2 id="benchmarks">The five human benchmarks</h2>
+
+<p>
+  Every run is scored against five numbers that have been measured in real human
+  laboratories. PASS means the platform value is within one standard error of the
+  published human estimate.
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Benchmark</th>
+      <th style="text-align:right">Human target</th>
+      <th style="text-align:right">SE</th>
+      <th>Source</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Ultimatum mean offer</td>
+      <td class="num">0.400</td>
+      <td class="num">0.050</td>
+      <td>Fehr &amp; Schmidt (1999); Oosterbeek et al. (2004), 75 studies</td>
+    </tr>
+    <tr>
+      <td>Ultimatum rejection rate</td>
+      <td class="num">0.160</td>
+      <td class="num">0.050</td>
+      <td>Oosterbeek et al. (2004)</td>
+    </tr>
+    <tr>
+      <td>Trust-game mean send</td>
+      <td class="num">0.502</td>
+      <td class="num">0.130</td>
+      <td>Johnson &amp; Mislin (2011), 162 studies</td>
+    </tr>
+    <tr>
+      <td>Trust-game mean return</td>
+      <td class="num">0.372</td>
+      <td class="num">0.120</td>
+      <td>Johnson &amp; Mislin (2011)</td>
+    </tr>
+    <tr>
+      <td>Final wealth Gini</td>
+      <td class="num">0.400</td>
+      <td class="num">0.120</td>
+      <td>World Bank household-wealth Gini, mid-range OECD</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>What PASS and FAIL mean</h3>
+<p>
+  Each benchmark is a single number from the simulation compared against a single
+  number from the human literature, with a tolerance band equal to one standard
+  error of the human estimate. PASS means the platform value falls inside that band.
+  FAIL means it falls outside. Both are findings; FAIL is not an error, it is a
+  documented difference that the platform treats as data.
+</p>
+
+<div class="callout info">
+  <strong>Important caveat.</strong> PASS does not mean the platform is <em>the
+  truth</em> about human behaviour. It means the simulation produces numbers
+  consistent with a particular set of published studies. Replication in a different
+  cultural or methodological context could shift any of these targets.
+</div>
+
+<!-- ============================================================ -->
+<!-- POPULATION                                                     -->
+<!-- ============================================================ -->
+<h2 id="population">The population and its provenance</h2>
+
+<p>
+  Every agent is a 26-dimensional vector sampled from a Vine Copula estimated on
+  real human psychometric data. The columns are named, documented, and each carries
+  a provenance record: where it came from, how many subjects it was estimated on,
+  and what its status is.
+</p>
+
+<p>Four provenance statuses are used:</p>
+
+<ul>
+  <li><span class="prov GROUNDED">GROUNDED</span> &mdash; the column came from a direct empirical sample of the named construct.</li>
+  <li><span class="prov PROXY">PROXY</span> &mdash; a defensible but weaker stand-in; the link to the target construct is documented and defended, but is not a direct measurement.</li>
+  <li><span class="prov DERIVED">DERIVED</span> &mdash; a deterministic function of other columns (e.g., the bifactor general factor).</li>
+  <li><span class="prov SYNTHETIC">SYNTHETIC</span> &mdash; a literature-derived prior, flagged in every XAI trace.</li>
+  <li><span class="prov INERT">INERT</span> &mdash; present in the engine's parameter list but never read by the calibrated decision loop; retired from the copula.</li>
+</ul>
+
+<h3>Full trait dictionary</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Code</th><th>Construct</th><th>Range</th><th>Source</th>
+      <th style="text-align:right">N</th><th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>O</td><td>Openness to Experience</td><td>[0,1]</td><td>IPIP-FFM</td><td class="num">603,000</td><td><span class="prov GROUNDED">GROUNDED</span></td></tr>
+    <tr><td>C</td><td>Conscientiousness</td><td>[0,1]</td><td>IPIP-FFM</td><td class="num">603,000</td><td><span class="prov GROUNDED">GROUNDED</span></td></tr>
+    <tr><td>E</td><td>Extraversion</td><td>[0,1]</td><td>IPIP-FFM</td><td class="num">603,000</td><td><span class="prov GROUNDED">GROUNDED</span></td></tr>
+    <tr><td>A</td><td>Agreeableness</td><td>[0,1]</td><td>IPIP-FFM</td><td class="num">603,000</td><td><span class="prov GROUNDED">GROUNDED</span></td></tr>
+    <tr><td>N</td><td>Neuroticism</td><td>[0,1]</td><td>IPIP-FFM</td><td class="num">603,000</td><td><span class="prov GROUNDED">GROUNDED</span></td></tr>
+    <tr><td>S_M</td><td>Machiavellianism (specific)</td><td>[0,1]</td><td>SD3</td><td class="num">17,740</td><td><span class="prov GROUNDED">GROUNDED</span></td></tr>
+    <tr><td>S_P</td><td>Psychopathy (specific)</td><td>[0,1]</td><td>SD3</td><td class="num">17,740</td><td><span class="prov GROUNDED">GROUNDED</span></td></tr>
+    <tr><td>S_N</td><td>Narcissism (specific)</td><td>[0,1]</td><td>SD3</td><td class="num">17,740</td><td><span class="prov GROUNDED">GROUNDED</span></td></tr>
+    <tr><td>D</td><td>General Dark Core</td><td>[0,1]</td><td>derived (bifactor)</td><td class="num">&mdash;</td><td><span class="prov DERIVED">DERIVED</span></td></tr>
+    <tr><td>DASS_Dep</td><td>Depression subscale</td><td>[0,1]</td><td>DASS-21</td><td class="num">39,775</td><td><span class="prov GROUNDED">GROUNDED</span></td></tr>
+    <tr><td>DASS_Anx</td><td>Anxiety subscale</td><td>[0,1]</td><td>DASS-21</td><td class="num">39,775</td><td><span class="prov GROUNDED">GROUNDED</span></td></tr>
+    <tr><td>DASS_Str</td><td>Stress subscale</td><td>[0,1]</td><td>DASS-21</td><td class="num">39,775</td><td><span class="prov GROUNDED">GROUNDED</span></td></tr>
+    <tr><td>general_distress</td><td>General distress factor</td><td>[0,1]</td><td>derived (bifactor)</td><td class="num">&mdash;</td><td><span class="prov DERIVED">DERIVED</span></td></tr>
+    <tr><td>alpha_R</td><td>Learning rate (collapsed)</td><td>[0,1]</td><td>Daw two-step</td><td class="num">149</td><td><span class="prov GROUNDED">GROUNDED</span></td></tr>
+    <tr><td>beta_choice</td><td>Inverse temperature</td><td>[0,10]</td><td>Daw two-step</td><td class="num">149</td><td><span class="prov GROUNDED">GROUNDED</span></td></tr>
+    <tr><td>phi_per</td><td>Perseveration</td><td>[0,3]</td><td>Daw two-step</td><td class="num">149</td><td><span class="prov GROUNDED">GROUNDED</span></td></tr>
+    <tr><td>w_MB</td><td>Model-based arbitration</td><td>[0,1]</td><td>Daw + Kool recovery</td><td class="num">149</td><td><span class="prov GROUNDED">GROUNDED</span></td></tr>
+    <tr><td>k_DD</td><td>Log hyperbolic discount rate</td><td>log-scale</td><td>Delay discounting</td><td class="num">476</td><td><span class="prov GROUNDED">GROUNDED</span></td></tr>
+    <tr><td>a_inhib</td><td>Inhibitory control</td><td>&gt;0</td><td>SSRT</td><td class="num">264</td><td><span class="prov GROUNDED">GROUNDED</span></td></tr>
+    <tr><td>lambda_ineq</td><td>Inequity aversion (FS &alpha;)</td><td>[0,3]</td><td>Ultimatum</td><td class="num">111</td><td><span class="prov GROUNDED">GROUNDED</span></td></tr>
+    <tr><td>theta_T</td><td>Threat sensitivity</td><td>[0,3]</td><td>HCP EMOTION FACE_RT</td><td class="num">482</td><td><span class="prov PROXY">PROXY</span></td></tr>
+    <tr><td>u_U</td><td>Uncertainty aversion</td><td>[0,3]</td><td>HCP GAMBLING PUNISH</td><td class="num">491</td><td><span class="prov PROXY">PROXY</span></td></tr>
+    <tr><td>omega_social</td><td>Social value weight</td><td>[0,3]</td><td>Trust-game investment</td><td class="num">113</td><td><span class="prov PROXY">PROXY</span></td></tr>
+    <tr><td>m_t</td><td>Current mood</td><td>[-3,3]</td><td>PANAS</td><td class="num">329</td><td><span class="prov GROUNDED">GROUNDED</span></td></tr>
+    <tr><td>eta_vol</td><td>Volatility update</td><td>[0,1]</td><td>literature prior</td><td class="num">&mdash;</td><td><span class="prov SYNTHETIC">SYNTHETIC</span></td></tr>
+    <tr><td>gamma_sal</td><td>Salience gain</td><td>[0,3]</td><td>literature prior</td><td class="num">&mdash;</td><td><span class="prov SYNTHETIC">SYNTHETIC</span></td></tr>
+  </tbody>
+</table>
+
+<div class="callout warn">
+  <strong>Retired (INERT) columns.</strong> <code>lambda_norm</code>,
+  <code>s_spite</code>, <code>tau_sens</code>, <code>kappa_ctx</code> are present
+  in the engine's <code>PARAM_NAMES</code> list but are never read by the
+  calibrated decision loop. They were removed from the copula in P6d step 1;
+  the engine's <code>load_all(required=False)</code> silently skips them.
+</div>
+
+<h3>What the copula is</h3>
+<p>
+  A <strong>Vine Copula</strong> (D-Vine or R-Vine) estimated from these samples.
+  Copulas separate the marginal distribution of each variable from the dependence
+  structure between them, and Vines extend this to high dimensions by decomposing
+  the joint into a cascade of pairwise copulas. This matters because human data is
+  not Gaussian: tail dependence and asymmetry are real, and a Gaussian copula
+  cannot represent them.
+</p>
+<p>
+  The current calibrated copula is <code>synthetic_32k_p6d.pkl</code>, shape
+  (32000, 26). It was selected over the earlier P6c copula after the P6d project
+  grounded four of the ten synthetic priors in external data and retired the four
+  inert parameters.
+</p>
+
+<!-- ============================================================ -->
+<!-- ARCHITECTURE                                                   -->
+<!-- ============================================================ -->
+<h2 id="architecture">Architecture and decision loop</h2>
+
+<h3>Three layers</h3>
+<table>
+  <thead><tr><th>Layer</th><th>What it does</th><th>Where it lives</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>Population</td>
+      <td>Samples 32,000 agents from the Vine Copula; applies optional copula operations (mean shift, SD scale).</td>
+      <td><code>p6c_v5.py:build_simulator</code>, <code>work_g2/synthetic_32k_p6d.pkl</code></td>
+    </tr>
+    <tr>
+      <td>Engine</td>
+      <td>Steps all agents in parallel: matching, engagement, two economic games, learning updates, distress dynamics, wealth accumulation.</td>
+      <td><code>p6c_v5.py:step</code> &mdash; one <code>jax.lax.scan</code></td>
+    </tr>
+    <tr>
+      <td>Interface</td>
+      <td>Runs the engine, exposes results, allows tracing, comparison, and export.</td>
+      <td><code>dashboard.py</code> (FastAPI), <code>dashboard_ui.html</code> (frontend)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>The per-tick decision loop</h3>
+<ol>
+  <li><strong>Partner selection.</strong> Each agent samples a neighbour from its Watts-Strogatz network (k=6, p=0.1). If the partner chose back, the pair is mutual.</li>
+  <li><strong>Role assignment.</strong> A coin flip determines who proposes in the ultimatum game; the other responds. In the trust game, roles invert.</li>
+  <li><strong>Arbitration.</strong> Each agent's effective model-based weight is
+      <code>w_eff = clip(w_base &middot; (1 + C &middot; 0.3) &middot; (1 - distress &middot; 0.8), 0, 1)</code>.
+      Distress suppresses planning.</li>
+  <li><strong>Stage-1 choice.</strong> Engage or avoid, by softmax over
+      <code>Q_net = w_eff &middot; Q_MB + (1-w_eff) &middot; Q_MF</code> with
+      engagement bias (<code>E &middot; 0.5 - a_inhib &middot; 0.2</code>) and
+      avoidance bias (<code>theta_T &middot; 0.5 + u_U &middot; 0.3</code>).</li>
+  <li><strong>Transition.</strong> The environment returns the expected state with
+      probability 0.7, otherwise the alternate state.</li>
+  <li><strong>Stage-2 action.</strong> One of four categories (self-max, self-mild,
+      fair, generous) chosen by softmax over Q_s2 with Dark Triad bias terms.</li>
+  <li><strong>Ultimatum game.</strong> Proposer offers <code>[2, 4, 5, 7]</code> of
+      endowment 10. Responder accepts if Fehr-Schmidt utility
+      <code>U = payoff - &alpha; &middot; max(other - mine, 0) - &beta; &middot; max(mine - other, 0)</code>
+      is non-negative.</li>
+  <li><strong>Trust game.</strong> Sender invests <code>[0, 3, 6, 9]</code> of
+      endowment 10; trustee returns a multiple <code>[0, 1, 2, 3]</code> of the
+      amount sent.</li>
+  <li><strong>Reward aggregation.</strong> Payoffs from both games are summed,
+      modified by <code>omega_social &middot; (1 + salience + 0.05 &middot; mood)</code>,
+      and clipped.</li>
+  <li><strong>Learning.</strong> Q tables update with the TD rule at rate
+      <code>alpha_R</code>. P_hat (transition model) updates at rate
+      <code>eta_vol</code>.</li>
+  <li><strong>Distress.</strong> Rises on rejection by <code>0.05 &middot; (1 + N &middot; 1.0)</code>,
+      decays by 0.95 per tick, pulled toward the baseline by 0.05.</li>
+  <li><strong>Wealth.</strong> Accumulated reward, clamped at 0, optionally
+      redistributed toward the population mean.</li>
+</ol>
+
+<h3>XAI trace schema (56 fields)</h3>
+<p>
+  When a designated agent is traced, the engine emits one 56-field vector per tick.
+  The fields fall into 8 groups:
+</p>
+<table>
+  <thead><tr><th>Group</th><th>Count</th><th>Examples</th></tr></thead>
+  <tbody>
+    <tr><td>Stage-1 self</td><td>19</td><td>Q_mf_a0, Q_mf_a1, Q_MB_a0, Q_MB_a1, Q_net_a0, Q_net_a1, w_mb_eff, tau, a1, s2, P_hat_*</td></tr>
+    <tr><td>Offer head</td><td>3</td><td>a_off, my_off, Q_off_chosen</td></tr>
+    <tr><td>Send head</td><td>3</td><td>a_send, my_send, Q_send_chosen</td></tr>
+    <tr><td>Accept head</td><td>6</td><td>a_acc, Q_acc_accept, Q_acc_reject, U_accept, inequity_neg, inequity_pos</td></tr>
+    <tr><td>Return head</td><td>3</td><td>a_ret, my_rm, Q_ret_chosen</td></tr>
+    <tr><td>Reward decomposition</td><td>5</td><td>r_off, r_acc, r_send, r_ret, reward_total</td></tr>
+    <tr><td>Partner view</td><td>11</td><td>partner_id, partner_alpha_e, partner_beta_g, partner_a_*, rec_off, rec_send, rec_rm</td></tr>
+    <tr><td>Events + context</td><td>6</td><td>interacting, is_mutual, rejected, distress_pre, baseline_dist, wealth_pre</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<!-- ENGINE                                                         -->
+<!-- ============================================================ -->
+<h2 id="engine">The simulation engine</h2>
+
+<h3>What happens in one tick, visually</h3>
+<pre><code>Every tick, for all 32,000 agents in parallel:
+
+  [1] Partner matching
+      sample neighbour  -->  mutual?  -->  assign roles (proposer / responder)
+
+  [2] Arbitration
+      w_eff = w_base * (1 + C * 0.3) * (1 - distress * 0.8)
+
+  [3] Engage or avoid
+      Q_net = w_eff * Q_MB + (1-w_eff) * Q_MF
+      L1 = tau * [Q_net[engage]+bias, Q_net[avoid]+bias]
+      a1 ~ softmax(L1)
+
+  [4] Transition
+      s2 = expected (70%) or unexpected (30%)
+
+  [5] Stage-2 action (4 categories)
+      a2 ~ softmax(beta_choice * (Q_s2 + dark_triad_bias))
+
+  [6] Play ultimatum + trust
+      offers   = [2, 4, 5, 7] / 10
+      sends    = [0, 3, 6, 9] / 10
+      returns  = [0, 1, 2, 3] multiples of sent
+
+  [7] Rewards + learning
+      reward = (payoffs from both games) * social_mod
+      Q heads updated with TD rule at rate alpha_R
+      P_hat updated at rate eta_vol
+
+  [8] Distress
+      distress = 0.95 * distress + 0.05 * baseline + rejection_bump
+
+  [9] Wealth
+      wealth = max(wealth + reward + redistribution_pull, 0)</code></pre>
+
+<h3>Calibrated scalars</h3>
+<p>
+  Nine scalars are calibrated on the five human benchmarks via differential
+  evolution with cross-validated holdout. They are the only free parameters of the
+  engine; all agent-level traits come from the copula.
+</p>
+<table>
+  <thead><tr><th>Name</th><th>Role</th><th>Bounds</th></tr></thead>
+  <tbody>
+    <tr><td>TAU_BASE</td><td>Softmax temperature</td><td>[0.5, 2.5]</td></tr>
+    <tr><td>BETA_OFF</td><td>Offer sharpness</td><td>[0.5, 3.0]</td></tr>
+    <tr><td>BETA_SEND</td><td>Send sharpness</td><td>[0.5, 3.0]</td></tr>
+    <tr><td>BETA_ACC</td><td>Accept sharpness</td><td>[0.5, 4.0]</td></tr>
+    <tr><td>BETA_RET</td><td>Return sharpness</td><td>[0.5, 3.0]</td></tr>
+    <tr><td>BIAS_OFF</td><td>Offer bias</td><td>[-1.5, 1.5]</td></tr>
+    <tr><td>BIAS_SEND</td><td>Send bias</td><td>[-1.5, 1.5]</td></tr>
+    <tr><td>BIAS_RET</td><td>Return bias</td><td>[-1.5, 1.5]</td></tr>
+    <tr><td>LAMBDA_FS</td><td>Fehr-Schmidt accept weight</td><td>[0.5, 6.0]</td></tr>
+  </tbody>
+</table>
+
+<h3>Shock types</h3>
+<table>
+  <thead><tr><th>Type</th><th>Mechanism</th><th>Magnitude range</th></tr></thead>
+  <tbody>
+    <tr><td>resource_scarcity</td><td>Multiplies reward modifier by <code>1 - magnitude</code></td><td>[0, 1]</td></tr>
+    <tr><td>distress_injection</td><td>Adds magnitude to baseline distress</td><td>[0, 5]</td></tr>
+    <tr><td>network_thinning</td><td>Reduces effective neighbour count</td><td>[0, 1]</td></tr>
+    <tr><td>wealth_redistribution</td><td>Pulls each agent's wealth toward population mean by magnitude per tick</td><td>[0, 1]</td></tr>
+  </tbody>
+</table>
+
+<h3>Pre-built scenarios (13 total)</h3>
+<table>
+  <thead><tr><th>Scenario</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td>baseline</td><td>No shocks. Calibrated reference run.</td></tr>
+    <tr><td>resource_crisis</td><td>Resource scarcity 0.85 all agents, ticks 50&ndash;450.</td></tr>
+    <tr><td>widespread_distress</td><td>Distress injection 1.5 on 70% of agents.</td></tr>
+    <tr><td>compound_stress</td><td>Scarcity 0.6 + distress 1.0 simultaneously.</td></tr>
+    <tr><td>social_isolation</td><td>Network thinning 0.75 all agents.</td></tr>
+    <tr><td>mild_isolation</td><td>Network thinning 0.35 all agents.</td></tr>
+    <tr><td>wealth_equalization</td><td>Redistribution 0.005 per tick all agents.</td></tr>
+    <tr><td>strong_redistribution</td><td>Redistribution 0.02 per tick all agents.</td></tr>
+    <tr><td>severe_scarcity</td><td>Scarcity 0.90 all agents.</td></tr>
+    <tr><td>total_isolation</td><td>Isolation 0.83 all agents.</td></tr>
+    <tr><td>radical_redistribution</td><td>Redistribution 0.05 per tick all agents.</td></tr>
+    <tr><td>compound_crisis</td><td>Scarcity 0.8 + isolation 0.6 simultaneously.</td></tr>
+    <tr><td>mild_distress_check</td><td>Extreme distress 2.0; small behavioural effect by design.</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<!-- UI TOUR                                                        -->
+<!-- ============================================================ -->
+<h2 id="ui">Interface tour, illustrated</h2>
+
+<p>
+  Every screenshot below is drawn in code (SVG), not captured. This means the
+  document is self-contained, prints cleanly, and never goes stale relative to a
+  real PNG. Colours, layout, and controls match the actual app.
+</p>
+
+<h3>Global layout — the sidebar</h3>
+<div class="screenshot">
+<svg viewBox="0 0 900 400" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, sans-serif">
+  <rect width="900" height="400" fill="#f6f7f9"/>
+  <rect x="0" y="0" width="240" height="400" fill="#ffffff" stroke="#e5e5ea"/>
+  <rect x="22" y="24" width="34" height="34" rx="8" fill="#1c1c1e"/>
+  <text x="66" y="40" font-size="15" font-weight="600" fill="#1c1c1e">32k-XAI</text>
+  <text x="66" y="56" font-size="11" fill="#8e8e93">Cognitive simulation</text>
+
+  <g font-size="13.5" fill="#48484a">
+    <rect x="12" y="86" width="216" height="30" rx="8" fill="none"/>
+    <text x="48" y="105">Home</text>
+    <rect x="12" y="120" width="216" height="30" rx="8" fill="none"/>
+    <text x="48" y="139">The crowd</text>
+    <rect x="12" y="154" width="216" height="30" rx="8" fill="none"/>
+    <text x="48" y="173">Scenarios</text>
+    <rect x="12" y="188" width="216" height="30" rx="8" fill="none"/>
+    <text x="48" y="207">Design experiments</text>
+    <rect x="12" y="222" width="216" height="30" rx="8" fill="#eff6ff"/>
+    <text x="48" y="241" fill="#0071e3" font-weight="600">Trace</text>
+    <rect x="12" y="256" width="216" height="30" rx="8" fill="none"/>
+    <text x="48" y="275">Guide</text>
+    <rect x="12" y="290" width="216" height="30" rx="8" fill="none"/>
+    <text x="48" y="309">3D views</text>
+    <rect x="12" y="324" width="216" height="30" rx="8" fill="none"/>
+    <text x="48" y="343">Library</text>
+    <rect x="12" y="358" width="216" height="30" rx="8" fill="none"/>
+    <text x="48" y="377">Compare</text>
+  </g>
+
+  <rect x="256" y="24" width="628" height="360" rx="12" fill="#ffffff" stroke="#e5e5ea"/>
+  <text x="284" y="60" font-size="20" font-weight="600" fill="#1c1c1e">Main content</text>
+  <text x="284" y="86" font-size="13" fill="#8e8e93">The active tab renders here.</text>
+</svg>
+<div class="cap">The sidebar shows every top-level view. Trace, added in the current release, sits between Design experiments and Guide.</div>
+</div>
+
+<h3>Scenarios tab</h3>
+<div class="screenshot">
+<svg viewBox="0 0 900 320" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, sans-serif">
+  <rect width="900" height="320" fill="#ffffff"/>
+  <text x="40" y="50" font-size="22" font-weight="600" fill="#1c1c1e">Scenarios</text>
+  <text x="40" y="76" font-size="13" fill="#48484a">Click any scenario to configure and run it.</text>
+
+  <g>
+    <rect x="40" y="100" width="256" height="120" rx="12" fill="#ffffff" stroke="#e5e5ea"/>
+    <text x="60" y="130" font-size="14" font-weight="600" fill="#1c1c1e">Baseline</text>
+    <text x="60" y="152" font-size="12" fill="#48484a">No shocks. Calibrated</text>
+    <text x="60" y="170" font-size="12" fill="#48484a">reference run.</text>
+    <rect x="60" y="188" width="60" height="18" rx="9" fill="#f1f1f3"/>
+    <text x="68" y="201" font-size="10" fill="#4a4a4c" font-weight="500">Reference</text>
+
+    <rect x="316" y="100" width="256" height="120" rx="12" fill="#ffffff" stroke="#e5e5ea"/>
+    <text x="336" y="130" font-size="14" font-weight="600" fill="#1c1c1e">Resource Crisis</text>
+    <text x="336" y="152" font-size="12" fill="#48484a">Resource scarcity 0.85</text>
+    <text x="336" y="170" font-size="12" fill="#48484a">all agents, ticks 50-450.</text>
+    <rect x="336" y="188" width="44" height="18" rx="9" fill="#fff4e0"/>
+    <text x="344" y="201" font-size="10" fill="#a35b00" font-weight="500">Stress</text>
+
+    <rect x="592" y="100" width="256" height="120" rx="12" fill="#ffffff" stroke="#e5e5ea"/>
+    <text x="612" y="130" font-size="14" font-weight="600" fill="#1c1c1e">Compound Crisis</text>
+    <text x="612" y="152" font-size="12" fill="#48484a">Scarcity 0.8 + isolation</text>
+    <text x="612" y="170" font-size="12" fill="#48484a">0.6 simultaneously.</text>
+    <rect x="612" y="188" width="68" height="18" rx="9" fill="#ffe9f5"/>
+    <text x="620" y="201" font-size="10" fill="#9d0e6a" font-weight="500">Compound</text>
+  </g>
+
+  <text x="40" y="262" font-size="12" fill="#8e8e93">13 pre-built scenarios, each a named shock package with documented magnitude and window.</text>
+</svg>
+<div class="cap">Each scenario card names the shock and tags its kind. Clicking opens a settings page.</div>
+</div>
+
+<h3>Trace tab — the signature feature</h3>
+<div class="screenshot">
+<svg viewBox="0 0 900 460" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, sans-serif">
+  <rect width="900" height="460" fill="#ffffff"/>
+  <text x="40" y="46" font-size="22" font-weight="600" fill="#1c1c1e">Trace a decision</text>
+  <text x="40" y="72" font-size="13" fill="#48484a">Every internal number behind one agent's choice at one tick.</text>
+
+  <rect x="40" y="94" width="360" height="56" rx="10" fill="#ffffff" stroke="#e5e5ea"/>
+  <text x="56" y="114" font-size="11" fill="#48484a" font-weight="500">Run</text>
+  <text x="56" y="134" font-size="13" fill="#1c1c1e">baseline · N=8000 · T=250 · seed 42 · 5/5</text>
+
+  <g font-size="13">
+    <text x="40" y="184" font-size="12" fill="#48484a">Which agent?</text>
+    <rect x="40" y="192" width="360" height="8" rx="4" fill="#e5e5ea"/>
+    <rect x="40" y="192" width="112" height="8" rx="4" fill="#0a84ff"/>
+    <circle cx="152" cy="196" r="9" fill="#ffffff" stroke="#0a84ff" stroke-width="2"/>
+    <text x="416" y="200" font-size="12" fill="#1c1c1e" font-weight="600">100</text>
+
+    <text x="500" y="184" font-size="12" fill="#48484a">At which tick?</text>
+    <rect x="500" y="192" width="360" height="8" rx="4" fill="#e5e5ea"/>
+    <rect x="500" y="192" width="180" height="8" rx="4" fill="#0a84ff"/>
+    <circle cx="680" cy="196" r="9" fill="#ffffff" stroke="#0a84ff" stroke-width="2"/>
+    <text x="876" y="200" font-size="12" fill="#1c1c1e" font-weight="600">125</text>
+  </g>
+
+  <g>
+    <rect x="40" y="230" width="180" height="34" rx="8" fill="#0a84ff"/>
+    <text x="72" y="252" font-size="12" fill="#ffffff" font-weight="500">Show me the trace</text>
+    <rect x="232" y="230" width="130" height="34" rx="8" fill="#ffffff" stroke="#e5e5ea"/>
+    <text x="252" y="252" font-size="12" fill="#1c1c1e">Random agent</text>
+    <rect x="374" y="230" width="140" height="34" rx="8" fill="#ffffff" stroke="#e5e5ea"/>
+    <text x="386" y="252" font-size="12" fill="#1c1c1e">← Prev interaction</text>
+    <rect x="526" y="230" width="140" height="34" rx="8" fill="#ffffff" stroke="#e5e5ea"/>
+    <text x="538" y="252" font-size="12" fill="#1c1c1e">Next interaction →</text>
+    <rect x="678" y="230" width="130" height="34" rx="8" fill="#ffffff" stroke="#e5e5ea"/>
+    <text x="700" y="252" font-size="12" fill="#1c1c1e">Save (.json)</text>
+    <rect x="820" y="230" width="40" height="34" rx="8" fill="#ffffff" stroke="#e5e5ea"/>
+  </g>
+
+  <rect x="40" y="292" width="820" height="148" rx="12" fill="#eff6ff" stroke="#dde7ff"/>
+  <circle cx="96" cy="340" r="26" fill="#ffffff" stroke="#dde7ff"/>
+  <text x="90" y="346" font-size="14" font-weight="700" fill="#0071e3">100</text>
+  <text x="142" y="332" font-size="16" font-weight="600" fill="#1c1c1e">Agent 100 at tick 125</text>
+  <text x="142" y="354" font-size="12" fill="#8e8e93">Scenario: Baseline · Baseline conditions</text>
+  <text x="142" y="386" font-size="13" fill="#48484a">Agent 100 chose to engage at tick 125 (p(engage)=64.2%, p(avoid)=35.8%).</text>
+  <text x="142" y="404" font-size="13" fill="#48484a">Blend weight w = 0.512 means the decision was a mix of habit and plan.</text>
+  <text x="142" y="422" font-size="13" fill="#48484a">Exchanged with partner 4712. Offered £5 of £10.</text>
+</svg>
+<div class="cap">The Trace tab. A run picker at the top, agent and tick sliders, six action buttons, and a natural-language story at the bottom of the panel.</div>
+</div>
+
+<h3>The crowd — provenance dots and subgroup analysis</h3>
+<div class="screenshot">
+<svg viewBox="0 0 900 420" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, sans-serif">
+  <rect width="900" height="420" fill="#ffffff"/>
+  <text x="40" y="46" font-size="22" font-weight="600" fill="#1c1c1e">The crowd</text>
+  <text x="40" y="72" font-size="13" fill="#48484a">The population every experiment runs on.</text>
+
+  <g font-size="12">
+    <rect x="40" y="100" width="86" height="26" rx="13" fill="#0a84ff"/>
+    <circle cx="56" cy="113" r="4" fill="#30d158"/>
+    <text x="68" y="118" fill="#ffffff" font-weight="600">Openness</text>
+
+    <rect x="132" y="100" width="130" height="26" rx="13" fill="#ffffff" stroke="#e5e5ea"/>
+    <circle cx="148" cy="113" r="4" fill="#30d158"/>
+    <text x="160" y="118" fill="#48484a">Conscientiousness</text>
+
+    <rect x="268" y="100" width="106" height="26" rx="13" fill="#ffffff" stroke="#e5e5ea"/>
+    <circle cx="284" cy="113" r="4" fill="#30d158"/>
+    <text x="296" y="118" fill="#48484a">Extraversion</text>
+
+    <rect x="380" y="100" width="120" height="26" rx="13" fill="#ffffff" stroke="#e5e5ea"/>
+    <circle cx="396" cy="113" r="4" fill="#30d158"/>
+    <text x="408" y="118" fill="#48484a">Agreeableness</text>
+
+    <rect x="506" y="100" width="118" height="26" rx="13" fill="#ffffff" stroke="#e5e5ea"/>
+    <circle cx="522" cy="113" r="4" fill="#30d158"/>
+    <text x="534" y="118" fill="#48484a">Neuroticism</text>
+
+    <rect x="630" y="100" width="86" height="26" rx="13" fill="#ffffff" stroke="#e5e5ea"/>
+    <circle cx="646" cy="113" r="4" fill="#ff9f0a"/>
+    <text x="658" y="118" fill="#48484a">Threat</text>
+
+    <rect x="722" y="100" width="86" height="26" rx="13" fill="#ffffff" stroke="#e5e5ea"/>
+    <circle cx="738" cy="113" r="4" fill="#ff453a"/>
+    <text x="750" y="118" fill="#48484a">Volatility</text>
+  </g>
+
+  <text x="40" y="152" font-size="11" fill="#8e8e93" font-weight="600">DISTRIBUTION OF OPENNESS</text>
+  <rect x="40" y="162" width="820" height="120" rx="12" fill="#ffffff" stroke="#e5e5ea"/>
+  <g fill="#0a84ff" opacity="0.82">
+    <rect x="60" y="240" width="18" height="18" rx="2"/>
+    <rect x="90" y="220" width="18" height="38" rx="2"/>
+    <rect x="120" y="190" width="18" height="68" rx="2"/>
+    <rect x="150" y="175" width="18" height="83" rx="2"/>
+    <rect x="180" y="172" width="18" height="86" rx="2"/>
+    <rect x="210" y="180" width="18" height="78" rx="2"/>
+    <rect x="240" y="196" width="18" height="62" rx="2"/>
+    <rect x="270" y="215" width="18" height="43" rx="2"/>
+    <rect x="300" y="232" width="18" height="26" rx="2"/>
+    <rect x="330" y="245" width="18" height="13" rx="2"/>
+  </g>
+  <line x1="180" y1="166" x2="180" y2="258" stroke="#1c1c1e" stroke-dasharray="3,2"/>
+  <text x="184" y="180" font-size="11" font-weight="600" fill="#1c1c1e">mean 0.734</text>
+
+  <g font-size="11" fill="#1c1c1e">
+    <text x="40" y="310" font-weight="600" fill="#8e8e93">MEAN</text>
+    <text x="40" y="326" font-size="16" font-weight="600">0.734</text>
+    <text x="140" y="310" font-weight="600" fill="#8e8e93">MEDIAN</text>
+    <text x="140" y="326" font-size="16" font-weight="600">0.769</text>
+    <text x="240" y="310" font-weight="600" fill="#8e8e93">SD</text>
+    <text x="240" y="326" font-size="16" font-weight="600">0.155</text>
+    <text x="340" y="310" font-weight="600" fill="#8e8e93">SKEW</text>
+    <text x="340" y="326" font-size="16" font-weight="600">-0.47</text>
+    <text x="440" y="310" font-weight="600" fill="#8e8e93">EX. KURT</text>
+    <text x="440" y="326" font-size="16" font-weight="600">+0.89</text>
+  </g>
+
+  <rect x="40" y="348" width="820" height="56" rx="12" fill="#f8f9fb" stroke="#e5e5ea"/>
+  <text x="58" y="372" font-size="13" font-weight="600" fill="#1c1c1e">Openness</text>
+  <rect x="130" y="360" width="58" height="18" rx="4" fill="#e7f9ec"/>
+  <text x="138" y="373" font-size="10" fill="#1a6b32" font-weight="600">GROUNDED</text>
+  <text x="200" y="372" font-size="12" fill="#48484a">Source: IPIP-FFM (N=603,000)</text>
+  <text x="200" y="390" font-size="12" fill="#8e8e93" font-style="italic">Openness to Experience, IPIP-FFM normative sample.</text>
+</svg>
+<div class="cap">The Crowd tab. Trait chips carry provenance dots (green = grounded, amber = proxy, red = synthetic). Clicking a chip reveals its full record below the histogram.</div>
+</div>
+
+<h3>3D views — the population cloud</h3>
+<div class="screenshot">
+<svg viewBox="0 0 900 340" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, sans-serif">
+  <rect width="900" height="340" fill="#ffffff"/>
+  <text x="40" y="46" font-size="22" font-weight="600" fill="#1c1c1e">3D views</text>
+
+  <rect x="40" y="72" width="820" height="246" rx="12" fill="#0c0d10"/>
+  <text x="60" y="98" font-size="12" fill="#8e8e93">X: O</text>
+  <text x="60" y="116" font-size="12" fill="#8e8e93">Y: C</text>
+  <text x="60" y="134" font-size="12" fill="#8e8e93">Z: E</text>
+
+  <g opacity="0.75">
+    <circle cx="200" cy="180" r="2" fill="#0a84ff"/>
+    <circle cx="230" cy="200" r="2" fill="#5e5ce6"/>
+    <circle cx="260" cy="185" r="2" fill="#30d158"/>
+    <circle cx="290" cy="220" r="2" fill="#0a84ff"/>
+    <circle cx="320" cy="205" r="2" fill="#ff453a"/>
+    <circle cx="350" cy="230" r="2" fill="#5e5ce6"/>
+    <circle cx="380" cy="210" r="2" fill="#0a84ff"/>
+    <circle cx="410" cy="240" r="2" fill="#30d158"/>
+    <circle cx="440" cy="220" r="2" fill="#0a84ff"/>
+    <circle cx="470" cy="250" r="2" fill="#5e5ce6"/>
+    <circle cx="500" cy="230" r="2" fill="#0a84ff"/>
+    <circle cx="530" cy="260" r="2" fill="#30d158"/>
+    <circle cx="560" cy="240" r="2" fill="#ff453a"/>
+    <circle cx="590" cy="270" r="2" fill="#0a84ff"/>
+    <circle cx="620" cy="250" r="2" fill="#5e5ce6"/>
+    <circle cx="650" cy="280" r="2" fill="#30d158"/>
+    <circle cx="680" cy="260" r="2" fill="#0a84ff"/>
+    <circle cx="710" cy="290" r="2" fill="#ff453a"/>
+    <circle cx="240" cy="170" r="2" fill="#5e5ce6"/>
+    <circle cx="270" cy="195" r="2" fill="#0a84ff"/>
+    <circle cx="300" cy="175" r="2" fill="#30d158"/>
+    <circle cx="330" cy="200" r="2" fill="#0a84ff"/>
+    <circle cx="360" cy="185" r="2" fill="#ff453a"/>
+    <circle cx="390" cy="215" r="2" fill="#5e5ce6"/>
+    <circle cx="420" cy="195" r="2" fill="#0a84ff"/>
+    <circle cx="450" cy="225" r="2" fill="#30d158"/>
+    <circle cx="480" cy="205" r="2" fill="#0a84ff"/>
+    <circle cx="510" cy="235" r="2" fill="#5e5ce6"/>
+    <circle cx="540" cy="215" r="2" fill="#0a84ff"/>
+    <circle cx="570" cy="245" r="2" fill="#ff453a"/>
+    <circle cx="600" cy="225" r="2" fill="#30d158"/>
+    <circle cx="630" cy="255" r="2" fill="#0a84ff"/>
+    <circle cx="660" cy="235" r="2" fill="#5e5ce6"/>
+    <circle cx="690" cy="265" r="2" fill="#0a84ff"/>
+    <circle cx="720" cy="245" r="2" fill="#30d158"/>
+    <circle cx="750" cy="275" r="2" fill="#0a84ff"/>
+  </g>
+
+  <circle cx="440" cy="220" r="8" fill="none" stroke="#ffffff" stroke-width="2.5"/>
+  <text x="452" y="224" font-size="12" fill="#ffffff" font-weight="600">agent 100</text>
+
+  <text x="60" y="308" font-size="11" fill="#8e8e93">drag to rotate · scroll to zoom</text>
+</svg>
+<div class="cap">The 3D view renders the actual agents of a specific run. Highlight ring picks out a single agent. Values are z-scored against the run's own population.</div>
+</div>
+
+<h3>Scientific report — print-ready output</h3>
+<div class="screenshot">
+<svg viewBox="0 0 900 380" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, sans-serif">
+  <rect width="900" height="380" fill="#f6f7f9"/>
+  <rect x="120" y="20" width="660" height="340" rx="4" fill="#ffffff" stroke="#e5e5ea"/>
+  <text x="150" y="58" font-size="22" font-weight="700" fill="#1c1c1e">32k-XAI Scientific Report</text>
+  <text x="150" y="80" font-size="12" fill="#48484a">Baseline · generated 2026-10-12 18:45</text>
+
+  <line x1="150" y1="100" x2="750" y2="100" stroke="#e5e5ea"/>
+
+  <text x="150" y="122" font-size="10" fill="#8e8e93">RUN KIND</text>
+  <text x="300" y="122" font-size="11" font-family="monospace" fill="#1c1c1e">scenario</text>
+  <text x="150" y="140" font-size="10" fill="#8e8e93">N AGENTS</text>
+  <text x="300" y="140" font-size="11" font-family="monospace" fill="#1c1c1e">8,000</text>
+  <text x="150" y="158" font-size="10" fill="#8e8e93">T TICKS</text>
+  <text x="300" y="158" font-size="11" font-family="monospace" fill="#1c1c1e">250</text>
+  <text x="150" y="176" font-size="10" fill="#8e8e93">REPRODUCIBILITY HASH</text>
+  <text x="300" y="176" font-size="11" font-family="monospace" fill="#1c1c1e">d28557b76274d2d4</text>
+
+  <line x1="150" y1="196" x2="750" y2="196" stroke="#1c1c1e" stroke-width="2"/>
+  <text x="150" y="222" font-size="14" font-weight="700" fill="#1c1c1e">Executive summary</text>
+  <text x="150" y="242" font-size="11" fill="#48484a">All 5 human benchmarks were reproduced within one</text>
+  <text x="150" y="258" font-size="11" fill="#48484a">standard error of the published estimates.</text>
+
+  <line x1="150" y1="278" x2="750" y2="278" stroke="#1c1c1e" stroke-width="2"/>
+  <text x="150" y="304" font-size="14" font-weight="700" fill="#1c1c1e">Benchmarks</text>
+  <text x="150" y="324" font-size="11" fill="#1c1c1e">Ultimatum offer</text>
+  <text x="500" y="324" font-size="11" font-family="monospace" fill="#1c1c1e">0.402</text>
+  <text x="620" y="324" font-size="11" font-family="monospace" fill="#1a6b32">PASS</text>
+  <text x="150" y="342" font-size="11" fill="#1c1c1e">Trust-game send</text>
+  <text x="500" y="342" font-size="11" font-family="monospace" fill="#1c1c1e">0.501</text>
+  <text x="620" y="342" font-size="11" font-family="monospace" fill="#1a6b32">PASS</text>
+
+  <text x="150" y="368" font-size="10" fill="#8e8e93">32k-XAI Scientific Report · run_id d28557b76274d2d4 · page 1</text>
+</svg>
+<div class="cap">The scientific report. Cover, executive summary, benchmark table, time-series panels, provenance, trace, audit, and citations, all in one printable HTML document.</div>
+</div>
+
+<!-- ============================================================ -->
+<!-- FEATURE REFERENCE                                              -->
+<!-- ============================================================ -->
+<h2 id="features">Feature reference</h2>
+
+<table>
+  <thead><tr><th>Feature</th><th>Where</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td>Run a pre-built scenario</td><td>Scenarios tab</td><td>Thirteen named shock packages with configurable N, T, seed.</td></tr>
+    <tr><td>Build a custom experiment</td><td>Design experiments tab</td><td>Shift population means/SDs, add interventions, target subgroups, average over seeds.</td></tr>
+    <tr><td>Trace a single decision</td><td>Trace tab or result card</td><td>56-field dump of every number driving one agent's choice at one tick.</td></tr>
+    <tr><td>Step through interactions</td><td>Trace tab</td><td>Prev/Next interaction jumps to the ticks where the agent actually interacted.</td></tr>
+    <tr><td>Save a trace</td><td>Trace tab</td><td>Download the current trace as JSON for an appendix.</td></tr>
+    <tr><td>Trace in 3D</td><td>Trace tab → See in 3D</td><td>Jump to 3D view with the matching run loaded and the trace agent highlighted.</td></tr>
+    <tr><td>Inspect the population</td><td>Crowd tab</td><td>Per-trait histograms, descriptive stats, provenance panel, 2D joint distributions.</td></tr>
+    <tr><td>Subgroup analysis</td><td>Crowd tab (filter bar)</td><td>Cohen's d and 95% CI comparing the filter subgroup to the rest of the population.</td></tr>
+    <tr><td>Factor structure panels</td><td>Crowd tab</td><td>Bifactor CFA tables and per-item loadings for SD3 and DASS-42.</td></tr>
+    <tr><td>APA-ready paragraphs</td><td>Crowd tab</td><td>Auto-generated Methods and Results sections, ready to paste into a manuscript.</td></tr>
+    <tr><td>3D population cloud</td><td>3D views tab</td><td>Rotatable scatter of actual agents in any three traits, colour by a fourth.</td></tr>
+    <tr><td>Agent profile in 3D</td><td>3D views tab</td><td>Radial bar chart of one agent's z-scores against its run's population.</td></tr>
+    <tr><td>Compare two runs</td><td>3D views, Library, Compare</td><td>Side-by-side benchmark tables and shared-coordinate 3D clouds.</td></tr>
+    <tr><td>Save to library</td><td>Library tab</td><td>Auto-saved and manually named experiment entries, exportable as JSON.</td></tr>
+    <tr><td>Scientific report</td><td>Result card</td><td>Self-contained printable HTML with cover, benchmarks, timeseries, trace, audit, references.</td></tr>
+    <tr><td>In-app Guide</td><td>Guide tab</td><td>Thirteen chapters, two-layer writing (plain-English + technical reader).</td></tr>
+    <tr><td>Spotlight tour</td><td>About → Replay tour</td><td>Twelve-step guided walkthrough of every tab.</td></tr>
+    <tr><td>Print or export</td><td>Any chart</td><td>Every chart is SVG with a native-save button.</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<!-- DEFAULTS                                                       -->
+<!-- ============================================================ -->
+<h2 id="defaults">Complete defaults catalog</h2>
+
+<h3>Run form defaults</h3>
+<table>
+  <thead><tr><th>Field</th><th>Default</th><th>Range</th></tr></thead>
+  <tbody>
+    <tr><td>Number of agents (N)</td><td>8,000</td><td>100 &ndash; 32,000</td></tr>
+    <tr><td>Simulation length (T)</td><td>250 (design: 500)</td><td>50 &ndash; 500</td></tr>
+    <tr><td>Random seed</td><td>42</td><td>0 &ndash; 999,999</td></tr>
+  </tbody>
+</table>
+
+<h3>Design form defaults</h3>
+<table>
+  <thead><tr><th>Field</th><th>Default</th></tr></thead>
+  <tbody>
+    <tr><td>Intervention type</td><td>resource_scarcity</td></tr>
+    <tr><td>Strength slider</td><td>0.30</td></tr>
+    <tr><td>Start tick</td><td>200</td></tr>
+    <tr><td>Duration</td><td>200 ticks</td></tr>
+    <tr><td>Target mode</td><td>Everyone</td></tr>
+    <tr><td>Seeds to average</td><td>1</td></tr>
+  </tbody>
+</table>
+
+<h3>3D view defaults</h3>
+<table>
+  <thead><tr><th>Control</th><th>Default</th></tr></thead>
+  <tbody>
+    <tr><td>X axis</td><td>Openness (O)</td></tr>
+    <tr><td>Y axis</td><td>Conscientiousness (C)</td></tr>
+    <tr><td>Z axis</td><td>Extraversion (E)</td></tr>
+    <tr><td>Colour by</td><td>Neuroticism (N)</td></tr>
+    <tr><td>Highlight agent</td><td>-1 (none)</td></tr>
+    <tr><td>Rotation (yaw, pitch)</td><td>0.6, -0.4 radians</td></tr>
+    <tr><td>Zoom</td><td>1.0</td></tr>
+  </tbody>
+</table>
+
+<h3>Crowd tab defaults</h3>
+<table>
+  <thead><tr><th>Control</th><th>Default</th></tr></thead>
+  <tbody>
+    <tr><td>Selected trait</td><td>Openness (O)</td></tr>
+    <tr><td>Histogram bins</td><td>30</td></tr>
+    <tr><td>Sort by</td><td>id, ascending</td></tr>
+    <tr><td>Page size</td><td>50 rows</td></tr>
+    <tr><td>Filter trait / op / value</td><td>Agreeableness, at least, 0.7</td></tr>
+    <tr><td>2D scatter X / Y</td><td>Openness / Conscientiousness</td></tr>
+  </tbody>
+</table>
+
+<h3>Engine constants</h3>
+<table>
+  <thead><tr><th>Name</th><th>Value</th><th>Role</th></tr></thead>
+  <tbody>
+    <tr><td>P_COMMON</td><td>0.7</td><td>Two-step transition probability to common state</td></tr>
+    <tr><td>E_ENDOWMENT</td><td>10.0</td><td>Endowment in each game</td></tr>
+    <tr><td>TRUST_K</td><td>3.0</td><td>Trust-game multiplier</td></tr>
+    <tr><td>WEALTH_INIT</td><td>10.0</td><td>Starting wealth per agent</td></tr>
+    <tr><td>KAPPA_DECAY</td><td>0.8</td><td>Distress effect on arbitration</td></tr>
+    <tr><td>DISTRESS_DECAY</td><td>0.95</td><td>Per-tick decay of distress</td></tr>
+    <tr><td>DISTRESS_PULL</td><td>0.05</td><td>Pull toward baseline distress</td></tr>
+    <tr><td>C_BOOST</td><td>0.3</td><td>Conscientiousness boost to arbitration</td></tr>
+    <tr><td>E_ENGAGE</td><td>0.5</td><td>Extraversion effect on engagement bias</td></tr>
+    <tr><td>A_INHIB</td><td>0.2</td><td>Inhibitory control effect on engagement</td></tr>
+    <tr><td>T_THREAT</td><td>0.5</td><td>Threat sensitivity effect on avoidance</td></tr>
+    <tr><td>U_UNCERT</td><td>0.3</td><td>Uncertainty aversion effect on avoidance</td></tr>
+    <tr><td>N_DISTRESS</td><td>1.0</td><td>Neuroticism boost to rejection bump</td></tr>
+    <tr><td>WEALTH_KAPPA</td><td>0.001</td><td>Diminishing marginal utility scale</td></tr>
+    <tr><td>GRAD_CLIP</td><td>100.0</td><td>Q-value update clip</td></tr>
+    <tr><td>LOGIT_CLIP</td><td>30.0</td><td>Softmax logit clip</td></tr>
+    <tr><td>REWARD_CLIP</td><td>100.0</td><td>Reward clip</td></tr>
+    <tr><td>WS_N, WS_K, WS_P</td><td>32000, 6, 0.1</td><td>Watts-Strogatz network parameters</td></tr>
+  </tbody>
+</table>
+
+<h3>API defaults</h3>
+<table>
+  <thead><tr><th>Endpoint</th><th>Default</th></tr></thead>
+  <tbody>
+    <tr><td>/api/run/{name}</td><td>N=8000, T=250, seed=42</td></tr>
+    <tr><td>/api/trace/{name}/{i}</td><td>tick=250, N=8000, T=250, seed=42</td></tr>
+    <tr><td>/api/scatter3d</td><td>x=O, y=C, z=E, color=N, max_points=2500</td></tr>
+    <tr><td>/api/scatter2d</td><td>max_points=3000</td></tr>
+    <tr><td>/api/population</td><td>n_bins=30, page_size=50</td></tr>
+    <tr><td>/api/design</td><td>N=8000, T=500, seeds=[42]</td></tr>
+    <tr><td>Run cache</td><td>5 entries, in-memory</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<!-- API                                                            -->
+<!-- ============================================================ -->
+<h2 id="api">API reference</h2>
+
+<p>All endpoints return JSON unless otherwise noted. Base URL is <code>http://127.0.0.1:8765</code>.</p>
+
+<table>
+  <thead><tr><th>Method</th><th>Path</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td>GET</td><td>/api/health</td><td>Liveness probe. Returns {"status": "ok", "version": "0.3.0"}.</td></tr>
+    <tr><td>GET</td><td>/api/scenarios</td><td>List of pre-built scenarios with descriptions.</td></tr>
+    <tr><td>GET</td><td>/api/scenarios-with-meta</td><td>Scenarios with shock summaries.</td></tr>
+    <tr><td>POST</td><td>/api/run/{name}</td><td>Run a named scenario. Query: N, T, seed.</td></tr>
+    <tr><td>POST</td><td>/api/run-custom</td><td>Ad-hoc run with custom shocks.</td></tr>
+    <tr><td>POST</td><td>/api/design</td><td>Full experiment: copula ops, shocks, N, T, seeds.</td></tr>
+    <tr><td>GET</td><td>/api/trace/{name}/{i}</td><td>Single-agent trace. Query: tick, N, T, seed.</td></tr>
+    <tr><td>GET</td><td>/api/trace-summary</td><td>Population-level interaction counts for a scenario.</td></tr>
+    <tr><td>GET</td><td>/api/traits</td><td>Per-column stats + provenance for the copula.</td></tr>
+    <tr><td>GET</td><td>/api/population</td><td>Paginated, sortable slice of the copula; histogram + stats.</td></tr>
+    <tr><td>GET</td><td>/api/correlations</td><td>Pearson correlation matrix for listed traits.</td></tr>
+    <tr><td>GET</td><td>/api/subgroup-analysis</td><td>Subgroup vs rest, Cohen's d, 95% CI, p-value.</td></tr>
+    <tr><td>GET</td><td>/api/scatter2d</td><td>Joint distribution of two traits with subgroup overlay.</td></tr>
+    <tr><td>GET</td><td>/api/scatter3d</td><td>3D coordinates of a run's agents; supports reference_run_id.</td></tr>
+    <tr><td>GET</td><td>/api/agent-profile</td><td>Z-scored traits for one agent in one run.</td></tr>
+    <tr><td>GET</td><td>/api/factor-structure</td><td>Bifactor CFA results for SD3 and DASS-42.</td></tr>
+    <tr><td>GET</td><td>/api/guide</td><td>The Guide tab's thirteen chapters as JSON.</td></tr>
+    <tr><td>GET</td><td>/api/runs</td><td>Currently-cached run_ids with metadata.</td></tr>
+    <tr><td>POST</td><td>/api/download/{kind}</td><td>Echo POST body with Content-Disposition for download.</td></tr>
+    <tr><td>GET</td><td>/</td><td>The dashboard HTML.</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<!-- FLAGS                                                          -->
+<!-- ============================================================ -->
+<h2 id="flags">Specification flags and caveats</h2>
+
+<p>
+  Every XAI trace carries an active flag set. Each flag corresponds to a
+  documented limitation. When a number from this platform appears in a
+  publication, the flags that were active at the time of the run should be
+  reported alongside it.
+</p>
+
+<table>
+  <thead><tr><th>Flag</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td><span class="flag">[SYNTHETIC-PRIOR]</span></td><td>Parameter not directly estimated from human data; prior derived from literature.</td></tr>
+    <tr><td><span class="flag">[SYNTHETIC-PRIOR-PARAMS]</span></td><td>One or more columns fall into the previous category; the current set is eta_vol and gamma_sal.</td></tr>
+    <tr><td><span class="flag">[LOW RECOVERABILITY]</span></td><td>Parameter recovery &rho; &lt; 0.7.</td></tr>
+    <tr><td><span class="flag">[HIGH SHRINKAGE]</span></td><td>Posterior shrinkage factor &lt; 0.7.</td></tr>
+    <tr><td><span class="flag">[SIMPLIFIED MODEL]</span></td><td>Parameter simplified due to identifiability constraints.</td></tr>
+    <tr><td><span class="flag">[COLLAPSED-LR]</span></td><td>Learning rate collapsed from two parameters to one.</td></tr>
+    <tr><td><span class="flag">[KOOL-VALIDATION-PASSED]</span></td><td>w_MB validated on the Kool paradigm in addition to Daw.</td></tr>
+    <tr><td><span class="flag">[RECOVERY-N60-PROVISIONAL]</span></td><td>Recovery run with N=60 synthetic subjects; N=500 run required for final sign-off.</td></tr>
+    <tr><td><span class="flag">[ENVY-ONLY]</span></td><td>Fehr-Schmidt is simplified to envy-only; guilt is a proxy from Agreeableness.</td></tr>
+    <tr><td><span class="flag">[REWARD-SCALE-DRIFT]</span></td><td>Engine reward scale differs from the human-data scale used to fit parameters.</td></tr>
+    <tr><td><span class="flag">[COPULA-COLUMN-IS-LOG-K-DD]</span></td><td>The k_DD column is stored as log(k), not k.</td></tr>
+    <tr><td><span class="flag">[KDE-TAIL-EXTRAPOLATION]</span></td><td>Some tail behaviour comes from KDE extrapolation, not direct samples.</td></tr>
+    <tr><td><span class="flag">[P6D-RANK-TRANSFORM-REJECTED]</span></td><td>A previous attempt to replace synthetic priors with rank-transforms of other columns was rejected and reverted.</td></tr>
+    <tr><td><span class="flag">[MF-GENERALIZED]</span></td><td>Model-free updating uses a generalised update rule, not canonical TD.</td></tr>
+    <tr><td><span class="flag">[PER-HEAD-Q]</span></td><td>Each decision head (offer, send, accept, return) has its own Q table.</td></tr>
+    <tr><td><span class="flag">[FEHR-SCHMIDT-CANONICAL]</span></td><td>The accept rule uses the canonical 1999 QJE form.</td></tr>
+    <tr><td><span class="flag">[HUMAN-BENCHMARK-PASS-5-OF-5]</span></td><td>All five benchmarks pass within one SE.</td></tr>
+    <tr><td><span class="flag">[NOT-IDENTIFIABLE-IN-HCP-UGR]</span></td><td>Some traits cannot be identified from the HCP unrestricted sample; the fact is carried in every trace.</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<!-- HISTORY                                                        -->
+<!-- ============================================================ -->
+<h2 id="history">Version history — the current development session</h2>
+
+<p>
+  The following commits were made during the session that produced this document.
+  They are all on <code>main</code> and pushed to <code>origin</code>.
+</p>
+
+<table>
+  <thead><tr><th>Commit</th><th>Title</th></tr></thead>
+  <tbody>
+    <tr><td><code>74e42d7</code></td><td>Fix 3D population cloud: force X/Y/Z/colour defaults on load</td></tr>
+    <tr><td><code>44f4780</code></td><td>Fix run_id eviction: rebuild-from-config + authoritative ensureRunLive</td></tr>
+    <tr><td><code>e46c83c</code></td><td>Crowd Phase 1: provenance for every trait + fix dead init call</td></tr>
+    <tr><td><code>b34ca5c</code></td><td>Crowd Phase 2a: subgroup vs rest analysis + CSV export</td></tr>
+    <tr><td><code>9d82dea</code></td><td>Crowd 2a polish: honest p-value display + N caveat</td></tr>
+    <tr><td><code>70bec0e</code></td><td>Crowd Phase 2b: joint distribution scatter (2D)</td></tr>
+    <tr><td><code>3045d8e</code></td><td>Crowd Phase 2c: bifactor CFA panels (SD3 + DASS)</td></tr>
+    <tr><td><code>1f51302</code></td><td>Crowd Phase 2d: APA-ready methods + results paragraphs</td></tr>
+    <tr><td><code>5568144</code></td><td>Guide tab rewrite: two-layer chapters from /api/guide</td></tr>
+    <tr><td><code>1320d37</code></td><td>Spotlight tour: 12-step guided walkthrough</td></tr>
+    <tr><td><code>5d3cab8</code></td><td>Scientific report: printable HTML + native print path</td></tr>
+    <tr><td><code>08cfc9e</code></td><td>Trace tab + runs-only picker + step navigation</td></tr>
+    <tr><td><code>c49136f</code></td><td>Trace tab polish: see-in-3D, runs-only picker, tour refresh</td></tr>
+  </tbody>
+</table>
+
+<p>
+  Before this session, the codebase was at <code>210fd9c</code>. Over the course of
+  the session it advanced by fourteen commits, adding the Crowd rebuild (four
+  phases), the Guide rewrite, the spotlight tour, the scientific report, and the
+  Trace unification.
+</p>
+
+<!-- ============================================================ -->
+<!-- ROADMAP                                                        -->
+<!-- ============================================================ -->
+<h2 id="roadmap">What is left</h2>
+
+<h3>Packaging for Windows and Linux</h3>
+<p>
+  The macOS bundle is complete and ships as a self-contained <code>.app</code>. The
+  Docker image is written but predates this session's engine changes; it needs
+  <code>guide_content.py</code> added to its whitelist before building. A
+  <code>docker-compose.yml</code> and launcher scripts (<code>run.sh</code> for
+  Linux and macOS, <code>run.bat</code> for Windows) are the natural next step.
+  A native PyInstaller bundle for Windows or Linux would require building on
+  those platforms; the Mac cannot cross-compile JAX reliably.
+</p>
+
+<h3>Optional future features</h3>
+<ul>
+  <li>Network graph view of the Watts-Strogatz adjacency with active interactions.</li>
+  <li>Q-value trajectories over time for a single agent.</li>
+  <li>Lorenz curve for wealth distribution.</li>
+  <li>CUDA-flavoured Dockerfile for NVIDIA-equipped Windows and Linux hosts.</li>
+  <li>CUDA or Metal backend selection inside the Docker container (currently CPU-only).</li>
+  <li>Hierarchical Bayesian refit of the Fehr-Schmidt parameters with a two-parameter model, to remove the <span class="flag">[ENVY-ONLY]</span> flag.</li>
+</ul>
+
+<!-- ============================================================ -->
+<!-- GLOSSARY                                                       -->
+<!-- ============================================================ -->
+<h2 id="glossary">Glossary</h2>
+
+<table>
+  <thead><tr><th>Term</th><th>Definition</th></tr></thead>
+  <tbody>
+    <tr><td>Agent</td><td>One simulated person. Default 8,000; full scale 32,000.</td></tr>
+    <tr><td>Tick</td><td>One round of the simulation. Every agent picks a partner, decides whether to engage, plays both games, updates its values.</td></tr>
+    <tr><td>Q-value</td><td>An agent's estimate of the reward from a given action. Higher Q means the agent expects this action to be more rewarding.</td></tr>
+    <tr><td>Model-free value (Q_MF)</td><td>Habit. Value learned from recent experience by trial and error.</td></tr>
+    <tr><td>Model-based value (Q_MB)</td><td>Plan. Value computed by simulating the future using a belief about state transitions.</td></tr>
+    <tr><td>Arbitration weight (w_mb_eff)</td><td>Blend between habit and plan. Near 0 = habit, near 1 = plan. Distress reduces this weight.</td></tr>
+    <tr><td>Softmax</td><td>Function turning Q-values into action probabilities. Higher Q = more likely, with some randomness.</td></tr>
+    <tr><td>Inverse temperature (&tau;)</td><td>How sharply softmax prefers the best option.</td></tr>
+    <tr><td>Fehr-Schmidt utility</td><td>Fairness-adjusted value of accepting an offer. Subtracts penalties for disadvantageous and advantageous inequality.</td></tr>
+    <tr><td>Distress</td><td>Internal state that rises when offers are rejected and decays slowly. High distress suppresses planning.</td></tr>
+    <tr><td>Gini coefficient</td><td>Single number from 0 (everyone equal) to 1 (one agent owns everything) summarising wealth inequality.</td></tr>
+    <tr><td>Bifactor structure</td><td>A latent model with one general factor plus orthogonal specific factors. Used for Dark Triad and DASS.</td></tr>
+    <tr><td>Vine Copula</td><td>A decomposition of a joint distribution into a cascade of pairwise copulas, allowing non-Gaussian tail dependence.</td></tr>
+    <tr><td>run_id</td><td>SHA-256 hash of (copula_ops, N, seed, shocks), truncated to 16 hex characters. Identifies a run.</td></tr>
+    <tr><td>Paired counterfactual</td><td>Two runs with the same seed and N, hence the same agents. The only difference is the intervention.</td></tr>
+    <tr><td>XAI trace</td><td>A 56-field per-tick dump of every number behind one agent's decision.</td></tr>
+    <tr><td>Provenance status</td><td>One of GROUNDED / PROXY / DERIVED / SYNTHETIC / INERT, attached to every trait.</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================================================ -->
+<!-- REFERENCES                                                     -->
+<!-- ============================================================ -->
+<h2 id="refs">References</h2>
+
+<ul>
+  <li>Fehr, E., &amp; Schmidt, K. M. (1999). A theory of fairness, competition, and cooperation. <em>Quarterly Journal of Economics</em>, 114(3), 817&ndash;868.</li>
+  <li>Oosterbeek, H., Sloof, R., &amp; Van De Kuilen, G. (2004). Cultural differences in ultimatum game experiments: Evidence from a meta-analysis. <em>Experimental Economics</em>, 7(2), 171&ndash;188.</li>
+  <li>Johnson, N. D., &amp; Mislin, A. A. (2011). Trust games: A meta-analysis. <em>Journal of Economic Psychology</em>, 32(5), 865&ndash;889.</li>
+  <li>Daw, N. D., Gershman, S. J., Seymour, B., Dayan, P., &amp; Dolan, R. J. (2011). Model-based influences on humans' choices and striatal prediction errors. <em>Neuron</em>, 69(6), 1204&ndash;1215.</li>
+  <li>Kool, W., Cushman, F. A., &amp; Gershman, S. J. (2016). When does model-based control pay off? <em>PLOS Computational Biology</em>, 12(8), e1005090.</li>
+  <li>Zanon, C., et al. (2020). Examining the dimensionality, reliability, and invariance of the DASS-21 across eight countries. <em>Assessment</em>, 28(2), 1&ndash;14.</li>
+  <li>Knitter, L. A., Hoffmann, J., Eid, M., &amp; Koch, T. (2025). Measuring the dark triad: A meta-analytical SEM study of two prominent short scales. <em>Frontiers in Psychology</em>, 15, 1469970.</li>
+  <li>Khorshidi, S., &amp; Mansouri Jamshidi, K. (2026). The Dark Triad as a Multi-Layered Structure: A Triangulation of Classical Psychometrics and Explainable Machine Learning. <em>SSRN Electronic Journal</em>.</li>
+  <li>Katahira, K., Oba, T., &amp; Toyama, A. (2024). Does the reliability of computational models truly improve with hierarchical modeling? <em>Computational Brain &amp; Behavior</em>, 7, 1&ndash;14.</li>
+  <li>Wiecki, T. V., Sofer, I., &amp; Frank, M. J. (2013). HDDM: Hierarchical Bayesian estimation of the Drift-Diffusion Model in Python. <em>Frontiers in Neuroinformatics</em>, 7, 14.</li>
+  <li>Zorowitz, S., &amp; Niv, Y. (2021). Data from N=149 participants completing a gamified version of the two-step task [Data set]. Princeton University.</li>
+  <li>Foldnes, N., &amp; Gr&oslash;nneberg, S. (2017). Covariance model simulation using regular vines. <em>Psychometrika</em>, 82(4), 1035&ndash;1051.</li>
+</ul>
+
+<hr>
+
+<p style="text-align:center;font-size:13px;color:#8e8e93;margin-top:60px;">
+  32k-XAI · Complete guide and pitch · v2.0 · generated 2026-10-12<br>
+  Repository: <a href="https://github.com/sirkianmj/32k-xai">github.com/sirkianmj/32k-xai</a><br>
+  Lead architect: Kian Mansouri Jamshidi · Lead psychologist: Sabihe Khorshidi
+</p>
+
+</div>
+</body>
+</html>
