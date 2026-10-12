@@ -1172,187 +1172,9 @@ table.cmp2 td.delta.ns  { color: var(--ink-3); font-weight: 400; }
     <!-- GUIDE -->
     <section id="view-guide" class="view">
       <h2 class="page-title">Guide</h2>
-      <p class="page-sub">A plain-English walkthrough for researchers. No programming required.</p>
-
-      <div class="guide">
-
-        <details class="guide-section" open>
-          <summary>What is this platform?</summary>
-          <div class="guide-body">
-            <p>
-              This is a <span class="term">simulated society</span>. It contains
-              thousands of virtual people (&ldquo;agents&rdquo;), each one with its own
-              personality, mood, and decision rules. The agents play economic
-              games with each other — offering money, sending trust, deciding
-              whether to reject unfair offers — and over time their choices
-              produce patterns like cooperation, inequality, and trust.
-            </p>
-            <p>
-              The purpose is to study <em>why</em> those patterns emerge. Unlike
-              a neural network, every single decision in this platform can be
-              traced back to a specific number inside the agent — for instance,
-              how much the agent values fairness, or how much distress it is
-              currently feeling. You can point at one agent, at one moment, and
-              ask &ldquo;what made you do that?&rdquo;, and get a real answer.
-            </p>
-            <p>
-              The simulation is calibrated against <span class="term">five human
-              benchmarks</span> — real data from published economic-game studies.
-              When the platform says &ldquo;PASS&rdquo;, it means the simulated
-              agents behaved within one standard error of what real humans did.
-            </p>
-          </div>
-        </details>
-
-        <details class="guide-section">
-          <summary>Quick start — 5 steps</summary>
-          <div class="guide-body">
-            <ol>
-              <li><span class="term">Open Scenarios.</span> You will see eight pre-built experiments.</li>
-              <li><span class="term">Click any scenario.</span> A settings page appears with three numbers (agents, ticks, seed). Leave them as they are.</li>
-              <li><span class="term">Click Run simulation.</span> In a few seconds you will see a bar chart and five result cards.</li>
-              <li><span class="term">Read the results.</span> Green bars = the agents matched human behaviour. Red bars = they did not. Click the &ldquo;i&rdquo; next to any benchmark for an explanation.</li>
-              <li><span class="term">Trace a decision.</span> Click the blue &ldquo;Trace a decision&rdquo; button. Slide the agent and tick sliders to any position, then click &ldquo;Show me the trace&rdquo; to see every number behind one specific decision.</li>
-            </ol>
-            <div class="example">
-              <strong>Tip.</strong> If you just want to see the platform work,
-              open <em>Scenarios &rarr; Baseline</em> and click <em>Run simulation</em>.
-              That takes the fewest steps.
-            </div>
-          </div>
-        </details>
-
-        <details class="guide-section">
-          <summary>Reading the results</summary>
-          <div class="guide-body">
-            <p>
-              Each run produces five <span class="term">benchmarks</span>. These are
-              the same five numbers that psychologists have measured in real
-              human laboratories, so you can compare the simulation directly
-              to people.
-            </p>
-
-            <h4>Ultimatum game — offer</h4>
-            <p>Two strangers have &pound;10 to split. One proposes a split; the other either accepts (both keep the money) or rejects (both get nothing). This benchmark is the <em>average amount offered</em>, as a fraction of the total. Human average: <strong>0.40</strong>.</p>
-
-            <h4>Ultimatum game — rejection</h4>
-            <p>The fraction of offers that get rejected. Low offers are rejected more often than fair ones. Human average: <strong>0.16</strong>.</p>
-
-            <h4>Trust game — send</h4>
-            <p>One person sends some money to a stranger, knowing the stranger will receive triple the amount. The sender is trusting the trustee to send something back. This benchmark is the <em>average amount sent</em> as a fraction of the sender's endowment. Human average: <strong>0.502</strong>.</p>
-
-            <h4>Trust game — return</h4>
-            <p>The fraction of the received amount the trustee sends back to the sender. Human average: <strong>0.372</strong>.</p>
-
-            <h4>Wealth inequality (Gini)</h4>
-            <p>A single number from 0 (everyone equal) to 1 (one person owns everything) that summarises how unequal wealth is after the simulation ends. Human comparison is to real wealth distributions, around <strong>0.40</strong>.</p>
-
-            <h4>What "PASS" means</h4>
-            <p>Each benchmark has a <span class="term">human target</span> and a
-              <span class="term">standard error</span> (SE). PASS means the
-              simulated value is within one SE of the human target. SE captures
-              how much the human data itself varies between studies. So PASS
-              means: the simulation behaves consistently with the range of
-              human findings.</p>
-          </div>
-        </details>
-
-        <details class="guide-section">
-          <summary>Reading the decision trace</summary>
-          <div class="guide-body">
-            <p>
-              The trace shows every internal number for one agent at one
-              moment. There are 56 fields in total, grouped by role. The most
-              important groups:
-            </p>
-            <h4>Decision at this tick</h4>
-            <p>What the agent chose to do: engage or avoid, what offer to make, what amount to send, whether to accept, how much to return.</p>
-            <h4>Beliefs and values</h4>
-            <p>The agent's internal estimates at the moment of choosing. The <code>Q_MF</code> values are habits learned from recent experience. The <code>Q_MB</code> values are forecasts based on a model of how the world works. The <code>Q_net</code> values blend the two based on the arbitration weight <code>w_mb_eff</code>. When <code>w_mb_eff</code> is small, the agent is running on habit; when it is large, it is planning.</p>
-            <h4>Why it accepted or rejected</h4>
-            <p>The Fehr-Schmidt utility (<code>U_accept</code>) is the number that decides whether to accept an offer. It is the agent's payoff minus a penalty for the offer being unfair. Two penalties are possible: <code>inequity_neg</code> (the partner has more) and <code>inequity_pos</code> (the agent has more).</p>
-            <h4>Click any label in the trace to see its definition in plain English.</h4>
-          </div>
-        </details>
-
-        <details class="guide-section">
-          <summary>Building your own experiment</summary>
-          <div class="guide-body">
-            <p>The <span class="term">Design experiments</span> tab lets you build a custom study by combining four pieces:</p>
-            <ol>
-              <li><span class="term">Population psychology</span> — shift the mean or variance of any trait (e.g. make everyone slightly more neurotic). Useful when you want to test how population characteristics change behaviour.</li>
-              <li><span class="term">Interventions</span> — add shocks to the simulation. There are four types:
-                <ul>
-                  <li><strong>Resource scarcity</strong> — reduce the money available in each interaction.</li>
-                  <li><strong>Distress injection</strong> — raise baseline stress levels for a subset of agents.</li>
-                  <li><strong>Social isolation</strong> — reduce the number of neighbours an agent can interact with.</li>
-                  <li><strong>Wealth redistribution</strong> — pull wealth toward the mean (like a tax-and-transfer policy).</li>
-                </ul>
-              </li>
-              <li><span class="term">Targeting</span> — an intervention can apply to everyone, to a random percentage, or to a subgroup defined by a trait (e.g. the top 30% on neuroticism).</li>
-              <li><span class="term">Measurement</span> — how many agents, how many ticks, and how many seeds to average over.</li>
-            </ol>
-            <p>When you click <strong>Run experiment</strong>, the platform produces a treatment-vs-control table (comparing targeted agents to non-targeted ones) and time-series charts (showing how behaviour evolves tick by tick).</p>
-          </div>
-        </details>
-
-        <details class="guide-section">
-          <summary>Statistical terms</summary>
-          <div class="guide-body">
-            <h4>Standard Error (SE)</h4>
-            <p>How much a measured value varies between independent studies. If a human average is 0.40 with SE 0.05, that means different published studies report values roughly between 0.35 and 0.45. PASS means the simulation falls in that range.</p>
-            <h4>Delta (Δ)</h4>
-            <p>The difference between the simulated value and the human target. Positive delta means the simulation scored higher than humans; negative means lower.</p>
-            <h4>z-score (delta &divide; SE)</h4>
-            <p>How many standard errors away from the human target the simulation is. A z of 0 means perfect agreement. A z of 1 is at the edge of the tolerance band. Below 1 is PASS.</p>
-            <h4>Confidence interval (CI)</h4>
-            <p>A range within which the true value is likely to fall. In this platform, the shaded band on the bar chart (± 1 SE) is a rough 68% interval.</p>
-            <h4>p-value</h4>
-            <p>How likely the observed result would be if there were no real effect. Small p means strong evidence. Not shown on the main dashboard, but available in the calibration log.</p>
-            <h4>Seed</h4>
-            <p>A number that makes random processes repeatable. Same seed + same settings = same result, exactly. Changing the seed gives a different random draw from the same population.</p>
-          </div>
-        </details>
-
-        <details class="guide-section">
-          <summary>Glossary of engine terms</summary>
-          <div class="guide-body">
-            <h4>Agent</h4>
-            <p>One virtual person in the simulation. The default is 8,000 agents; full scale is 32,000.</p>
-            <h4>Tick</h4>
-            <p>One round of the simulation. In each tick, every agent chooses a partner, decides whether to engage, plays both games, and updates its internal estimates.</p>
-            <h4>Q-value</h4>
-            <p>The agent's estimate of how much reward it will get from a given action. Higher Q = the agent expects this action to be more rewarding.</p>
-            <h4>Model-based control (Q_MB)</h4>
-            <p>The agent's plan. It simulates what would happen if it took each action, using a model of how the environment transitions between states.</p>
-            <h4>Model-free control (Q_MF)</h4>
-            <p>The agent's habit. It just remembers what worked before and does it again.</p>
-            <h4>Arbitration weight (w_mb_eff)</h4>
-            <p>The blend between habit and plan. Near 0 = mostly habit. Near 1 = mostly plan. Distress reduces this weight, forcing a reversion to habit.</p>
-            <h4>Softmax</h4>
-            <p>The formula that turns Q-values into probabilities. Actions with higher Q are more likely, but with some randomness.</p>
-            <h4>Fehr-Schmidt utility</h4>
-            <p>A utility function from behavioural economics that adds a &ldquo;fairness penalty&rdquo; to the agent's payoff. An unfair offer feels worse than the money alone would suggest.</p>
-            <h4>Distress</h4>
-            <p>An internal state that rises when the agent's offers are rejected and slowly decays. High distress reduces planning and biases the agent toward safer, more habitual choices.</p>
-            <h4>Inverse temperature (τ)</h4>
-            <p>How sharply the agent prefers higher-Q actions. High τ = strongly prefers the best option. Low τ = chooses more randomly.</p>
-          </div>
-        </details>
-
-        <details class="guide-section">
-          <summary>References for the human benchmarks</summary>
-          <div class="guide-body">
-            <ul class="refs">
-              <li>Fehr, E., &amp; Schmidt, K. M. (1999). A theory of fairness, competition, and cooperation. <em>Quarterly Journal of Economics</em>, 114(3), 817&ndash;868.</li>
-              <li>Sanfey, A. G., Rilling, J. K., Aronson, J. A., Nystrom, L. E., &amp; Cohen, J. D. (2003). The neural basis of economic decision-making in the ultimatum game. <em>Science</em>, 300(5626), 1755&ndash;1758.</li>
-              <li>Oosterbeek, H., Sloof, R., &amp; Van De Kuilen, G. (2004). Cultural differences in ultimatum game experiments: Evidence from a meta-analysis. <em>Experimental Economics</em>, 7(2), 171&ndash;188.</li>
-              <li>Johnson, N. D., &amp; Mislin, A. A. (2011). Trust games: A meta-analysis. <em>Journal of Economic Psychology</em>, 32(5), 865&ndash;889.</li>
-              <li>Daw, N. D., Gershman, S. J., Seymour, B., Dayan, P., &amp; Dolan, R. J. (2011). Model-based influences on humans' choices and striatal prediction errors. <em>Neuron</em>, 69(6), 1204&ndash;1215.</li>
-            </ul>
-          </div>
-        </details>
-
+      <p class="page-sub">A two-layer walkthrough for researchers. Plain-English at the top of each chapter; open the technical reader for the details.</p>
+      <div id="guide-body">
+        <div class="notice info" style="margin-top:0;">Loading guide…</div>
       </div>
     </section>
 
@@ -1587,6 +1409,9 @@ function goTo(view) {
   }
   if (view === 'crowd') {
     try { crowdLoad(); } catch (e) { console.warn('crowd refresh failed', e); }
+  }
+  if (view === 'guide') {
+    try { guideLoad(); } catch (e) { console.warn('guide load failed', e); }
   }
   if (view === 'view3d') {
     try { v3dPopulateRunsDropdown(); init3DView(); } catch (e) {
@@ -3860,6 +3685,53 @@ function apaDownload() {
     "===== METHODS =====\n\n" + apaBuildMethodsText() + "\n\n" +
     "===== RESULTS =====\n\n" + apaBuildResultsText() + "\n";
   downloadFile("xai32k-apa.txt", text, "text/plain");
+}
+
+let guideCache = null;
+
+async function guideLoad() {
+  const el = document.getElementById("guide-body");
+  if (!el) return;
+  if (guideCache) { guideRender(el, guideCache); return; }
+  try {
+    const r = await fetch("/api/guide");
+    if (!r.ok) throw new Error(await r.text());
+    guideCache = await r.json();
+    guideRender(el, guideCache);
+  } catch (e) {
+    el.innerHTML = '<div class="notice error" style="margin-top:0;">Could not load the guide: ' +
+                   escapeHtml(e.message) + '</div>';
+  }
+}
+
+function guideRender(el, data) {
+  const chapters = data.chapters || [];
+  const html = chapters.map((ch, i) => {
+    const openAttr = (i === 0) ? " open" : "";
+    const intro = (ch.intro || []).map(p => "<p>" + escapeHtml(p) + "</p>").join("");
+    const bullets = (ch.bullets && ch.bullets.length)
+      ? '<ul class="refs">' + ch.bullets.map(b => "<li>" + escapeHtml(b) + "</li>").join("") + "</ul>"
+      : "";
+    const tech = (ch.tech && ch.tech.length)
+      ? '<details style="margin-top:16px;">' +
+          '<summary style="cursor:pointer;font-weight:600;color:var(--accent-hi);font-size:13px;' +
+          'padding:6px 0;">For the technical reader</summary>' +
+          '<div style="margin-top:8px;padding-left:16px;border-left:3px solid #dde7ff;color:var(--ink-2);' +
+          'font-size:13.5px;line-height:1.7;">' +
+            ch.tech.map(p => "<p>" + escapeHtml(p) + "</p>").join("") +
+          "</div>" +
+        "</details>"
+      : "";
+    return '<details class="guide-section"' + openAttr + ">" +
+             "<summary>" + escapeHtml(ch.title) + "</summary>" +
+             '<div class="guide-body">' + intro + bullets + tech + "</div>" +
+           "</details>";
+  }).join("");
+  el.innerHTML =
+    '<div class="notice info" style="margin-top:0;padding:8px 14px;font-size:13px;">' +
+      "Two layers: plain-English on top, <em>technical reader</em> below." +
+    "</div>" +
+    '<div class="guide" style="margin-top:16px;">' + html + "</div>";
 }
 
 async function crowdRenderSubgroupAnalysis() {

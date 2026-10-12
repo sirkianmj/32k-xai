@@ -23,6 +23,7 @@ from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse, Response
 
 from scenarios import SCENARIOS
+from guide_content import GUIDE
 from xai_trace_scenarios import trace_in_scenario, shock_state_at_tick
 
 app = FastAPI(title="32k-XAI Dashboard", version="0.3.0")
@@ -947,6 +948,14 @@ def factor_structure():
     (distress). Returns per-scale model comparisons and per-item
     standardised loadings on general + specific factors."""
     return FACTOR_STRUCTURE
+
+
+@app.get("/api/guide")
+def guide_endpoint():
+    """Return the in-app Guide chapters as JSON. The chapters live in
+    guide_content.py so the prose can be edited without touching the
+    300 KB dashboard_ui.html."""
+    return {"chapters": GUIDE}
 
 
 @app.get("/api/correlations")
