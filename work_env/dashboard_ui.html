@@ -355,6 +355,49 @@ table.cmp tr:last-child td { border-bottom: 0; }
 }
 .trait-chip:hover { border-color: var(--accent); color: var(--accent-hi); }
 .trait-chip.active { background: var(--accent); border-color: var(--accent); color: white; font-weight: 600; }
+.trait-chip .prov-dot {
+  display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+  margin-right: 6px; vertical-align: middle; opacity: 0.9;
+}
+.trait-chip.active .prov-dot { box-shadow: 0 0 0 1.5px white; }
+.prov-dot.GROUNDED     { background: #30d158; }
+.prov-dot.PROXY        { background: #ff9f0a; }
+.prov-dot.DERIVED      { background: #0a84ff; }
+.prov-dot.SYNTHETIC    { background: #ff453a; }
+.prov-dot.INERT        { background: #8e8e93; }
+.prov-dot.UNCLASSIFIED { background: #c7c7cc; }
+
+.prov-panel {
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 16px 22px;
+  box-shadow: var(--shadow-1); margin: 16px 0;
+  font-size: 13.5px; color: var(--ink-2);
+}
+.prov-panel h4 {
+  margin: 0 0 10px; font-size: 15px; color: var(--ink); font-weight: 600;
+  display: flex; align-items: center; gap: 10px;
+}
+.prov-badge {
+  display: inline-block; font-size: 11px; font-weight: 600;
+  padding: 3px 10px; border-radius: 99px; letter-spacing: 0.04em;
+}
+.prov-badge.GROUNDED     { background: #e7f9ec; color: #1a6b32; }
+.prov-badge.PROXY        { background: #fff4e0; color: #a35b00; }
+.prov-badge.DERIVED      { background: #eff6ff; color: #1c4dba; }
+.prov-badge.SYNTHETIC    { background: #ffecea; color: #a1150d; }
+.prov-badge.INERT        { background: #f2f3f5; color: #4a4a4c; }
+.prov-badge.UNCLASSIFIED { background: #f2f3f5; color: #4a4a4c; }
+.prov-panel .prov-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px; margin-top: 10px; padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.prov-panel .prov-kv .k {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
+  color: var(--ink-3); font-weight: 600;
+}
+.prov-panel .prov-kv .v { font-size: 14px; color: var(--ink); font-weight: 500; }
+.prov-panel .prov-note { margin-top: 10px; font-style: italic; color: var(--ink-3); font-size: 13px; }
 
 .hist-card {
   background: var(--panel); border: 1px solid var(--line);
@@ -767,6 +810,8 @@ table.cmp2 td.delta.ns  { color: var(--ink-3); font-weight: 400; }
         <div id="hist-svg-wrap"></div>
         <div class="hist-stats" id="hist-stats"></div>
       </div>
+
+      <div class="prov-panel" id="crowd-prov-panel"></div>
 
       <div class="charts-grid" style="margin-top:16px;">
         <div id="corr-heatmap-slot"></div>
@@ -3178,7 +3223,63 @@ const crowd = {
   last: null,
 };
 
-function crowdInit() {
+let crowdProvCache = null;
+
+async function crowdLoadProvenance() {
+  if (crowdProvCache) return crowdProvCache;
+  try {
+    const r = await fetch("/api/traits");
+    if (r.ok) {
+      const list = await r.json();
+      const map = {};
+      list.forEach(t => { map[t.name] = t; });
+      crowdProvCache = map;
+    }
+  } catch (e) {
+    console.warn("crowdLoadProvenance failed", e);
+  }
+  return crowdProvCache || {};
+}
+
+function crowdChipHTML(k, l, provMap) {
+  const prov = (provMap && provMap[k] && provMap[k].provenance) || { status: "UNCLASSIFIED", source: "" };
+  const titleSrc = (prov.source || "").replace(/"/g, "&quot;");
+  const dot = `<span class="prov-dot ${prov.status}" title="${prov.status}: ${titleSrc}"></span>`;
+  return `<button class="trait-chip" data-k="${k}" onclick="crowdSelectTrait('${k}')">${dot}${l}</button>`;
+}
+
+function crowdRenderProvenance(k) {
+  const panel = document.getElementById("crowd-prov-panel");
+  if (!panel) return;
+  const cached = (crowdProvCache && crowdProvCache[k]) || null;
+  const prov = (cached && cached.provenance) || {
+    status: "UNCLASSIFIED", source: "loading…", n: null,
+    note: "Provenance record is still loading. Reload the tab if it persists.",
+  };
+  const label = (CROWD_TRAITS.find(([kk]) => kk === k) || [k, k])[1];
+  const nLine = (prov.n == null) ? "—" : Number(prov.n).toLocaleString();
+  let statCells = "";
+  if (cached && typeof cached.mean === "number") {
+    statCells = `
+      <div class="prov-kv"><div class="k">Mean ± SD</div><div class="v">${cached.mean.toFixed(3)} ± ${cached.sd.toFixed(3)}</div></div>
+      <div class="prov-kv"><div class="k">Median</div><div class="v">${cached.median.toFixed(3)}</div></div>
+      <div class="prov-kv"><div class="k">5–95%</div><div class="v">${cached.p05.toFixed(3)} – ${cached.p95.toFixed(3)}</div></div>
+      <div class="prov-kv"><div class="k">Skew</div><div class="v">${cached.skew.toFixed(2)}</div></div>
+      <div class="prov-kv"><div class="k">Excess kurtosis</div><div class="v">${cached.kurtosis.toFixed(2)}</div></div>
+    `;
+  }
+  panel.innerHTML = `
+    <h4>${label} <span class="prov-badge ${prov.status}">${prov.status}</span></h4>
+    <div class="prov-grid">
+      <div class="prov-kv"><div class="k">Source</div><div class="v">${prov.source}</div></div>
+      <div class="prov-kv"><div class="k">Sample size</div><div class="v">${nLine}</div></div>
+      ${statCells}
+    </div>
+    <div class="prov-note">${prov.note || ""}</div>
+  `;
+}
+
+async function crowdInit() {
   const picker = document.getElementById("trait-picker");
   picker.innerHTML = CROWD_TRAITS.map(([k, l]) =>
     `<button class="trait-chip" data-k="${k}" onclick="crowdSelectTrait('${k}')">${l}</button>`
@@ -3190,6 +3291,13 @@ function crowdInit() {
   document.getElementById("filter-op").addEventListener("change", e => { crowd.filter_op = e.target.value; });
   document.getElementById("filter-value").addEventListener("change", e => { crowd.filter_value = +e.target.value; });
   crowdSelectTrait("O");
+
+  const provMap = await crowdLoadProvenance();
+  picker.innerHTML = CROWD_TRAITS.map(([k, l]) => crowdChipHTML(k, l, provMap)).join("");
+  document.querySelectorAll(".trait-chip").forEach(el => {
+    el.classList.toggle("active", el.dataset.k === crowd.trait);
+  });
+  crowdRenderProvenance(crowd.trait);
 }
 
 function crowdSelectTrait(k) {
@@ -3198,6 +3306,7 @@ function crowdSelectTrait(k) {
   document.querySelectorAll(".trait-chip").forEach(el => {
     el.classList.toggle("active", el.dataset.k === k);
   });
+  crowdRenderProvenance(k);
   crowdLoad();
 }
 
@@ -5353,8 +5462,12 @@ function exportProfileSvg() {
 }
 
 // ---------- Init ----------
+// updateBuilderLabels() was removed: the function no longer exists
+// (it was renamed to updateDesignLabels in the design-view rewrite),
+// and calling it threw a ReferenceError that silently aborted this
+// whole init block. updateDesignLabels is now called from the
+// loadTraits() promise chain in the design-view section.
 loadScenarios();
-updateBuilderLabels();
 crowdInit();
 </script>
 

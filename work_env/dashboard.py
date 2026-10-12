@@ -48,6 +48,88 @@ TRAIT_LABELS = {
     "m_t": "Current mood",
 }
 
+# ---- Provenance record for every trait the dashboard knows about.
+# status meanings:
+#   GROUNDED   -- column came from a direct empirical sample (HCP, IPIP, PANAS, ...)
+#   PROXY      -- column is a defensible proxy for the target construct;
+#                 documented as weaker evidence than direct grounding
+#   DERIVED    -- column is a deterministic function of other columns
+#                 (e.g. bifactor general factor)
+#   SYNTHETIC  -- literature-derived prior; flagged [SYNTHETIC-PRIOR-PARAMS]
+#                 in every XAI trace
+#   INERT      -- retired: present in the engine's parameter list but never
+#                 read by the calibrated decision loop
+TRAIT_PROVENANCE = {
+    # --- Big Five: IPIP-FFM, N = 603k ---
+    "O":  {"status": "GROUNDED", "source": "IPIP-FFM (N=603k)",
+           "n": 603000, "note": "Openness to Experience, IPIP-FFM normative sample."},
+    "C":  {"status": "GROUNDED", "source": "IPIP-FFM (N=603k)",
+           "n": 603000, "note": "Conscientiousness, IPIP-FFM normative sample."},
+    "E":  {"status": "GROUNDED", "source": "IPIP-FFM (N=603k)",
+           "n": 603000, "note": "Extraversion, IPIP-FFM normative sample."},
+    "A":  {"status": "GROUNDED", "source": "IPIP-FFM (N=603k)",
+           "n": 603000, "note": "Agreeableness, IPIP-FFM normative sample."},
+    "N":  {"status": "GROUNDED", "source": "IPIP-FFM (N=603k)",
+           "n": 603000, "note": "Neuroticism, IPIP-FFM normative sample."},
+    # --- Dark Triad bifactor: SD3, N = 17k ---
+    "S_M": {"status": "GROUNDED", "source": "SD3 (N=17k)",
+            "n": 17000, "note": "Machiavellianism specific factor."},
+    "S_P": {"status": "GROUNDED", "source": "SD3 (N=17k)",
+            "n": 17000, "note": "Psychopathy specific factor."},
+    "S_N": {"status": "GROUNDED", "source": "SD3 (N=17k)",
+            "n": 17000, "note": "Narcissism specific factor."},
+    "D":   {"status": "DERIVED",  "source": "derived from S_M, S_P, S_N",
+            "n": None,  "note": "General Dark Core, first bifactor component."},
+    # --- DASS-21 bifactor: N = 40k ---
+    "DASS_Dep": {"status": "GROUNDED", "source": "DASS-21 (N=40k)",
+                 "n": 40000, "note": "Depression subscale."},
+    "DASS_Anx": {"status": "GROUNDED", "source": "DASS-21 (N=40k)",
+                 "n": 40000, "note": "Anxiety subscale."},
+    "DASS_Str": {"status": "GROUNDED", "source": "DASS-21 (N=40k)",
+                 "n": 40000, "note": "Stress subscale."},
+    "general_distress": {"status": "DERIVED",
+                         "source": "bifactor general factor",
+                         "n": None, "note": "General distress factor."},
+    # --- Learning / decision ---
+    "alpha_R":     {"status": "GROUNDED", "source": "Daw two-step (N=149)",
+                    "n": 149, "note": "Collapsed learning rate. [COLLAPSED-LR]."},
+    "beta_choice": {"status": "GROUNDED", "source": "Daw two-step (N=149)",
+                    "n": 149, "note": "Inverse temperature."},
+    "phi_per":     {"status": "GROUNDED", "source": "Daw two-step (N=149)",
+                    "n": 149, "note": "Perseveration (stage-1 stickiness)."},
+    "w_MB":        {"status": "GROUNDED", "source": "Daw (N=149) + Kool recovery",
+                    "n": 149, "note": "Model-based arbitration weight."},
+    "k_DD":        {"status": "GROUNDED", "source": "delay-discounting (N=476)",
+                    "n": 476, "note": "Log hyperbolic discount rate."},
+    "a_inhib":     {"status": "GROUNDED", "source": "SSRT (N=264)",
+                    "n": 264, "note": "Inhibitory control index."},
+    "lambda_ineq": {"status": "GROUNDED", "source": "ultimatum (N=111)",
+                    "n": 111, "note": "Fehr-Schmidt alpha. [ENVY-ONLY] simplification."},
+    # --- P6d external proxies ---
+    "theta_T":     {"status": "PROXY", "source": "HCP EMOTION FACE_MEDIAN_RT (N=482)",
+                    "n": 482, "note": "Threat sensitivity, RT-based proxy."},
+    "u_U":         {"status": "PROXY", "source": "HCP GAMBLING PUNISH_PROP_LARGER (N=491)",
+                    "n": 491, "note": "Uncertainty aversion, choice-based proxy."},
+    "omega_social":{"status": "PROXY", "source": "trust-game investment (N=113)",
+                    "n": 113, "note": "Social value weight, proxy from behaviour."},
+    "m_t":         {"status": "GROUNDED", "source": "PANAS (N=329)",
+                    "n": 329, "note": "Current mood, direct ground."},
+    # --- Synthetic ---
+    "eta_vol":     {"status": "SYNTHETIC", "source": "literature prior",
+                    "n": None, "note": "Volatility update. [SYNTHETIC-PRIOR-PARAMS]."},
+    "gamma_sal":   {"status": "SYNTHETIC", "source": "literature prior",
+                    "n": None, "note": "Salience gain. [SYNTHETIC-PRIOR-PARAMS]."},
+    # --- Retired inert columns (kept for provenance completeness) ---
+    "lambda_norm": {"status": "INERT", "source": "retired P6d step 1",
+                    "n": None, "note": "Not read by the calibrated engine."},
+    "s_spite":     {"status": "INERT", "source": "retired P6d step 1",
+                    "n": None, "note": "Not read by the calibrated engine."},
+    "tau_sens":    {"status": "INERT", "source": "retired P6d step 1",
+                    "n": None, "note": "Not read by the calibrated engine."},
+    "kappa_ctx":   {"status": "INERT", "source": "retired P6d step 1",
+                    "n": None, "note": "Not read by the calibrated engine."},
+}
+
 def _load_p6c():
     import importlib.util
     p6c_path = WORK / "p6c_v5.py"
@@ -337,18 +419,34 @@ def list_scenarios():
 
 @app.get("/api/traits")
 def list_traits():
+    """Per-column descriptive statistics for the copula, plus a
+    provenance record for every trait the dashboard recognises."""
     df = _load_copula()
     out = []
     for c in df.columns:
         v = df[c].to_numpy().astype(np.float64)
+        q = np.percentile(v, [5, 25, 50, 75, 95])
+        m = float(np.mean(v)); s = float(np.std(v, ddof=1))
+        skew = float(np.mean(((v - m) / max(s, 1e-12)) ** 3)) if s > 0 else 0.0
+        kurt = float(np.mean(((v - m) / max(s, 1e-12)) ** 4)) - 3.0 if s > 0 else 0.0
         out.append({
             "name": c,
             "label": TRAIT_LABELS.get(c, c),
             "min": float(np.min(v)),
             "max": float(np.max(v)),
-            "mean": float(np.mean(v)),
-            "sd": float(np.std(v, ddof=1)),
+            "mean": float(m),
+            "sd": s,
             "unique": int(len(np.unique(v))),
+            "skew": skew,
+            "kurtosis": kurt,
+            "p05": float(q[0]), "p25": float(q[1]), "median": float(q[2]),
+            "p75": float(q[3]), "p95": float(q[4]),
+            "provenance": TRAIT_PROVENANCE.get(c, {
+                "status": "UNCLASSIFIED",
+                "source": "unknown",
+                "n": None,
+                "note": "No provenance record. Report this.",
+            }),
         })
     return out
 
