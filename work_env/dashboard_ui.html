@@ -1822,11 +1822,13 @@ function renderResults(containerId, data) {
   el.innerHTML = `
     ${summary}
     <h3>Benchmark chart</h3>
-    <div class="card" id="bench-chart-svg" style="padding:20px;">${benchBarChart(data.benchmarks)}</div>
+    ${chartCard('Human benchmark comparison',
+                'Platform values against published human means ± 1 SE. Green bars pass, red bars fail.',
+                benchBarChart(data.benchmarks),
+                'benchmark-' + (state.current || 'design') + '.svg')}
     <h3>Results ${infoIcon('stat_pass')}</h3>
     <div class="results-grid">${cards}</div>
     <div class="btn-row">
-      <button class="btn primary" onclick="saveSvg(document.querySelector('#bench-chart-svg svg'), 'xai32k-chart.svg')">Save chart</button>
       <button class="btn secondary" onclick="saveLatest('json')">Save JSON</button>
       <button class="btn secondary" onclick="saveLatest('csv')">Save CSV</button>
     </div>
@@ -2557,11 +2559,13 @@ function renderDesignResults(data) {
   el.innerHTML = `
     <div class="notice success"><strong>Experiment complete.</strong> ${data.n_seeds} seed(s) averaged over ${data.wall_total_s.toFixed(1)}s.</div>
     <h3>Benchmark chart</h3>
-    <div class="card" id="bench-chart-svg" style="padding:20px;">${benchBarChart(data.benchmarks)}</div>
+    ${chartCard('Human benchmark comparison',
+                'Platform values against published human means ± 1 SE. Green bars pass, red bars fail.',
+                benchBarChart(data.benchmarks),
+                'benchmark-' + (state.current || 'design') + '.svg')}
     <h3>Results ${infoIcon('stat_pass')}</h3>
     <div class="results-grid">${cards}</div>
     <div class="btn-row">
-      <button class="btn primary" onclick="saveSvg(document.querySelector('#bench-chart-svg svg'), 'xai32k-chart.svg')">Save chart</button>
       <button class="btn secondary" onclick="librarySaveCurrent()">Save to library</button>
       <button class="btn secondary" onclick="saveLatest('json')">Save full record</button>
       <button class="btn secondary" onclick="saveLatest('csv')">Save CSV</button>
