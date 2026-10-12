@@ -3443,6 +3443,8 @@ function _dClass(d) {
 }
 function _fmtP(p) {
   if (p == null) return '\u2014';
+  if (p === 0) return '< 1e-300';
+  if (p < 1e-6) return '< 1e-6';
   if (p < 0.001) return '< .001';
   return p.toFixed(3);
 }
@@ -3505,6 +3507,14 @@ function renderSubgroupAnalysis(el, d) {
         '<strong>p</strong>: two-sided normal-approximation p-value on the mean difference. ' +
         'No multiple-comparison correction is applied; with ' + d.traits.length + ' traits shown, ' +
         'a Bonferroni threshold of p &lt; ' + bonf + ' would be appropriate if you treat the table as a family of tests.' +
+      '</p>' +
+      '<p style="font-size:12px;color:#a35b00;background:#fff4e0;border:1px solid #ffe4b8;' +
+        'border-radius:8px;padding:10px 14px;margin-top:8px;">' +
+        '<strong>At this N (' + (d.n_subgroup + d.n_rest).toLocaleString() + ' agents) ' +
+        'every difference is statistically significant</strong>, so the p column carries ' +
+        'no decision-relevant information. <strong>Cohen\u2019s d is the column to read.</strong> ' +
+        'A d near 0 means the subgroup is indistinguishable from the rest of the population; ' +
+        'a large |d| means the two groups genuinely differ on that trait.' +
       '</p>' +
     '</div>';
 }
