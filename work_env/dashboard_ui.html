@@ -327,7 +327,23 @@ table.cmp tr:last-child td { border-bottom: 0; }
 .tour-title { font-size: 24px; font-weight: 600; margin: 8px 0 12px; letter-spacing: -0.02em; }
 .tour-body { color: var(--ink-2); font-size: 14.5px; line-height: 1.65; margin-bottom: 24px; }
 .tour-body strong { color: var(--ink); }
-.tour-actions { display: flex; justify-content: space-between; gap: 10px; }
+.tour-actions { display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+.tour-backdrop { pointer-events: none; }
+.tour-spotlight {
+  position: fixed; z-index: 10001; pointer-events: none;
+  border-radius: 10px;
+  box-shadow: 0 0 0 3px #0a84ff, 0 0 0 9999px rgba(0,0,0,0.55);
+  transition: all 0.15s ease-out;
+}
+#tour-tip {
+  position: fixed; z-index: 10002; display: none;
+  width: 380px; background: var(--panel); border-radius: 16px;
+  padding: 24px 26px; box-shadow: 0 24px 72px rgba(0,0,0,0.35);
+  pointer-events: auto;
+}
+#tour-tip .tour-step { font-size: 11px; }
+#tour-tip .tour-title { font-size: 20px; margin: 6px 0 10px; }
+#tour-tip .tour-body { font-size: 14px; margin-bottom: 18px; line-height: 1.6; }
 
 /* ---- Reference list ---- */
 .refs { font-size: 12.5px; line-height: 1.7; color: var(--ink-2); }
@@ -3038,48 +3054,144 @@ document.addEventListener('keydown', (e) => {
 
 // ---------- Tour ----------
 const TOUR_STEPS = [
-  {
-    title: 'Welcome to 32k-XAI',
-    body: 'This is a simulated society of thousands of agents with transparent, hand-written decision rules. Everything is traceable — no neural networks, no black boxes. This short tour will show you the four main tabs.',
-  },
-  {
-    title: 'Start with Scenarios',
-    body: 'The <strong>Scenarios</strong> tab has eight pre-built experiments. Click any one and you will see a settings page, then a Run button. That is all you need to reproduce a result.',
-  },
-  {
-    title: 'Design your own experiments',
-    body: 'The <strong>Design experiments</strong> tab lets you shift the population psychology, add interventions, target a specific subgroup, and average over multiple random seeds. This is where you build a real study.',
-  },
-  {
-    title: 'Trace individual decisions',
-    body: 'Every decision can be opened up. Click "Trace a decision" after running any scenario, and use the sliders to pick an agent and a moment. Every internal number behind that decision will be shown — with explanations you can click on.',
-  },
+  { sel: null, title: "Welcome to 32k-XAI",
+    body: "A simulated society of 32,000 cognitive agents. Every decision is transparent and traceable — no neural networks, no black boxes. This short tour shows you what each tab does." },
+  { sel: '[data-view="home"]', title: "Home",
+    body: "Your landing page. Quick links to run a scenario, build your own experiment, or trace a decision. Start here if you are new." },
+  { sel: '[data-view="crowd"]', title: "The crowd",
+    body: "The population every experiment runs on. Inspect any trait, see where it came from, filter to a subgroup, and compare that subgroup to the rest with effect sizes." },
+  { sel: '[data-view="scenarios"]', title: "Scenarios",
+    body: "Thirteen pre-built experiments, from a calm baseline to a resource crisis. Click any one to configure N, T, and seed, then run. Fastest way to see the platform work." },
+  { sel: '[data-view="design"]', title: "Design experiments",
+    body: "Build your own study: shift the population's psychology, add interventions, target a subgroup, and average across seeds. This is where real research happens." },
+  { sel: '[data-view="trace"]', title: "Trace a decision (from any result)",
+    body: "After running anything, click 'Trace a single decision' to see every internal number behind one agent's choice at one moment — 56 fields, each with a plain-English definition." },
+  { sel: '[data-view="view3d"]', title: "3D views",
+    body: "See the actual agents of a run in three dimensions. Compare two runs side by side; when they share the same seed and N, they drew the same agents and the difference is the intervention." },
+  { sel: '[data-view="library"]', title: "Library",
+    body: "Every run is auto-saved here. Rename, duplicate, delete, export. Select two and click Compare for a paired counterfactual — a test you cannot run on real humans." },
+  { sel: '[data-view="compare"]', title: "Compare",
+    body: "Run two or more scenarios side by side. The paired-vs-independent distinction is reported at the top of the results, since it changes what the comparison can claim." },
+  { sel: '[data-view="guide"]', title: "Guide",
+    body: "A full two-layer manual: plain-English on top of every chapter, technical detail underneath. Start here when you want depth on any feature." },
+  { sel: '[data-view="about"]', title: "About",
+    body: "Who built this, what it can answer, and the five human benchmarks the platform reproduces. Replay the tour from here any time." },
+  { sel: null, title: "You are ready",
+    body: "Recommended first step: open Scenarios, choose Baseline, and click Run simulation. Then explore the Crowd tab and the 3D views. Enjoy." },
 ];
+
 let tourStep = 0;
+let tourReturnFocus = null;
+
+function tourClear() {
+  document.querySelectorAll(".tour-spotlight").forEach(el => el.remove());
+  const tip = document.getElementById("tour-tip");
+  if (tip) { tip.style.display = "none"; tip.innerHTML = ""; }
+}
+
 function startTour() {
   tourStep = 0;
+  tourReturnFocus = document.activeElement;
+  document.getElementById("tour-backdrop").classList.add("open");
+  document.body.style.overflow = "hidden";
   renderTourStep();
-  document.getElementById('tour-backdrop').classList.add('open');
 }
+
 function renderTourStep() {
   const s = TOUR_STEPS[tourStep];
-  document.getElementById('tour-step').textContent = `Step ${tourStep + 1} of ${TOUR_STEPS.length}`;
-  document.getElementById('tour-title').textContent = s.title;
-  document.getElementById('tour-body').innerHTML = s.body;
-  document.getElementById('tour-next').textContent = (tourStep === TOUR_STEPS.length - 1) ? 'Got it' : 'Next';
+  const backdrop = document.getElementById("tour-backdrop");
+
+  // clear previous spotlight/tip
+  tourClear();
+  const _bd = document.getElementById('tour-backdrop');
+  _bd.style.background = s.sel ? 'transparent' : 'rgba(0,0,0,0.55)';
+
+  // build spotlight if this step targets an element
+  let spotBox = null;
+  if (s.sel) {
+    const target = document.querySelector(s.sel);
+    if (target) {
+      const r = target.getBoundingClientRect();
+      const pad = 6;
+      const spot = document.createElement("div");
+      spot.className = "tour-spotlight";
+      spot.style.left   = (r.left   - pad) + "px";
+      spot.style.top    = (r.top    - pad) + "px";
+      spot.style.width  = (r.width  + pad*2) + "px";
+      spot.style.height = (r.height + pad*2) + "px";
+      document.body.appendChild(spot);
+      spotBox = { r, pad };
+    }
+  }
+
+  // tooltip card
+  const tip = document.getElementById("tour-tip");
+  tip.style.display = "block";
+  tip.innerHTML =
+    '<div class="tour-step">' + (tourStep + 1) + " of " + TOUR_STEPS.length + '</div>' +
+    '<h2 class="tour-title">' + escapeHtml(s.title) + '</h2>' +
+    '<div class="tour-body">' + escapeHtml(s.body) + '</div>' +
+    '<div class="tour-actions">' +
+      '<button class="btn tertiary" onclick="skipTour()">Skip tour</button>' +
+      '<div style="display:flex;gap:10px;">' +
+        (tourStep > 0
+          ? '<button class="btn secondary" id="tour-prev" onclick="prevTourStep()">Back</button>'
+          : '') +
+        '<button class="btn primary" id="tour-next" onclick="nextTourStep()">' +
+          (tourStep === TOUR_STEPS.length - 1 ? "Finish" : "Next") +
+        '</button>' +
+      '</div>' +
+    '</div>';
+
+  // position the tip
+  if (spotBox) {
+    const tipRect = { w: 380, h: 260 };
+    const spaceRight = window.innerWidth - (spotBox.r.right + 16);
+    const spaceLeft  = spotBox.r.left - 16;
+    let tx;
+    if (spaceRight > tipRect.w)      tx = spotBox.r.right + 16;
+    else if (spaceLeft > tipRect.w)  tx = spotBox.r.left - tipRect.w - 16;
+    else                             tx = Math.max(16, Math.min(window.innerWidth - tipRect.w - 16, spotBox.r.left));
+    let ty = spotBox.r.top;
+    ty = Math.max(80, Math.min(window.innerHeight - tipRect.h - 80, ty));
+    tip.style.left = tx + "px";
+    tip.style.top  = ty + "px";
+    tip.style.transform = "none";
+  } else {
+    // centered for welcome/done
+    tip.style.left = "50%";
+    tip.style.top  = "50%";
+    tip.style.transform = "translate(-50%, -50%)";
+  }
 }
+
 function nextTourStep() {
   tourStep += 1;
-  if (tourStep >= TOUR_STEPS.length) {
-    skipTour();
-    return;
-  }
+  if (tourStep >= TOUR_STEPS.length) { skipTour(); return; }
   renderTourStep();
 }
-function skipTour() {
-  document.getElementById('tour-backdrop').classList.remove('open');
-  try { localStorage.setItem('xai32k.tour_seen.v1', '1'); } catch (e) {}
+
+function prevTourStep() {
+  if (tourStep <= 0) return;
+  tourStep -= 1;
+  renderTourStep();
 }
+
+function skipTour() {
+  tourClear();
+  document.getElementById("tour-backdrop").classList.remove("open");
+  document.body.style.overflow = "";
+  try { localStorage.setItem("xai32k.tour_seen.v1", "1"); } catch (e) {}
+  if (tourReturnFocus && tourReturnFocus.focus) {
+    try { tourReturnFocus.focus(); } catch (e) {}
+  }
+}
+
+window.addEventListener("resize", () => {
+  if (document.getElementById("tour-backdrop").classList.contains("open")) {
+    renderTourStep();
+  }
+});
 
 // Auto-show tour on first launch
 window.addEventListener('DOMContentLoaded', () => {
@@ -5946,17 +6058,8 @@ crowdInit();
 </div>
 
 <!-- First-launch tour -->
-<div id="tour-backdrop" class="tour-backdrop">
-  <div class="tour-card">
-    <div class="tour-step" id="tour-step">Step 1 of 4</div>
-    <h2 class="tour-title" id="tour-title"></h2>
-    <div class="tour-body" id="tour-body"></div>
-    <div class="tour-actions">
-      <button class="btn tertiary" onclick="skipTour()">Skip</button>
-      <button class="btn primary" id="tour-next" onclick="nextTourStep()">Next</button>
-    </div>
-  </div>
-</div>
+<div id="tour-backdrop" class="tour-backdrop"></div>
+<div id="tour-tip" role="dialog" aria-modal="true"></div>
 
 </body>
 </html>
