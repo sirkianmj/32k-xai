@@ -633,11 +633,53 @@ Repository layout:
 
 ## 📄 License
 
-[MIT](LICENSE) © 2026 Kian Mansouri Jamshidi
+**32k-XAI Citation License 1.0** © 2026 Kian Mansouri Jamshidi and Sabihe Khorshidi.
+
+> **The deal, in one sentence:** use it for anything you want — commercial,
+> academic, personal — but **you must cite it**. Citation is a legal condition
+> of the license, not a polite request. If you cannot cite it, you need a
+> separate commercial license.
+
+**What this license gives you:**
+
+- ✅ Use the software for any purpose, commercial or non-commercial
+- ✅ Modify it, redistribute it, sell it, sublicense it
+- ✅ Incorporate it into commercial products and paid services
+- ✅ Use it in academic research without restriction
+
+**What it requires of you:**
+
+- 📝 **Cite the software in any project that uses it** — papers, products,
+  theses, reports, internal tools, teaching materials, derivative works,
+  and any public distribution. See [`CITATION.cff`](CITATION.cff) for the
+  exact format.
+- 📎 Preserve the copyright notice and this license in all copies
+- 🚫 Do not claim the authors endorse your project without permission
+
+The license follows the **US-align / TM-align precedent** (Zhang Lab, Stanford),
+which has been used for over a decade on research software that requires
+citation from all downstream users.
+
+Read the full text: [`LICENSE`](LICENSE). For commercial licensing, or any use
+that cannot comply with the citation requirement, contact the authors via the
+repository.
+
+[![License](https://img.shields.io/badge/license-32k--XAI%20Citation%201.0-0a84ff?style=flat-square)](LICENSE)
+[![Citation Required](https://img.shields.io/badge/citation-legally%20required-a1150d?style=flat-square)](#-citation)
 
 ---
 
+
 ## 📝 Citation
+
+> [!IMPORTANT]
+> **Citation is required by the license** for any project that uses 32k-XAI —
+> academic, commercial, internal, or personal. See Section 3.1 of
+> [`LICENSE`](LICENSE). The [`CITATION.cff`](CITATION.cff) file is the
+> authoritative citation record, and GitHub renders it automatically in the
+> sidebar of this repository.
+
+**BibTeX:**
 
 ```bibtex
 @software{mansouri_jamshidi_2026_32kxai,
@@ -645,8 +687,32 @@ Repository layout:
   title   = {{32k-XAI: Mechanistic simulation of 32,000 cognitive agents}},
   year    = 2026,
   version = {2.0},
+  license = {32k-XAI Citation License 1.0},
   url     = {https://github.com/sirkianmj/32k-xai}
 }
+```
+
+**APA:**
+
+```
+Mansouri Jamshidi, K., & Khorshidi, S. (2026). 32k-XAI: Mechanistic simulation
+of 32,000 cognitive agents (Version 2.0) [Computer software]. 32k-XAI Citation
+License 1.0. https://github.com/sirkianmj/32k-xai
+```
+
+**Plain text (minimum acceptable form):**
+
+```
+This work uses 32k-XAI, developed by Kian Mansouri Jamshidi and Sabihe
+Khorshidi (https://github.com/sirkianmj/32k-xai).
+```
+
+**Related publication** — if your work builds on the Dark Triad bifactor model, also cite:
+
+```
+Khorshidi, S., & Mansouri Jamshidi, K. (2026). The Dark Triad as a Multi-Layered
+Structure: A Triangulation of Classical Psychometrics and Explainable Machine
+Learning. SSRN Electronic Journal. https://ssrn.com/abstract=7306299
 ```
 
 ---

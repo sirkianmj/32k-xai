@@ -1,0 +1,116 @@
+cff-version: 1.2.0
+message: "If you use this software, you are required by its license to cite it. Use the metadata below."
+title: "32k-XAI: Mechanistic simulation of 32,000 cognitive agents"
+abstract: >-
+  A research platform for simulating a synthetic population of 32,000
+  autonomous cognitive agents, each governed by a transparent,
+  mechanistically interpretable decision architecture parameterized by
+  empirically grounded psychological variables. Enables causal, glass-box
+  interrogation of emergent social phenomena by tracing macro-level
+  outcomes to specific cognitive parameters at the individual level.
+  No neural networks. No large language models. Every decision traceable
+  to a named parameter with documented uncertainty and provenance.
+type: software
+version: "2.0"
+date-released: "2026-10-12"
+license: "LicenseRef-32kXAI-Citation-1.0"
+license-url: "https://github.com/sirkianmj/32k-xai/blob/main/LICENSE"
+repository-code: "https://github.com/sirkianmj/32k-xai"
+url: "https://github.com/sirkianmj/32k-xai"
+keywords:
+  - cognitive simulation
+  - multi-agent reinforcement learning
+  - explainable AI
+  - XAI
+  - psychometric mapping
+  - Vine Copula
+  - bifactor model
+  - Dark Triad
+  - DASS
+  - Fehr-Schmidt
+  - ultimatum game
+  - trust game
+  - mechanistic interpretability
+  - JAX
+  - computational social science
+authors:
+  - family-names: Mansouri Jamshidi
+    given-names: Kian
+    affiliation: "XAI Protocol Engineering, HPC"
+    email: "sirkianmj@users.noreply.github.com"
+  - family-names: Khorshidi
+    given-names: Sabihe
+    affiliation: "Psychometric Mapping, Empirical Validation"
+preferred-citation:
+  type: article
+  title: "The Dark Triad as a Multi-Layered Structure: A Triangulation of Classical Psychometrics and Explainable Machine Learning"
+  authors:
+    - family-names: Khorshidi
+      given-names: Sabihe
+    - family-names: Mansouri Jamshidi
+      given-names: Kian
+  journal: "SSRN Electronic Journal"
+  year: 2026
+  url: "https://ssrn.com/abstract=7306299"
+references:
+  - type: article
+    title: "A Theory of Fairness, Competition, and Cooperation"
+    authors:
+      - family-names: Fehr
+        given-names: Ernst
+      - family-names: Schmidt
+        given-names: Klaus M.
+    journal: "Quarterly Journal of Economics"
+    volume: 114
+    issue: 3
+    start: 817
+    end: 868
+    year: 1999
+    doi: "10.1162/003355399556151"
+  - type: article
+    title: "Cultural differences in ultimatum game experiments: Evidence from a meta-analysis"
+    authors:
+      - family-names: Oosterbeek
+        given-names: Hessel
+      - family-names: Sloof
+        given-names: Randolph
+      - family-names: Van De Kuilen
+        given-names: Gijs
+    journal: "Experimental Economics"
+    volume: 7
+    issue: 2
+    start: 171
+    end: 188
+    year: 2004
+  - type: article
+    title: "Trust games: A meta-analysis"
+    authors:
+      - family-names: Johnson
+        given-names: Noel D.
+      - family-names: Mislin
+        given-names: Alexandra A.
+    journal: "Journal of Economic Psychology"
+    volume: 32
+    issue: 5
+    start: 865
+    end: 889
+    year: 2011
+  - type: article
+    title: "Model-based influences on humans' choices and striatal prediction errors"
+    authors:
+      - family-names: Daw
+        given-names: Nathaniel D.
+      - family-names: Gershman
+        given-names: Samuel J.
+      - family-names: Seymour
+        given-names: Ben
+      - family-names: Dayan
+        given-names: Peter
+      - family-names: Dolan
+        given-names: Raymond J.
+    journal: "Neuron"
+    volume: 69
+    issue: 6
+    start: 1204
+    end: 1215
+    year: 2011
