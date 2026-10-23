@@ -29,7 +29,7 @@ jobs:
         run: |
           pip install "jax[cpu]" numpy scipy pandas networkx tqdm
           pip install fastapi "uvicorn[standard]"
-          pip install pywebview pyinstaller
+          pip install pywebview pythonnet clr-loader pyinstaller
 
       - name: Build with PyInstaller
         run: |

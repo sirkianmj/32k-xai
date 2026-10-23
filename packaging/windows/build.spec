@@ -77,10 +77,13 @@ hiddenimports = [
     "webview",
     "webview.platforms.edgechromium",
     "webview.platforms.winforms",
+    "clr",
+    "pythonnet",
+    "clr_loader",
 ]
 
 # Collect the whole jax / jaxlib / webview trees so no DLL is missed
-for pkg in ("jax", "jaxlib", "webview"):
+for pkg in ("jax", "jaxlib", "webview", "pythonnet", "clr_loader"):
     try:
         d, b, h = collect_all(pkg)
         datas += d
@@ -97,7 +100,7 @@ a = Analysis(
     datas=datas,
     hiddenimports=hiddenimports,
     hookspath=[],
-    runtime_hooks=[],
+    runtime_hooks=[str(REPO / "packaging" / "windows" / "rthook_pythonnet.py")],
     excludes=["tkinter", "matplotlib", "PyQt5", "PyQt6", "PySide2", "PySide6"],
     noarchive=False,
 )
