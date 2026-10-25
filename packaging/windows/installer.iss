@@ -1,4 +1,5 @@
 [Setup]
+SourceDir=..\..
 AppName=32k-XAI
 AppVersion=2.0
 AppPublisher=Kian Mansouri Jamshidi & Sabihe Khorshidi
