@@ -10,7 +10,7 @@ from engine_v5_ckpt import run_with_checkpoints
 from xai_trace import trace_agent, TRACE_DIM, TRACE_KEYS
 
 CKPT_DIR = Path(__file__).parent / "ckpt_p3_test"
-PARAMS = Path.home() / "projects/xai_project/work_g2/synthetic_32k.pkl"
+PARAMS = Path(os.environ.get("P6C_PARAMS", Path.home() / "projects/xai_project/work_g2/synthetic_32k.pkl"))
 N_TICKS = 500
 SEED = 42
 N = E.WS_N
