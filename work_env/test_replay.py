@@ -20,7 +20,7 @@ N = WS_N
 N_TICKS = 500
 SEED = 42
 CKPT_DIR = Path(__file__).parent / "ckpt_p2g"
-PARAMS = Path.home() / "projects/xai_project/work_g2/synthetic_32k.pkl"
+PARAMS = Path(os.environ.get("P6C_PARAMS", Path.home() / "projects/xai_project/work_g2/synthetic_32k.pkl"))
 
 def run_reference(params_pkl, n_ticks, seed, N):
     P_np = load_all(params_pkl)
