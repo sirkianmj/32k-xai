@@ -29,4 +29,5 @@ jobs:
           JAX_PLATFORMS: cpu
         run: |
           cd work_env
-          python -m pytest test_replay.py test_xai_trace.py -v
+          python test_replay.py
+          python test_xai_trace.py
