@@ -28,3 +28,9 @@ jax_install.log
 pip_upgrade.log
 /score_ipip.log
 work_env/*.pre_*
+# Build artifacts and installers
+dist/
+build/
+release/
+XAI-32k.dmg
+.venv-build-mac/
