@@ -1539,8 +1539,12 @@ async function runScenario() {
     sessionSaveRun(state.current, N, T, seed, data);
     libraryAutoSave('scenario');
   } catch (e) {
+    let msg = e.message;
+    if (msg === 'Failed to fetch') {
+      msg = 'The engine crashed or ran out of memory. Please check the "xai32k_debug.log" file on your Desktop.';
+    }
     document.getElementById('run-progress').innerHTML =
-      `<div class="notice error">Run failed: ${e.message}</div>`;
+      `<div class="notice error">Run failed: ${msg}</div>`;
   } finally {
     btn.disabled = false;
     btn.textContent = 'Run simulation';

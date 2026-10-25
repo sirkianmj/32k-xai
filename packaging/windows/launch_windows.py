@@ -6,6 +6,15 @@ subprocess to avoid the PyInstaller sys.executable fork-bomb issue.
 """
 import os, sys, time
 from pathlib import Path
+# Redirect stdout/stderr to a log file on the Desktop for debugging
+log_path = Path.home() / "Desktop" / "xai32k_debug.log"
+try:
+    sys.stdout = open(log_path, "a", buffering=1, encoding="utf-8")
+    sys.stderr = sys.stdout
+    print("=== 32k-XAI Launcher Started ===")
+except Exception:
+    pass
+from pathlib import Path
 import threading
 
 # --- locate data root ---------------------------------------------------
@@ -22,6 +31,7 @@ WORK_ENV = APP_DIR / "work_env" if (APP_DIR / "work_env").exists() else APP_DIR
 WORK_G2  = (DATA_ROOT / "work_g2") if (DATA_ROOT / "work_g2").exists() else (REPO / "work_g2")
 
 os.environ.setdefault("JAX_PLATFORMS", "cpu")
+os.environ.setdefault("XLA_FLAGS", "--xla_cpu_multi_thread_eigen=false intra_op_parallelism_threads=1")
 os.environ.setdefault("XLA_PYTHON_CLIENT_PREALLOCATE", "false")
 os.environ.setdefault("P6C_PARAMS", str(WORK_G2 / "synthetic_32k_p6d.pkl"))
 os.chdir(str(WORK_ENV))
