@@ -1,0 +1,46 @@
+name: Sign Existing Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to sign (e.g., v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  sign:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3.6.0 # Pin to a specific version
+
+      - name: Download release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p release-assets
+          gh release download ${{ github.event.inputs.tag }} --dir release-assets
+
+      - name: Sign assets
+        run: |
+          cd release-assets
+          for asset in *; do
+            if [[ "$asset" != *.sigstore.json ]]; then
+              echo "Signing $asset..."
+              cosign sign-blob --yes --bundle "${asset}.sigstore.json" "$asset"
+            fi
+          done
+
+      - name: Upload signatures to release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload ${{ github.event.inputs.tag }} release-assets/*.sigstore.json
