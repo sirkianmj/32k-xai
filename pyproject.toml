@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "32k-xai"
+version = "1.0.1"
+description = "A mechanistic simulation platform for 32,000 cognitive agents."
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Kian Mansouri Jamshidi", email = "sirkianmj@users.noreply.github.com"},
+    {name = "Sabihe Khorshidi"}
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "jax[cpu]",
+    "numpy",
+    "scipy",
+    "pandas",
+    "networkx",
+    "tqdm",
+    "fastapi",
+    "uvicorn[standard]"
+]
+
+[tool.setuptools]
+packages = ["work_env"]

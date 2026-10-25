@@ -634,7 +634,7 @@ Repository layout:
 
 ## 📄 License
 
-**32k-XAI Citation License 1.0** © 2026 Kian Mansouri Jamshidi and Sabihe Khorshidi.
+**MIT License** © 2026 Kian Mansouri Jamshidi and Sabihe Khorshidi.
 
 > **The deal, in one sentence:** use it for anything you want — commercial,
 > academic, personal — but **you must cite it**. Citation is a legal condition
@@ -665,7 +665,7 @@ Read the full text: [`LICENSE`](LICENSE). For commercial licensing, or any use
 that cannot comply with the citation requirement, contact the authors via the
 repository.
 
-[![License](https://img.shields.io/badge/license-32k--XAI%20Citation%201.0-0a84ff?style=flat-square)](LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-30d158?style=flat-square)](LICENSE)
 [![Citation Required](https://img.shields.io/badge/citation-legally%20required-a1150d?style=flat-square)](#-citation)
 
 ---
