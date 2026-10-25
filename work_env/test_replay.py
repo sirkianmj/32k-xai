@@ -24,6 +24,10 @@ PARAMS = Path(os.environ.get("P6C_PARAMS", Path.home() / "projects/xai_project/w
 
 def run_reference(params_pkl, n_ticks, seed, N):
     P_np = load_all(params_pkl, required=False)
+    # Inject missing inert parameters for the legacy engine_v5 test
+    for missing in ['lambda_norm', 's_spite', 'tau_sens', 'kappa_ctx']:
+        if missing not in P_np:
+            P_np[missing] = np.zeros(N, dtype=np.float32)
     P, neighbors, _ = _prepare(P_np, N)
     step_fn = make_step(neighbors, P)
     keys = random.split(random.PRNGKey(seed), n_ticks)
