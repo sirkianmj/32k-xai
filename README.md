@@ -9,6 +9,7 @@
 ### Every agent decision traceable to a named parameter.
 
 [![Version](https://img.shields.io/badge/version-2.0-0a84ff?style=flat-square)](https://github.com/sirkianmj/32k-xai/releases)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/sirkianmj/32k-xai/badge)](https://securityscorecards.dev/viewer/?uri=github.com/sirkianmj/32k-xai)
 [![Calibration](https://img.shields.io/badge/human%20benchmarks-5%2F5%20PASS-30d158?style=flat-square)](#-the-five-human-benchmarks)
 [![Agents](https://img.shields.io/badge/agents-32%2C000-5e5ce6?style=flat-square)](#-the-population)
 [![Python](https://img.shields.io/badge/python-3.12-3776ab?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
