@@ -4,6 +4,8 @@ on:
     tags:
       - "v*"
 
+permissions: read-all
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -31,7 +33,7 @@ jobs:
       actions: read
       id-token: write
       contents: write
-    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.1.0
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@a3b28f3a52a21ed657e0fd3b57f7a63a0eb4737f # v2.1.0
     with:
       base64-subjects: "${{ needs.build.outputs.hashes }}"
       upload-assets: true
