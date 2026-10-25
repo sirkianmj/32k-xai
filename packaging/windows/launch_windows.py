@@ -1,20 +1,18 @@
 """Windows launcher for 32k-XAI.
 
-Starts uvicorn as a subprocess, waits for /api/health, then opens a
-pywebview (WebView2) window. Mirrors launch.py on macOS but uses the
-frozen-bundle data directory (sys._MEIPASS) when running as a PyInstaller
-.exe.
+Runs the Uvicorn server in a background thread, waits for /api/health,
+then opens a pywebview (WebView2) window. Uses threading rather than
+subprocess to avoid the PyInstaller sys.executable fork-bomb issue.
 """
-import os, sys, time, signal, subprocess
+import os, sys, time
 from pathlib import Path
+import threading
 
 # --- locate data root ---------------------------------------------------
 if getattr(sys, "frozen", False):
-    # PyInstaller onefile: data lives in sys._MEIPASS
     DATA_ROOT = Path(sys._MEIPASS)
     APP_DIR   = DATA_ROOT / "app"
 else:
-    # Running from source: packaging/windows/ -> repo root
     HERE = Path(__file__).resolve().parent
     REPO = HERE.parent.parent
     APP_DIR = REPO / "work_env"
@@ -30,10 +28,14 @@ os.chdir(str(WORK_ENV))
 sys.path.insert(0, str(WORK_ENV))
 
 import webview
+import uvicorn
+from dashboard import app
 
 PORT = 8765
 URL  = f"http://127.0.0.1:{PORT}"
 
+def _run_server():
+    uvicorn.run(app, host="127.0.0.1", port=PORT, log_level="warning")
 
 def _wait_for_health(timeout=180):
     import urllib.request
@@ -48,20 +50,10 @@ def _wait_for_health(timeout=180):
         time.sleep(0.5)
     return False
 
-
 def main():
-    env = dict(os.environ)
-    env["PYTHONUNBUFFERED"] = "1"
-
-    # uvicorn runs from WORK_ENV so `dashboard:app` resolves
-    proc = subprocess.Popen(
-        [sys.executable, "-m", "uvicorn", "dashboard:app",
-         "--host", "127.0.0.1", "--port", str(PORT), "--log-level", "warning"],
-        cwd=str(WORK_ENV),
-        env=env,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
+    # Start Uvicorn in a daemon thread. It will die when the main thread exits.
+    server_thread = threading.Thread(target=_run_server, daemon=True)
+    server_thread.start()
 
     window = webview.create_window(
         "32k-XAI Cognitive Simulation",
@@ -82,18 +74,13 @@ def main():
             window.load_html(
                 "<html><body style='font-family:-apple-system,sans-serif;padding:40px'>"
                 "<h2>Startup failed</h2><p>The engine did not respond in time.</p>"
-                "<p>Close this window and try again. If it persists, run the .exe "
-                "from a terminal to see the error output.</p></body></html>")
+                "<p>Close this window and try again.</p></body></html>")
 
     try:
         webview.start(background, debug=False)
-    finally:
-        proc.send_signal(signal.SIGTERM)
-        try:
-            proc.wait(timeout=5)
-        except subprocess.TimeoutExpired:
-            proc.kill()
-
+    except Exception as e:
+        print(f"Fatal error: {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()

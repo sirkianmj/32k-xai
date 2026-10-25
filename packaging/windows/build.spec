@@ -80,6 +80,7 @@ hiddenimports = [
     "clr",
     "pythonnet",
     "clr_loader",
+    "dashboard",
 ]
 
 # Collect the whole jax / jaxlib / webview trees so no DLL is missed
