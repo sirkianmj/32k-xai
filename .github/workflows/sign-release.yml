@@ -8,19 +8,20 @@ on:
         required: true
         default: 'v1.0.0'
 
-permissions:
-  contents: write
-  id-token: write
+permissions: read-all
 
 jobs:
   sign:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Install cosign
-        uses: sigstore/cosign-installer@v3.6.0 # Pin to a specific version
+        uses: sigstore/cosign-installer@v3.6.0
 
       - name: Download release assets
         env:
