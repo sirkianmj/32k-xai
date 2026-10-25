@@ -23,7 +23,7 @@ CKPT_DIR = Path(__file__).parent / "ckpt_p2g"
 PARAMS = Path(os.environ.get("P6C_PARAMS", Path.home() / "projects/xai_project/work_g2/synthetic_32k.pkl"))
 
 def run_reference(params_pkl, n_ticks, seed, N):
-    P_np = load_all(params_pkl)
+    P_np = load_all(params_pkl, required=False)
     P, neighbors, _ = _prepare(P_np, N)
     step_fn = make_step(neighbors, P)
     keys = random.split(random.PRNGKey(seed), n_ticks)
