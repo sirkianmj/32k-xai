@@ -29,7 +29,21 @@ jobs:
         run: |
           pip install "jax[cpu]" numpy scipy pandas networkx tqdm
           pip install fastapi "uvicorn[standard]"
-          pip install pywebview pythonnet clr-loader pyinstaller
+          pip install pywebview pythonnet clr-loader pyinstaller pillow
+
+      - name: Convert Mac icon to Windows .ico
+        shell: pwsh
+        run: |
+          $src = "assets/app-icon.png"
+          if (!(Test-Path $src)) {
+            Write-Error "Source icon not found: $src"
+            exit 1
+          }
+          python -c "from PIL import Image; img = Image.open('assets/app-icon.png'); img.save('packaging/windows/icon.ico', format='ICO', sizes=[(16,16),(32,32),(48,48),(64,64),(128,128),(256,256)])"
+          if (!(Test-Path "packaging/windows/icon.ico")) {
+            Write-Error "Icon conversion failed"
+            exit 1
+          }
 
       - name: Build with PyInstaller
         run: |
@@ -42,22 +56,42 @@ jobs:
             Write-Error "XAI-32k.exe not found"
             exit 1
           }
-          Get-ChildItem dist/XAI-32k | Measure-Object -Property Length -Sum |
-            Select-Object Count, @{N='SizeMB';E={[math]::Round($_.Sum/1MB,1)}}
+
+      - name: Install Inno Setup
+        run: choco install innosetup -y --no-progress
+        shell: pwsh
+
+      - name: Build the Windows wizard installer
+        shell: pwsh
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" packaging/windows/installer.iss
+          if (!(Test-Path "dist/XAI-32k-Setup.exe")) {
+            Write-Error "Installer not created"
+            exit 1
+          }
 
       - name: Zip the portable folder
         shell: pwsh
         run: Compress-Archive -Path dist/XAI-32k -DestinationPath XAI-32k-windows.zip
 
-      - name: Upload as workflow artifact
+      - name: Upload portable zip
         uses: actions/upload-artifact@v4
         with:
-          name: XAI-32k-windows
+          name: XAI-32k-windows-portable
           path: XAI-32k-windows.zip
           retention-days: 30
 
-      - name: Attach to release (on tag)
+      - name: Upload wizard installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: XAI-32k-windows-setup
+          path: dist/XAI-32k-Setup.exe
+          retention-days: 30
+
+      - name: Attach both to release (on tag)
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: XAI-32k-windows.zip
+          files: |
+            XAI-32k-windows.zip
+            dist/XAI-32k-Setup.exe
