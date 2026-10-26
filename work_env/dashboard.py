@@ -246,7 +246,7 @@ def _run_design(copula_ops, shocks, N, T, seeds):
     run_id = _run_id_for(copula_ops, N, seeds[0], shocks=resolved_shocks)
     _store_run(run_id, df)
 
-    tmp = Path(tempfile.gettempdir()) / f"p6c_design_{uuid.uuid4().hex}.pkl"
+    tmp = WORK / f"p6c_design_{uuid.uuid4().hex}.pkl"
     df.to_pickle(tmp)
     prev_copula = os.environ.get("P6C_PARAMS", str(DEFAULT_COPULA))
     try:
