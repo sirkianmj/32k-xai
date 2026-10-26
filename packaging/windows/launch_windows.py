@@ -60,6 +60,42 @@ def _wait_for_health(timeout=180):
         time.sleep(0.5)
     return False
 
+
+class Api:
+    """Exposed to JavaScript as window.pywebview.api.<method>."""
+    def __init__(self):
+        self.window = None
+
+    def save_file(self, name, content_b64, file_type="json"):
+        if self.window is None:
+            return {"ok": False, "error": "no window"}
+        file_types = {
+            "json": ("JSON files (*.json)",),
+            "csv":  ("CSV files (*.csv)",),
+            "svg":  ("SVG images (*.svg)",),
+            "png":  ("PNG images (*.png)",),
+            "txt":  ("Text files (*.txt)",),
+        }.get(file_type, ("All files (*.*)",))
+        try:
+            target = self.window.create_file_dialog(
+                webview.SAVE_DIALOG,
+                save_filename=name,
+                file_types=file_types,
+            )
+        except Exception as e:
+            return {"ok": False, "error": f"dialog failed: {e}"}
+        if not target:
+            return {"ok": False, "error": "cancelled"}
+        path = target[0] if isinstance(target, (list, tuple)) else target
+        try:
+            data = base64.b64decode(content_b64)
+            Path(path).write_bytes(data)
+            return {"ok": True, "path": str(path)}
+        except Exception as e:
+            return {"ok": False, "error": f"write failed: {e}"}
+
+API = Api()
+
 def main():
     # Start Uvicorn in a daemon thread. It will die when the main thread exits.
     server_thread = threading.Thread(target=_run_server, daemon=True)
@@ -75,7 +111,9 @@ def main():
         width=1400, height=900, min_size=(900, 600),
         text_select=True,
         background_color="#f6f7f9",
+        js_api=API,
     )
+    API.window = window
 
     def background():
         if _wait_for_health():
