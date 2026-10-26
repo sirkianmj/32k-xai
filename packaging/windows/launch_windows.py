@@ -4,6 +4,7 @@ Runs the Uvicorn server in a background thread, waits for /api/health,
 then opens a pywebview (WebView2) window. Uses threading rather than
 subprocess to avoid the PyInstaller sys.executable fork-bomb issue.
 """
+import base64
 import os, sys, time
 from pathlib import Path
 # Redirect stdout/stderr to a log file on the Desktop for debugging
