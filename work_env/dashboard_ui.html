@@ -3303,7 +3303,7 @@ function renderTourStep() {
   // clear previous spotlight/tip
   tourClear();
   const _bd = document.getElementById('tour-backdrop');
-  _bd.style.background = s.sel ? 'transparent' : 'rgba(0,0,0,0.55)';
+  _bd.style.background = 'rgba(0,0,0,0.55)';
 
   // build spotlight if this step targets an element
   let spotBox = null;
@@ -3393,14 +3393,29 @@ window.addEventListener("resize", () => {
   }
 });
 
-// Auto-show tour on first launch
+// Auto-show welcome prompt on first launch
 window.addEventListener('DOMContentLoaded', () => {
   try {
-    if (!localStorage.getItem('xai32k.tour_seen.v1')) {
-      setTimeout(startTour, 1200);
+    if (!localStorage.getItem('xai32k.tour_never_show')) {
+      document.getElementById('welcome-backdrop').style.display = 'flex';
     }
-  } catch (e) { /* private mode etc. */ }
+  } catch (e) {}
 });
+
+function acceptWelcome() {
+  if (document.getElementById('tour-never-show').checked) {
+    try { localStorage.setItem('xai32k.tour_never_show', '1'); } catch(e){}
+  }
+  document.getElementById('welcome-backdrop').style.display = 'none';
+  startTour();
+}
+
+function dismissWelcome() {
+  if (document.getElementById('tour-never-show').checked) {
+    try { localStorage.setItem('xai32k.tour_never_show', '1'); } catch(e){}
+  }
+  document.getElementById('welcome-backdrop').style.display = 'none';
+}
 
 // Helper: info button markup
 function infoIcon(key) {
@@ -6667,6 +6682,26 @@ function exportProfileSvg() {
 loadScenarios();
 crowdInit();
 </script>
+
+<!-- Welcome prompt -->
+<div id="welcome-backdrop" class="modal-backdrop" style="z-index: 10000;">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-head">
+      <h3 class="modal-title">Welcome to 32k-XAI</h3>
+    </div>
+    <div class="modal-body">
+      <p class="lede">Would you like a quick tour of the platform?</p>
+      <p style="color:var(--ink-3);font-size:13px;">This short walkthrough will show you the key features of the simulation environment.</p>
+      <label style="display:flex; align-items:center; gap:8px; margin-top:16px; font-size:13px; color:var(--ink-3); cursor:pointer;">
+        <input type="checkbox" id="tour-never-show"> Do not show this again
+      </label>
+    </div>
+    <div class="modal-body" style="display:flex; justify-content:flex-end; gap:10px; padding-top:0;">
+      <button class="btn secondary" onclick="dismissWelcome()">No, thanks</button>
+      <button class="btn primary" onclick="acceptWelcome()">Start tour</button>
+    </div>
+  </div>
+</div>
 
 <!-- Info modal -->
 <div id="modal-backdrop" class="modal-backdrop" onclick="if(event.target===this)closeInfo()">
