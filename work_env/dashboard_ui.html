@@ -277,7 +277,7 @@ table.cmp tr:last-child td { border-bottom: 0; }
 .modal-backdrop {
   position: fixed; inset: 0; background: rgba(0,0,0,0.35);
   display: none; align-items: center; justify-content: center;
-  z-index: 9999; padding: 24px; backdrop-filter: blur(2px);
+  z-index: 9999; padding: 24px;
 }
 .modal-backdrop.open { display: flex; }
 .modal {
@@ -1375,7 +1375,7 @@ table.cmp2 td.delta.ns  { color: var(--ink-3); font-weight: 400; }
       <p class="page-sub">A research tool for causal, individual-level interrogation of emergent social behaviour.</p>
 
       <div class="btn-row" style="margin-bottom:20px;">
-        <button class="btn primary" onclick="startTour()">Replay the intro tour</button>
+        
         <button class="btn secondary" onclick="goTo('guide')">Open the Guide</button>
       </div>
 
@@ -3386,6 +3386,12 @@ function skipTour() {
   document.body.style.overflow = "";
   try { localStorage.setItem("xai32k.tour_seen.v1", "1"); } catch (e) {}
 }
+
+window.addEventListener("resize", () => {
+  if (document.getElementById("tour-backdrop").classList.contains("open")) {
+    renderTourStep();
+  }
+});
 
 window.addEventListener("resize", () => {
   if (document.getElementById("tour-backdrop").classList.contains("open")) {
@@ -6683,26 +6689,6 @@ loadScenarios();
 crowdInit();
 </script>
 
-<!-- Welcome prompt -->
-<div id="welcome-backdrop" class="modal-backdrop" style="z-index: 10000;">
-  <div class="modal" style="max-width:440px;">
-    <div class="modal-head">
-      <h3 class="modal-title">Welcome to 32k-XAI</h3>
-    </div>
-    <div class="modal-body">
-      <p class="lede">Would you like a quick tour of the platform?</p>
-      <p style="color:var(--ink-3);font-size:13px;">This short walkthrough will show you the key features of the simulation environment.</p>
-      <label style="display:flex; align-items:center; gap:8px; margin-top:16px; font-size:13px; color:var(--ink-3); cursor:pointer;">
-        <input type="checkbox" id="tour-never-show"> Do not show this again
-      </label>
-    </div>
-    <div class="modal-body" style="display:flex; justify-content:flex-end; gap:10px; padding-top:0;">
-      <button class="btn secondary" onclick="dismissWelcome()">No, thanks</button>
-      <button class="btn primary" onclick="acceptWelcome()">Start tour</button>
-    </div>
-  </div>
-</div>
-
 <!-- Info modal -->
 <div id="modal-backdrop" class="modal-backdrop" onclick="if(event.target===this)closeInfo()">
   <div class="modal" role="dialog" aria-modal="true">
@@ -6713,10 +6699,6 @@ crowdInit();
     <div class="modal-body" id="modal-body"></div>
   </div>
 </div>
-
-<!-- First-launch tour -->
-<div id="tour-backdrop" class="tour-backdrop"></div>
-<div id="tour-tip" role="dialog" aria-modal="true"></div>
 
 </body>
 </html>
