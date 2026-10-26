@@ -67,32 +67,43 @@ class Api:
         self.window = None
 
     def save_file(self, name, content_b64, file_type="json"):
-        if self.window is None:
-            return {"ok": False, "error": "no window"}
-        file_types = {
-            "json": ("JSON files (*.json)",),
-            "csv":  ("CSV files (*.csv)",),
-            "svg":  ("SVG images (*.svg)",),
-            "png":  ("PNG images (*.png)",),
-            "txt":  ("Text files (*.txt)",),
-        }.get(file_type, ("All files (*.*)",))
+        log_path = Path.home() / "Desktop" / "xai32k_save_debug.log"
         try:
-            target = self.window.create_file_dialog(
-                webview.SAVE_DIALOG,
-                save_filename=name,
-                file_types=file_types,
-            )
-        except Exception as e:
-            return {"ok": False, "error": f"dialog failed: {e}"}
-        if not target:
-            return {"ok": False, "error": "cancelled"}
-        path = target[0] if isinstance(target, (list, tuple)) else target
-        try:
-            data = base64.b64decode(content_b64)
-            Path(path).write_bytes(data)
-            return {"ok": True, "path": str(path)}
-        except Exception as e:
-            return {"ok": False, "error": f"write failed: {e}"}
+            with open(log_path, "a", encoding="utf-8") as f:
+                f.write(f"\n--- Save requested: {name} ---\n")
+            if self.window is None:
+                return {"ok": False, "error": "no window"}
+            file_types = {
+                "json": ("JSON files (*.json)",),
+                "csv":  ("CSV files (*.csv)",),
+                "svg":  ("SVG images (*.svg)",),
+                "png":  ("PNG images (*.png)",),
+                "txt":  ("Text files (*.txt)",),
+            }.get(file_type, ("All files (*.*)",))
+            try:
+                target = self.window.create_file_dialog(
+                    webview.SAVE_DIALOG,
+                    save_filename=name,
+                    file_types=file_types,
+                )
+            except Exception as e:
+                return {"ok": False, "error": f"dialog failed: {e}"}
+            if not target:
+                return {"ok": False, "error": "cancelled"}
+            
+            path = target[0] if isinstance(target, (list, tuple)) else target
+            path = str(path).strip("\0")  # Fix Windows null-byte bug
+            
+            try:
+                data = base64.b64decode(content_b64)
+                Path(path).write_bytes(data)
+                return {"ok": True, "path": str(path)}
+            except Exception as e:
+                with open(log_path, "a", encoding="utf-8") as f:
+                    f.write(f"WRITE FAILED: {e}\nPath: {path}\n")
+                return {"ok": False, "error": f"write failed: {e}"}
+        except Exception as outer_e:
+            return {"ok": False, "error": f"outer failed: {outer_e}"}
 
 API = Api()
 
