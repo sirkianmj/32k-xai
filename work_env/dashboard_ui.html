@@ -333,7 +333,7 @@ table.cmp tr:last-child td { border-bottom: 0; }
   position: fixed; z-index: 10001; pointer-events: none;
   border-radius: 10px;
   box-shadow: 0 0 0 3px #0a84ff, 0 0 0 9999px rgba(0,0,0,0.55);
-  transition: all 0.15s ease-out;
+  /* transition removed to prevent WebView2 freeze */
 }
 #tour-tip {
   position: fixed; z-index: 10002; display: none;
@@ -3280,7 +3280,10 @@ let tourStep = 0;
 let tourReturnFocus = null;
 
 function tourClear() {
-  document.querySelectorAll(".tour-spotlight").forEach(el => el.remove());
+  document.querySelectorAll(".tour-spotlight").forEach(el => {
+    el.style.boxShadow = "none"; // Clear heavy shadow first to avoid freeze
+    el.remove();
+  });
   const tip = document.getElementById("tour-tip");
   if (tip) { tip.style.display = "none"; tip.innerHTML = ""; }
 }
@@ -3374,13 +3377,14 @@ function prevTourStep() {
 }
 
 function skipTour() {
+  const backdrop = document.getElementById("tour-backdrop");
+  if (backdrop) {
+    backdrop.classList.remove("open");
+    backdrop.style.display = "none";
+  }
   tourClear();
-  document.getElementById("tour-backdrop").classList.remove("open");
   document.body.style.overflow = "";
   try { localStorage.setItem("xai32k.tour_seen.v1", "1"); } catch (e) {}
-  if (tourReturnFocus && tourReturnFocus.focus) {
-    try { tourReturnFocus.focus(); } catch (e) {}
-  }
 }
 
 window.addEventListener("resize", () => {
